@@ -6,19 +6,28 @@ import java.util.Properties;
 
 public final class PropertiesUtil {
 
-  private static final Properties PROPERTIES = loadProperties();
+  private static final Properties APPLICATION = loadProperties("application.properties");
+  private static final Properties HIKARICP = loadProperties("hikaricp.properties");
 
   private PropertiesUtil() {
   }
 
   public static String getProperty(String name) {
-    return PROPERTIES.getProperty(name);
+    return APPLICATION.getProperty(name);
   }
 
-  private static Properties loadProperties() {
+  public static Properties getApplicationProperties() {
+    return new Properties(APPLICATION);
+  }
+
+  public static Properties getHikariProperties() {
+    return new Properties(HIKARICP);
+  }
+
+  private static Properties loadProperties(String filename) {
 
     try (InputStream resource = PropertiesUtil.class.getClassLoader()
-        .getResourceAsStream("application.properties")) {
+        .getResourceAsStream(filename)) {
       Properties properties = new Properties();
       properties.load(resource);
       return properties;

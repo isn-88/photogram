@@ -2,7 +2,7 @@ package su.itpro;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import su.itpro.util.ConnectionManager;
+import su.itpro.util.DataSource;
 
 public class Main {
 
@@ -11,7 +11,7 @@ public class Main {
 
   public static void main(String[] args) {
 
-    try (Connection connection = ConnectionManager.open()) {
+    try (Connection connection = DataSource.getConnection()) {
       System.out.println(connection.getSchema());
 
     } catch (SQLException e) {
