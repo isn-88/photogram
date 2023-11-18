@@ -17,11 +17,11 @@ public final class PropertiesUtil {
   }
 
   public static Properties getApplicationProperties() {
-    return APPLICATION;
+    return new Properties(APPLICATION);
   }
 
   public static Properties getHikariProperties() {
-    return HIKARICP;
+    return new Properties(HIKARICP);
   }
 
   private static Properties loadProperties(String filename) {
