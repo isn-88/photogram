@@ -20,10 +20,10 @@ public class Main {
   public static void main(String[] args) {
 
     try (Connection connection = DataSource.getConnection()) {
-      //connection.setAutoCommit(false);
+      connection.setAutoCommit(false);
 
       List<Contact> contactList = generate();
-      save(contactList);
+      save(contactList, connection);
 
       UUID id = contactList.get(0).getId();
       findById(id, connection);
@@ -34,16 +34,16 @@ public class Main {
       UUID idToDelete = contactList.get(4).getId();
       delete(idToDelete, connection);
 
-      findAll();
+      findAll(connection);
 
-      //connection.commit();
+      connection.commit();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static void save(List<Contact> contactList) {
-    contactList.forEach(c -> ContactDao.getInstance().save(c));
+  private static void save(List<Contact> contactList, Connection connection) {
+    contactList.forEach(c -> ContactDao.getInstance().save(c, connection));
     System.out.println("Contacts saved successfully!\n");
   }
 
@@ -67,8 +67,8 @@ public class Main {
     }
   }
 
-  private static void findAll() {
-    List<Contact> allContacts = ContactDao.getInstance().findAll();
+  private static void findAll(Connection connection) {
+    List<Contact> allContacts = ContactDao.getInstance().findAll(connection);
     System.out.println("All contacts:");
     allContacts.forEach(System.out::println);
   }
