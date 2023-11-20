@@ -3,13 +3,17 @@ package su.itpro.photogram.entity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Contact {
 
-  private Long id;
+  private UUID id;
   private String email;
   private String phone;
   private Map<String, String> contacts;
+
+  public Contact() {
+  }
 
   public Contact(String email, String phone) {
     this(email, phone, new HashMap<>());
@@ -19,14 +23,18 @@ public class Contact {
     this(null, email, phone, contacts);
   }
 
-  public Contact(Long id, String email, String phone, Map<String, String> contacts) {
+  public Contact(UUID id, String email, String phone, Map<String, String> contacts) {
     this.id = id;
     this.email = email;
     this.phone = phone;
     this.contacts = contacts;
   }
 
-  public Long getId() {
+  public void addContact(String key, String value) {
+    contacts.put(key, value);
+  }
+
+  public UUID getId() {
     return id;
   }
 
@@ -42,7 +50,7 @@ public class Contact {
     return contacts;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

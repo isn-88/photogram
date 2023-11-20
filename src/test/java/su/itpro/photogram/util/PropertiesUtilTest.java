@@ -1,8 +1,9 @@
-package su.itpro.util;
+package su.itpro.photogram.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import su.itpro.photogram.util.PropertiesUtil;
 
 class PropertiesUtilTest {
 

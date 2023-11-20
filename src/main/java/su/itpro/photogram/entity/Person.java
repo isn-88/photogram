@@ -2,10 +2,11 @@ package su.itpro.photogram.entity;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Person {
 
-  private Long id;
+  private UUID id;
   private String firstName;
   private String lastName;
   private String middleName;
@@ -23,7 +24,7 @@ public class Person {
     this(null, firstName, lastName, middleName, contact, birthdate, icon);
   }
 
-  public Person(Long id,
+  public Person(UUID id,
                 String firstName,
                 String lastName,
                 String middleName,
@@ -39,7 +40,7 @@ public class Person {
     this.icon = icon;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -67,7 +68,7 @@ public class Person {
     return icon;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

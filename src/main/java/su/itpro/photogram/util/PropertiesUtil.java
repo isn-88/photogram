@@ -1,4 +1,4 @@
-package su.itpro.util;
+package su.itpro.photogram.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,11 +17,11 @@ public final class PropertiesUtil {
   }
 
   public static Properties getApplicationProperties() {
-    return new Properties(APPLICATION);
+    return APPLICATION;
   }
 
   public static Properties getHikariProperties() {
-    return new Properties(HIKARICP);
+    return HIKARICP;
   }
 
   private static Properties loadProperties(String filename) {

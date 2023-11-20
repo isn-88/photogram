@@ -2,10 +2,11 @@ package su.itpro.photogram.entity;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Icon {
 
-  private Long id;
+  private UUID id;
   private String name;
   private String type;
   private byte[] data;
@@ -14,14 +15,14 @@ public class Icon {
     this(null, name, type, data);
   }
 
-  public Icon(Long id, String name, String type, byte[] data) {
+  public Icon(UUID id, String name, String type, byte[] data) {
     this.id = id;
     this.name = name;
     this.type = type;
     this.data = data != null ? Arrays.copyOf(data, data.length) : new byte[0];
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -37,7 +38,7 @@ public class Icon {
     return Arrays.copyOf(data, data.length);
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

@@ -1,4 +1,4 @@
-package su.itpro.util;
+package su.itpro.photogram.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
