@@ -25,11 +25,11 @@ CREATE TABLE role
 CREATE TABLE person
 (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    first_name varchar(64) NOT NULL ,
-    last_name varchar(64) NOT NULL ,
+    first_name varchar(64) NOT NULL,
+    last_name varchar(64) NOT NULL,
     middle_name varchar(64),
-    contact_id uuid,
     birth_date date,
+    contact_id uuid REFERENCES contact (id),
     icon_id uuid REFERENCES icon (id)
 );
 

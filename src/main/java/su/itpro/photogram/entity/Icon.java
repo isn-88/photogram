@@ -11,6 +11,13 @@ public class Icon {
   private String type;
   private byte[] data;
 
+  public Icon() {
+  }
+
+  public Icon(UUID id) {
+    this.id = id;
+  }
+
   public Icon(String name, String type, byte[] data) {
     this(null, name, type, data);
   }

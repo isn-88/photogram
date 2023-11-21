@@ -15,6 +15,10 @@ public class Contact {
   public Contact() {
   }
 
+  public Contact(UUID id) {
+    this.id = id;
+  }
+
   public Contact(String email, String phone) {
     this(email, phone, new HashMap<>());
   }
