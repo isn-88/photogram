@@ -2,44 +2,52 @@ package su.itpro.photogram.entity;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Person {
 
-  private Long id;
+  private UUID id;
   private String firstName;
   private String lastName;
   private String middleName;
-  private Contact contact;
   private LocalDate birthdate;
+  private Contact contact;
   private Icon icon;
 
+
+  public Person() {
+  }
+
+  public Person(UUID id) {
+    this.id = id;
+  }
 
   public Person(String firstName,
                 String lastName,
                 String middleName,
-                Contact contact,
                 LocalDate birthdate,
+                Contact contact,
                 Icon icon) {
-    this(null, firstName, lastName, middleName, contact, birthdate, icon);
+    this(null, firstName, lastName, middleName, birthdate, contact, icon);
   }
 
-  public Person(Long id,
+  public Person(UUID id,
                 String firstName,
                 String lastName,
                 String middleName,
-                Contact contact,
                 LocalDate birthdate,
+                Contact contact,
                 Icon icon) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.middleName = middleName;
-    this.contact = contact;
     this.birthdate = birthdate;
+    this.contact = contact;
     this.icon = icon;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -55,19 +63,19 @@ public class Person {
     return middleName;
   }
 
-  public Contact getContact() {
-    return contact;
-  }
-
   public LocalDate getBirthdate() {
     return birthdate;
+  }
+
+  public Contact getContact() {
+    return contact;
   }
 
   public Icon getIcon() {
     return icon;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 
@@ -83,12 +91,12 @@ public class Person {
     this.middleName = middleName;
   }
 
-  public void setContact(Contact contact) {
-    this.contact = contact;
-  }
-
   public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
+  }
+
+  public void setContact(Contact contact) {
+    this.contact = contact;
   }
 
   public void setIcon(Icon icon) {

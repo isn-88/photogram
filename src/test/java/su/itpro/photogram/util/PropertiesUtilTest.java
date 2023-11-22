@@ -1,4 +1,4 @@
-package su.itpro.util;
+package su.itpro.photogram.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,29 +1,42 @@
 package su.itpro.photogram.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Account {
 
-  private Long id;
+  private UUID id;
   private Person person;
   private String login;
   private String password;
   private Role role;
   private Boolean isActive;
   private String description;
-  private LocalDateTime createDate;
-  private LocalDateTime lastActivity;
+  private Instant createDate;
+  private Instant lastActivity;
 
-  public Account(Long id,
+  public Account() {
+  }
+
+  public Account(Person person,
                  String login,
+                 String password,
+                 Role role,
+                 Boolean isActive,
+                 String description) {
+    this(null, person, login, password, role, isActive, description, Instant.now(), Instant.now());
+  }
+
+  public Account(UUID id,
                  Person person,
+                 String login,
                  String password,
                  Role role,
                  Boolean isActive,
                  String description,
-                 LocalDateTime createDate,
-                 LocalDateTime lastActivity) {
+                 Instant createDate,
+                 Instant lastActivity) {
     this.id = id;
     this.person = person;
     this.login = login;
@@ -35,7 +48,7 @@ public class Account {
     this.lastActivity = lastActivity;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -63,15 +76,15 @@ public class Account {
     return description;
   }
 
-  public LocalDateTime getCreateDate() {
+  public Instant getCreateDate() {
     return createDate;
   }
 
-  public LocalDateTime getLastActivity() {
+  public Instant getLastActivity() {
     return lastActivity;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 
@@ -99,11 +112,11 @@ public class Account {
     this.description = description;
   }
 
-  public void setCreateDate(LocalDateTime createDate) {
+  public void setCreateDate(Instant createDate) {
     this.createDate = createDate;
   }
 
-  public void setLastActivity(LocalDateTime lastActivity) {
+  public void setLastActivity(Instant lastActivity) {
     this.lastActivity = lastActivity;
   }
 
@@ -129,7 +142,7 @@ public class Account {
     String personId = (person != null) ? Objects.toString(person.getId()) : "null";
     return "Account{" +
            ", login='" + login + '\'' +
-           ", personId'" + personId +'\'' +
+           ", personId='" + personId + '\'' +
            ", description='" + description + '\'' +
            '}';
   }
