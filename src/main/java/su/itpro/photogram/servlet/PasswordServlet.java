@@ -22,11 +22,11 @@ public class PasswordServlet extends HttpServlet {
     req.setCharacterEncoding("UTF-8");
 
     String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    service.changePassword(username,
-                           req.getParameter("old_password"),
-                           req.getParameter("new_password"),
-                           req.getParameter("check_password")
-    );
+    String oldPass = ServletUtil.getValue(req, "old_password");
+    String newPass = ServletUtil.getValue(req, "new_password");
+    String checkPass = ServletUtil.getValue(req, "check_password");
+
+    service.changePassword(username, oldPass, newPass, checkPass);
 
     //TODO LogOut
     resp.sendRedirect("/edit/" + username);

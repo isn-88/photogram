@@ -21,13 +21,12 @@ public class AccountServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    Account accountUpdated = accountService.update(
-        username,
-        req.getParameter("phone"),
-        req.getParameter("email"),
-        req.getParameter("username")
-    );
+    String usernameFromPath = ServletUtil.variableOfQueryPath(req.getPathInfo());
+    String phone = ServletUtil.getValueAndStrip(req, "phone");
+    String email = ServletUtil.getValueAndStrip(req, "email");
+    String username = ServletUtil.getValueAndStrip(req, "username");
+
+    Account accountUpdated = accountService.update(usernameFromPath, phone, email, username);
 
     resp.sendRedirect("/edit/" + accountUpdated.getUsername());
   }

@@ -1,9 +1,10 @@
 package su.itpro.photogram.dao.impl;
 
+import static su.itpro.photogram.util.converter.DateConverter.fromTimestamp;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,17 @@ import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.model.entity.Role;
 
 public class AccountDaoImpl implements AccountDao {
+
+  private static final String ID = "id";
+  private static final String PHONE = "phone";
+  private static final String EMAIL = "email";
+  private static final String USERNAME = "username";
+  private static final String PASSWORD = "password";
+  private static final String ROLE = "role";
+  private static final String IS_ACTIVE = "is_active";
+  private static final String IS_VERIFIED_PHONE = "is_verified_phone";
+  private static final String IS_VERIFIED_EMAIL = "is_verified_email";
+  private static final String CREATE_DATE = "create_date";
 
   private static final AccountDao INSTANCE = new AccountDaoImpl();
 
@@ -200,19 +212,16 @@ public class AccountDaoImpl implements AccountDao {
   }
 
   private Account parseAccount(ResultSet resultSet) throws SQLException {
-    Account account = new Account(resultSet.getObject("id", UUID.class));
-    account.setPhone(resultSet.getString("phone"));
-    account.setEmail(resultSet.getString("email"));
-    account.setUsername(resultSet.getString("username"));
-    account.setPassword(resultSet.getString("password"));
-    account.setRole(Role.valueOf(resultSet.getString("role")));
-    account.setActive(resultSet.getBoolean("is_active"));
-    account.setVerifiedPhone(resultSet.getBoolean("is_verified_phone"));
-    account.setVerifiedEmail(resultSet.getBoolean("is_verified_email"));
-    Timestamp createDate = resultSet.getTimestamp("create_date");
-    if (createDate != null) {
-      account.setCreateDate(createDate.toInstant());
-    }
+    Account account = new Account(resultSet.getObject(ID, UUID.class));
+    account.setPhone(resultSet.getString(PHONE));
+    account.setEmail(resultSet.getString(EMAIL));
+    account.setUsername(resultSet.getString(USERNAME));
+    account.setPassword(resultSet.getString(PASSWORD));
+    account.setRole(Role.valueOf(resultSet.getString(ROLE)));
+    account.setActive(resultSet.getBoolean(IS_ACTIVE));
+    account.setVerifiedPhone(resultSet.getBoolean(IS_VERIFIED_PHONE));
+    account.setVerifiedEmail(resultSet.getBoolean(IS_VERIFIED_EMAIL));
+    fromTimestamp(resultSet.getTimestamp(CREATE_DATE)).ifPresent(account::setCreateDate);
     return account;
   }
 

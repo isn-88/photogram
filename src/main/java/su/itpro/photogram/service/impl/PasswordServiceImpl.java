@@ -32,7 +32,7 @@ public class PasswordServiceImpl implements PasswordService {
     Account account = accountService.findByUsername(username);
 
     if (!(account.getPassword()).equals(currentPassword)) {
-      throw new PasswordServiceException("Current password is is incorrect");
+      throw new PasswordServiceException("Current password is incorrect");
     }
     validationInputNewPassword(newPassword, checkPassword);
     accountService.updatePassword(account, newPassword);

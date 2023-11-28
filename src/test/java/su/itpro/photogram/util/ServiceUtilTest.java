@@ -34,31 +34,4 @@ class ServiceUtilTest {
     assertTrue(actual.isPresent());
   }
 
-  @Test
-  void valueOrNull_isNull() {
-    String value = null;
-
-    String actual = ServiceUtil.valueOrNull(value);
-
-    assertNull(actual);
-  }
-
-  @Test
-  void valueOrNull_isEmpty() {
-    String value = " ";
-
-    String actual = ServiceUtil.valueOrNull(value);
-
-    assertNull(actual);
-  }
-
-  @Test
-  void valueOrNull_isPresent() {
-    String value = "value";
-
-    String actual = ServiceUtil.valueOrNull(value);
-
-    assertEquals(value, actual);
-  }
-
 }

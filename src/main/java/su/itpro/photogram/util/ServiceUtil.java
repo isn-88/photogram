@@ -14,12 +14,5 @@ public class ServiceUtil {
     }
     return Optional.empty();
   }
-
-  public static String valueOrNull(String value) {
-    if (value != null && !value.isBlank()) {
-      return value;
-    }
-    return null;
-  }
 }
 

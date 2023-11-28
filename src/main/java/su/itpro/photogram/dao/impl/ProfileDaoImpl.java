@@ -1,9 +1,12 @@
 package su.itpro.photogram.dao.impl;
 
-import java.sql.Date;
+import static su.itpro.photogram.util.converter.ContactConverter.toJson;
+import static su.itpro.photogram.util.converter.ContactConverter.toMap;
+import static su.itpro.photogram.util.converter.DateConverter.fromSqlDate;
+import static su.itpro.photogram.util.converter.DateConverter.toSqlDate;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,11 +15,17 @@ import su.itpro.photogram.datasource.DataSource;
 import su.itpro.photogram.exception.DaoException;
 import su.itpro.photogram.model.entity.Profile;
 import su.itpro.photogram.model.enums.Gender;
-import su.itpro.photogram.util.converter.ContactConverter;
 
 public class ProfileDaoImpl implements ProfileDao {
 
   private static final ProfileDao INSTANCE = new ProfileDaoImpl();
+
+  private static final String ACCOUNT_ID = "account_id";
+  private static final String FULL_NAME = "full_name";
+  private static final String GENDER = "gender";
+  private static final String BIRTHDATE = "birthdate";
+  private static final String CONTACTS = "contacts";
+  private static final String ABOUT_ME = "about_me";
 
   private static final String FIND_BY_ID_SQL = """
       SELECT account_id, full_name, gender, birthdate, contacts, about_me
@@ -82,11 +91,9 @@ public class ProfileDaoImpl implements ProfileDao {
 
       prepared.setObject(1, profile.getAccountId());
       prepared.setString(2, profile.getFullName());
-      prepared.setString(3, (profile.getGender() != null)
-                            ? profile.getGender().toString() : null);
-      prepared.setDate(4, (profile.getBirthdate() != null)
-                          ? Date.valueOf(profile.getBirthdate()) : null);
-      prepared.setObject(5, ContactConverter.toJson(profile.getContacts()));
+      prepared.setString(3, genderToString(profile.getGender()));
+      prepared.setDate(4, toSqlDate(profile.getBirthdate()));
+      prepared.setObject(5, toJson(profile.getContacts()));
       prepared.setString(6, profile.getAboutMe());
       prepared.executeUpdate();
 
@@ -100,11 +107,9 @@ public class ProfileDaoImpl implements ProfileDao {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setString(1, profile.getFullName());
-      prepared.setString(2, (profile.getGender() != null)
-                            ? profile.getGender().toString() : null);
-      LocalDate birthdate = profile.getBirthdate();
-      prepared.setDate(3, (birthdate != null) ? Date.valueOf(birthdate) : null);
-      prepared.setObject(4, ContactConverter.toJson(profile.getContacts()));
+      prepared.setString(2, genderToString(profile.getGender()));
+      prepared.setDate(3, toSqlDate(profile.getBirthdate()));
+      prepared.setObject(4, toJson(profile.getContacts()));
       prepared.setString(5, profile.getAboutMe());
       prepared.setObject(6, profile.getAccountId());
 
@@ -120,18 +125,25 @@ public class ProfileDaoImpl implements ProfileDao {
   }
 
   private Profile parsePerson(ResultSet resultSet) throws SQLException {
-    Profile profile = new Profile(resultSet.getObject("account_id", UUID.class));
-    String gender = resultSet.getString("gender");
-    if (gender != null) {
-      profile.setGender(Gender.valueOf(gender));
-    }
-    profile.setFullName(resultSet.getString("full_name"));
-    Date birthDate = resultSet.getDate("birthdate");
-    if (birthDate != null) {
-      profile.setBirthdate(birthDate.toLocalDate());
-    }
-    profile.setContacts(ContactConverter.toMap(resultSet.getString("contacts")));
-    profile.setAboutMe(resultSet.getString("about_me"));
+    Profile profile = new Profile(resultSet.getObject(ACCOUNT_ID, UUID.class));
+    genderFromString(resultSet.getString(GENDER)).ifPresent(profile::setGender);
+    profile.setFullName(resultSet.getString(FULL_NAME));
+    fromSqlDate(resultSet.getDate(BIRTHDATE)).ifPresent(profile::setBirthdate);
+    profile.setContacts(toMap(resultSet.getString(CONTACTS)));
+    profile.setAboutMe(resultSet.getString(ABOUT_ME));
     return profile;
+  }
+
+  private static String genderToString(Gender gender) {
+    return Optional.ofNullable(gender)
+        .map(Enum::toString)
+        .orElse(null);
+  }
+
+  private static Optional<Gender> genderFromString(String gender) {
+    if (gender != null && !gender.isBlank()) {
+      return Optional.of(Gender.valueOf(gender));
+    }
+    return Optional.empty();
   }
 }

@@ -23,12 +23,7 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public Account registerNewAccount(String phone, String email, String username, String password) {
-    Account newAccount = new Account(
-        (phone != null && phone.isBlank()) ? null : phone,
-        (email != null && email.isBlank()) ? null : email,
-        username,
-        password
-    );
+    Account newAccount = new Account(phone, email, username, password);
     accountDao.save(newAccount);
     return newAccount;
   }

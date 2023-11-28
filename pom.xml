@@ -13,6 +13,19 @@
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <javax.servlet-apiVersion>4.0.1</javax.servlet-apiVersion>
+    <jsp-apiVersion>2.0</jsp-apiVersion>
+    <jstlVersion>1.2</jstlVersion>
+    <postgresqlVersion>42.6.0</postgresqlVersion>
+    <jackson-databindVersion>2.16.0</jackson-databindVersion>
+    <slf4j-apiVersion>2.0.9</slf4j-apiVersion>
+    <slf4j-simpleVersion>2.0.9</slf4j-simpleVersion>
+    <junit-jupiter-apiVersion>5.10.1</junit-jupiter-apiVersion>
+
+    <maven-compiler-pluginVersion>3.11.0</maven-compiler-pluginVersion>
+    <maven-checkstyle-pluginVersion>3.3.1</maven-checkstyle-pluginVersion>
+    <checkstyleVersion>10.9.1</checkstyleVersion>
   </properties>
 
   <dependencies>
@@ -20,26 +33,26 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>4.0.1</version>
+      <version>${javax.servlet-apiVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jsp-api</artifactId>
-      <version>2.0</version>
+      <version>${jsp-apiVersion}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>jstl</groupId>
       <artifactId>jstl</artifactId>
-      <version>1.2</version>
+      <version>${jstlVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.6.0</version>
+      <version>${postgresqlVersion}</version>
     </dependency>
 
     <dependency>
@@ -51,25 +64,25 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.16.0</version>
+      <version>${jackson-databindVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.9</version>
+      <version>${slf4j-apiVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>2.0.9</version>
+      <version>${slf4j-simpleVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>5.10.1</version>
+      <version>${junit-jupiter-apiVersion}</version>
       <scope>test</scope>
     </dependency>
 
@@ -80,13 +93,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>${maven-compiler-pluginVersion}</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>${maven-checkstyle-pluginVersion}</version>
         <configuration>
           <configLocation>config/checkstyle/checkstyle.xml</configLocation>
           <propertyExpansion>config_loc=config/checkstyle</propertyExpansion>
@@ -107,7 +120,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>10.9.1</version>
+            <version>${checkstyleVersion}</version>
           </dependency>
         </dependencies>
       </plugin>

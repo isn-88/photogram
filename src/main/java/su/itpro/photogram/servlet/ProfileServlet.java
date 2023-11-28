@@ -23,7 +23,8 @@ public class ProfileServlet extends HttpServlet {
     req.setCharacterEncoding("UTF-8");
 
     String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    profileService.update(username, req.getParameter("full_name"));
+    String fullName = ServletUtil.getValueAndStrip(req, "full_name");
+    profileService.update(username, fullName);
 
     resp.sendRedirect("/edit/" + username);
   }
