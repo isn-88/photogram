@@ -1,12 +1,19 @@
 
 
-CREATE TABLE contact
+CREATE TABLE account
 (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    email varchar(64) UNIQUE NOT NULL,
     phone varchar(32) UNIQUE,
-    contacts jsonb
+    email varchar(64) UNIQUE,
+    username varchar(64) UNIQUE NOT NULL,
+    password varchar(64) NOT NULL,
+    role varchar(8) NOT NULL DEFAULT 'USER',
+    is_active boolean NOT NULL DEFAULT true,
+    is_verified_phone boolean NOT NULL DEFAULT false,
+    is_verified_email boolean NOT NULL DEFAULT false,
+    create_date timestamp with time zone DEFAULT now()
 );
+
 
 CREATE TABLE icon
 (
@@ -16,37 +23,17 @@ CREATE TABLE icon
     data bytea
 );
 
-CREATE TABLE role
+
+CREATE TABLE profile
 (
-    id smallserial PRIMARY KEY,
-    name varchar(16) UNIQUE NOT NULL
+    account_id uuid REFERENCES account (id),
+    full_name varchar(128),
+    birthdate date,
+    gender char(1),
+    contacts jsonb,
+    about_me text,
+    PRIMARY KEY (account_id)
 );
-
-CREATE TABLE person
-(
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    first_name varchar(64) NOT NULL,
-    last_name varchar(64) NOT NULL,
-    middle_name varchar(64),
-    birth_date date,
-    contact_id uuid REFERENCES contact (id),
-    icon_id uuid REFERENCES icon (id)
-);
-
-CREATE TABLE account
-(
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    person_id bigint,
-    login varchar(64) UNIQUE NOT NULL,
-    password varchar(64) NOT NULL,
-    role_id smallint,
-    is_active boolean NOT NULL DEFAULT false,
-    description text,
-    create_date timestamp with time zone DEFAULT now(),
-    last_activity timestamp with time zone DEFAULT now()
-);
-
-
 
 
 
