@@ -7,17 +7,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import su.itpro.photogram.model.entity.Account;
-import su.itpro.photogram.model.entity.Profile;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.impl.AccountServiceImpl;
 import su.itpro.photogram.service.impl.ProfileServiceImpl;
 import su.itpro.photogram.util.ServletUtil;
 
-@WebServlet("/register")
-public class RegisterServlet extends HttpServlet {
-
-  private static final String EDIT_JSP = "/edit.jsp";
-  private static final String REGISTER_JSP = "/register.jsp";
+@WebServlet("/registration")
+public class RegistrationServlet extends HttpServlet {
 
   private final AccountService accountService = AccountServiceImpl.getInstance();
   private final ProfileServiceImpl profileService = ProfileServiceImpl.getInstance();
@@ -26,7 +22,7 @@ public class RegisterServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    getServletContext().getRequestDispatcher(REGISTER_JSP).forward(req, resp);
+    getServletContext().getRequestDispatcher(SelectPage.REG.get()).forward(req, resp);
   }
 
   @Override
@@ -40,13 +36,11 @@ public class RegisterServlet extends HttpServlet {
     String password = ServletUtil.getValue(req, "password");
     String fullName = ServletUtil.getValueAndStrip(req, "full_name");
 
-
     Account newAccount = accountService.registerNewAccount(phone, email, username, password);
-    Profile newProfile = profileService.registerNewProfile(newAccount.getId(), fullName);
+    newAccount.setProfile(profileService.registerNewProfile(newAccount.getId(), fullName));
 
     req.setAttribute("account", newAccount);
-    req.setAttribute("profile", newProfile);
 
-    getServletContext().getRequestDispatcher(EDIT_JSP).forward(req, resp);
+    getServletContext().getRequestDispatcher(SelectPage.EDIT.get()).forward(req, resp);
   }
 }

@@ -1,30 +1,37 @@
 package su.itpro.photogram.model.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Post {
 
   private UUID id;
-  private Account account;
-  private String title;
-  private LocalDateTime createDate;
+  private UUID accountId;
+  private String description;
+  private Instant createDate;
 
-  public Post(Account account, String title) {
-    this(account, title, LocalDateTime.now());
-    this.account = account;
-    this.title = title;
+  public Post() {
   }
 
-  public Post(Account account, String title, LocalDateTime createDate) {
-    this(UUID.randomUUID(), account, title, createDate);
-  }
-
-  public Post(UUID id, Account account, String title, LocalDateTime createDate) {
+  public Post(UUID id) {
     this.id = id;
-    this.account = account;
-    this.title = title;
+  }
+
+  public Post(UUID accountId, String description) {
+    this(accountId, description, Instant.now());
+    this.accountId = accountId;
+    this.description = description;
+  }
+
+  public Post(UUID accountId, String description, Instant createDate) {
+    this(UUID.randomUUID(), accountId, description, createDate);
+  }
+
+  public Post(UUID id, UUID accountId, String description, Instant createDate) {
+    this.id = id;
+    this.accountId = accountId;
+    this.description = description;
     this.createDate = createDate;
   }
 
@@ -32,15 +39,15 @@ public class Post {
     return id;
   }
 
-  public Account getAccount() {
-    return account;
+  public UUID getAccountId() {
+    return accountId;
   }
 
-  public String getTitle() {
-    return title;
+  public String getDescription() {
+    return description;
   }
 
-  public LocalDateTime getCreateDate() {
+  public Instant getCreateDate() {
     return createDate;
   }
 
@@ -48,15 +55,15 @@ public class Post {
     this.id = id;
   }
 
-  public void setAccount(Account account) {
-    this.account = account;
+  public void setAccountId(UUID accountId) {
+    this.accountId = accountId;
   }
 
-  public void setTitle(String title) {
-    this.title = title;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public void setCreateDate(LocalDateTime createDate) {
+  public void setCreateDate(Instant createDate) {
     this.createDate = createDate;
   }
 
@@ -79,13 +86,10 @@ public class Post {
 
   @Override
   public String toString() {
-    String login = (account != null)
-                   ? Objects.toString(account.getUsername(), "null")
-                   : "null";
     return "Post{" +
            "id=" + id +
-           ", account=" + login +
-           ", title='" + title + '\'' +
+           ", accountId=" + accountId +
+           ", description='" + description + '\'' +
            ", createDate=" + createDate +
            '}';
   }

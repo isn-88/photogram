@@ -188,7 +188,6 @@ public class AccountDaoImpl implements AccountDao {
     } catch (SQLException e) {
       throw new DaoException("Error save Account", e.getMessage());
     }
-
   }
 
   @Override

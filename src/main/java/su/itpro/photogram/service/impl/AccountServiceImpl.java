@@ -12,9 +12,10 @@ public class AccountServiceImpl implements AccountService {
 
   private static final AccountService INSTANCE = new AccountServiceImpl();
 
-  private final AccountDao accountDao = DaoFactory.INSTANCE.getAccountDao();
+  private final AccountDao accountDao;
 
   private AccountServiceImpl() {
+    accountDao = DaoFactory.INSTANCE.getAccountDao();
   }
 
   public static AccountService getInstance() {
@@ -29,32 +30,40 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public void updatePassword(Account account, String newPassword) {
+  public void updatePassword(final Account account, String newPassword) {
     accountDao.changePassword(account, newPassword);
   }
 
   @Override
   public Account findByUsername(String username) {
     return accountDao.findByUsername(username)
-        .orElseThrow(() -> new AccountServiceException("Account not found"));
+        .orElseThrow(() -> new AccountServiceException(
+            "Account not found by username:" + username
+        ));
   }
 
   @Override
   public Account findByEmail(String email) {
     return accountDao.findByEmail(email)
-        .orElseThrow(() -> new AccountServiceException("Account not found"));
+        .orElseThrow(() -> new AccountServiceException(
+            "Account not found by email: " + email
+        ));
   }
 
   @Override
   public Account findByPhone(String phone) {
     return accountDao.findByPhone(phone)
-        .orElseThrow(() -> new AccountServiceException("Account not found"));
+        .orElseThrow(() -> new AccountServiceException(
+            "Account not found by phone: " + phone
+        ));
   }
 
   @Override
   public Account update(String username, String newPhone, String newEmail, String newUsername) {
     Account account = accountDao.findByUsername(username)
-        .orElseThrow(() -> new AccountServiceException("Account not found "));
+        .orElseThrow(() -> new AccountServiceException(
+            "Account not found by username: " + username
+        ));
 
     optionalOf(newPhone).ifPresent(account::setPhone);
     optionalOf(newEmail).ifPresent(account::setEmail);

@@ -39,7 +39,7 @@
                 </div>
               </div>
               <div class="d-grid">
-                <input class="btn btn-primary" type="submit" value="Войти">
+                <input class="btn btn-outline-secondary" type="submit" value="Войти">
               </div>
             </form>
           </div>
@@ -54,7 +54,7 @@
         <div class="card-body">
           <div class="card-text">
 
-            <h5>Нет аккаунта? <a href="${pageContext.request.contextPath}/register">Зарегистрировать</a></h5>
+            <h5>Нет аккаунта? <a href="${pageContext.request.contextPath}/registration">Зарегистрировать</a></h5>
 
           </div>
         </div>

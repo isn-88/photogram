@@ -17,8 +17,6 @@ import su.itpro.photogram.util.ServletUtil;
 @WebServlet("/edit/*")
 public class EditServlet extends HttpServlet {
 
-  private static final String EDIT_JSP = "/edit.jsp";
-
   private final AccountService accountService = AccountServiceImpl.getInstance();
   private final ProfileService profileService = ProfileServiceImpl.getInstance();
 
@@ -30,9 +28,10 @@ public class EditServlet extends HttpServlet {
     String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
     Account account = accountService.findByUsername(username);
     account.setProfile(profileService.loadProfile(account.getId()));
+    req.setAttribute("username", username);
     req.setAttribute("account", account);
 
-    getServletContext().getRequestDispatcher(EDIT_JSP).forward(req, resp);
+    getServletContext().getRequestDispatcher(SelectPage.EDIT.get()).forward(req, resp);
   }
 
 }
