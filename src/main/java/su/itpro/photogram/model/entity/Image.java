@@ -11,6 +11,10 @@ public class Image {
   private String fileName;
   private int ordinal;
 
+
+  public Image() {
+  }
+
   public Image(UUID accountId, UUID postId, String fileName, int ordinal) {
     this(UUID.randomUUID(), accountId, postId, fileName, ordinal);
   }

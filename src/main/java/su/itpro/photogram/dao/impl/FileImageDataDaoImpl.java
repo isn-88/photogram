@@ -1,4 +1,4 @@
-package su.itpro.photogram.datasource.impl;
+package su.itpro.photogram.dao.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,12 +6,11 @@ import java.nio.file.Path;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import su.itpro.photogram.datasource.ImageRepository;
-import su.itpro.photogram.datasource.exception.FileRepositoryException;
-import su.itpro.photogram.model.entity.Image;
+import su.itpro.photogram.dao.ImageDataDao;
+import su.itpro.photogram.dao.exception.ImageOperationException;
 import su.itpro.photogram.util.PropertiesUtil;
 
-public class FileImageRepositoryImpl implements ImageRepository {
+public class FileImageDataDaoImpl implements ImageDataDao {
 
   private static final String ROOT_PATH = PropertiesUtil.getProperty("app.root.file.path");
 
@@ -19,32 +18,32 @@ public class FileImageRepositoryImpl implements ImageRepository {
 
   private static final int DEFAULT_SHARDING_FACTOR = 1;
 
-  private static final ImageRepository INSTANCE = new FileImageRepositoryImpl();
+  private static final ImageDataDao INSTANCE = new FileImageDataDaoImpl();
 
 
   private final int shardingSize;
 
   private final Logger log;
 
-  private FileImageRepositoryImpl() {
+
+  private FileImageDataDaoImpl() {
     shardingSize = getShardingSize();
-    log = LoggerFactory.getLogger(FileImageRepositoryImpl.class);
+    log = LoggerFactory.getLogger(FileImageDataDaoImpl.class);
   }
 
-  public static ImageRepository getInstance() {
+  public static ImageDataDao getInstance() {
     return INSTANCE;
   }
 
-
   @Override
-  public void saveImage(Image image, byte[] data) {
+  public void saveImage(UUID imageId, byte[] data) {
+    Path fullPath = getFullPath(imageId.toString(), IMAGE_FORMAT_BY_DEFAULT);
     try {
-      Path fullPath = getFullPath(image.getId().toString(), IMAGE_FORMAT_BY_DEFAULT);
       Files.createDirectories(fullPath.getParent());
       Files.write(fullPath, data);
     } catch (IOException e) {
-      log.error("Error save Image {}", image.getFileName());
-      throw new FileRepositoryException(e.getMessage());
+      log.error("Error save Image with ID [{}] to Path [{}]", imageId, fullPath);
+      throw new ImageOperationException(e.getMessage());
     }
   }
 

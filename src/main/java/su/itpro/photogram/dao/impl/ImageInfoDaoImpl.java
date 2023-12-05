@@ -2,15 +2,16 @@ package su.itpro.photogram.dao.impl;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import su.itpro.photogram.dao.ImageDao;
+import su.itpro.photogram.dao.ImageInfoDao;
+import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
-import su.itpro.photogram.exception.DaoException;
 import su.itpro.photogram.model.entity.Image;
 
-public class ImageDaoImpl implements ImageDao {
+public class ImageInfoDaoImpl implements ImageInfoDao {
 
   private static final String ID = "id";
 
@@ -39,13 +40,13 @@ public class ImageDaoImpl implements ImageDao {
       ;
       """;
 
-  private static final ImageDao INSTANCE = new ImageDaoImpl();
+  private static final ImageInfoDao INSTANCE = new ImageInfoDaoImpl();
 
 
-  private ImageDaoImpl() {
+  private ImageInfoDaoImpl() {
   }
 
-  public static ImageDao getInstance() {
+  public static ImageInfoDao getInstance() {
     return INSTANCE;
   }
 
@@ -56,11 +57,12 @@ public class ImageDaoImpl implements ImageDao {
 
   @Override
   public List<Image> findAll() {
-    return null;
+    // TODO add implementation
+    return new ArrayList<>();
   }
 
   @Override
-  public UUID findPreviewImageId(UUID postId) {
+  public Optional<UUID> findPreviewImageId(UUID postId) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(FIND_PREVIEW_IMAGE_SQL)) {
       prepared.setObject(1, postId);
@@ -72,7 +74,7 @@ public class ImageDaoImpl implements ImageDao {
       if (resultSet.next()) {
         imageId = resultSet.getObject(ID, UUID.class);
       }
-      return imageId;
+      return Optional.ofNullable(imageId);
     } catch (SQLException e) {
       throw new DaoException("Error findPreviewImageIds", e.getMessage());
     }
@@ -115,6 +117,7 @@ public class ImageDaoImpl implements ImageDao {
 
   @Override
   public boolean delete(UUID id) {
+    // TODO add implementation
     return false;
   }
 

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.PostDao;
+import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
-import su.itpro.photogram.exception.DaoException;
 import su.itpro.photogram.model.entity.Post;
 
 public class PostDaoImpl implements PostDao {
@@ -47,6 +47,7 @@ public class PostDaoImpl implements PostDao {
 
   @Override
   public Optional<Post> findById(UUID id) {
+    // TODO add implementation
     return Optional.empty();
   }
 
@@ -72,7 +73,8 @@ public class PostDaoImpl implements PostDao {
 
   @Override
   public List<Post> findAll() {
-    return null;
+    // TODO add implementation
+    return new ArrayList<>();
   }
 
   @Override
@@ -94,10 +96,12 @@ public class PostDaoImpl implements PostDao {
 
   @Override
   public void update(Post post) {
+    // TODO add implementation
   }
 
   @Override
   public boolean delete(UUID id) {
+    // TODO add implementation
     return false;
   }
 

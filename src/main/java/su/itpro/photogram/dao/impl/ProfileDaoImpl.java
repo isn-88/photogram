@@ -7,12 +7,13 @@ import static su.itpro.photogram.util.converter.DateConverter.toSqlDate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.ProfileDao;
+import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
-import su.itpro.photogram.exception.DaoException;
 import su.itpro.photogram.model.entity.Profile;
 import su.itpro.photogram.model.enums.Gender;
 
@@ -58,7 +59,6 @@ public class ProfileDaoImpl implements ProfileDao {
     return INSTANCE;
   }
 
-
   @Override
   public Optional<Profile> findById(UUID accountId) {
     try (var connection = DataSource.getConnection();
@@ -80,7 +80,8 @@ public class ProfileDaoImpl implements ProfileDao {
 
   @Override
   public List<Profile> findAll() {
-    return null;
+    // TODO add implementation
+    return new ArrayList<>();
   }
 
 
@@ -121,6 +122,7 @@ public class ProfileDaoImpl implements ProfileDao {
 
   @Override
   public boolean delete(UUID id) {
+    // TODO add implementation
     return false;
   }
 

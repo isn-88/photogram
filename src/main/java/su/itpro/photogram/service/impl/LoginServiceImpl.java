@@ -1,11 +1,11 @@
 package su.itpro.photogram.service.impl;
 
-import su.itpro.photogram.exception.DaoException;
-import su.itpro.photogram.exception.PasswordServiceException;
+import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.LoginService;
 import su.itpro.photogram.service.ProfileService;
+import su.itpro.photogram.service.exception.PasswordServiceException;
 import su.itpro.photogram.util.validation.ValidationPasswordUtil;
 import su.itpro.photogram.util.validation.ValidationValueUtil;
 
@@ -29,7 +29,7 @@ public class LoginServiceImpl implements LoginService {
     ValidationValueUtil.validationNullOrBlanc(login, "Login must be empty");
     ValidationValueUtil.validationNullOrBlanc(password, "Password must be empty");
 
-    Account account = null;
+    Account account;
     try {
       if (login.contains("@")) {
         account = accountService.findByEmail(login);

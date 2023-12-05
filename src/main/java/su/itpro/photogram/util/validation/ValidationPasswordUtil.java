@@ -1,6 +1,5 @@
 package su.itpro.photogram.util.validation;
 
-import su.itpro.photogram.exception.ValidationException;
 import su.itpro.photogram.model.entity.Account;
 
 public class ValidationPasswordUtil {

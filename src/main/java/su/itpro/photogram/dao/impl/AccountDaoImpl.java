@@ -5,12 +5,13 @@ import static su.itpro.photogram.util.converter.DateConverter.fromTimestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.AccountDao;
+import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
-import su.itpro.photogram.exception.DaoException;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.model.entity.Role;
 
@@ -162,12 +163,14 @@ public class AccountDaoImpl implements AccountDao {
 
   @Override
   public Optional<Account> findById(UUID id) {
+    // TODO add implementation
     return Optional.empty();
   }
 
   @Override
   public List<Account> findAll() {
-    return null;
+    // TODO add implementation
+    return new ArrayList<>();
   }
 
   @Override
@@ -207,6 +210,7 @@ public class AccountDaoImpl implements AccountDao {
 
   @Override
   public boolean delete(UUID id) {
+    // TODO add implementation
     return false;
   }
 

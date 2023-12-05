@@ -1,4 +1,4 @@
-package su.itpro.photogram.exception;
+package su.itpro.photogram.util.converter;
 
 public class JsonConvertException extends RuntimeException {
 

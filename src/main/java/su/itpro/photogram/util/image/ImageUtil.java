@@ -7,9 +7,15 @@ import java.io.IOException;
 import java.util.Base64;
 import javax.imageio.ImageIO;
 import net.coobird.thumbnailator.Thumbnails;
+import su.itpro.photogram.util.PropertiesUtil;
 import su.itpro.photogram.util.image.exception.ImageConvertException;
 
 public class ImageUtil {
+
+  private static final String IMAGE_OUTPUT_FORMAT
+      = PropertiesUtil.getProperty("image.output.format");
+  private static final double IMAGE_OUTPUT_QUALITY
+      = PropertiesUtil.getDouble("image.output.quality", 1.0);
 
   private ImageUtil() {
   }
@@ -47,8 +53,8 @@ public class ImageUtil {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       Thumbnails.of(image)
           .width(width)
-          .outputFormat("JPEG")
-          .outputQuality(1.0)
+          .outputFormat(IMAGE_OUTPUT_FORMAT)
+          .outputQuality(IMAGE_OUTPUT_QUALITY)
           .toOutputStream(outputStream);
       return outputStream.toByteArray();
     } catch (IOException e) {
@@ -60,8 +66,8 @@ public class ImageUtil {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       Thumbnails.of(image)
           .height(height)
-          .outputFormat("JPEG")
-          .outputQuality(1.0)
+          .outputFormat(IMAGE_OUTPUT_FORMAT)
+          .outputQuality(IMAGE_OUTPUT_QUALITY)
           .toOutputStream(outputStream);
       return outputStream.toByteArray();
     } catch (IOException e) {
@@ -76,8 +82,8 @@ public class ImageUtil {
       Thumbnails.of(bufferedImage)
           .scale(1.0)
           .sourceRegion(x, 0, width, height)
-          .outputFormat("JPEG")
-          .outputQuality(1.0)
+          .outputFormat(IMAGE_OUTPUT_FORMAT)
+          .outputQuality(IMAGE_OUTPUT_QUALITY)
           .toOutputStream(output);
       return output.toByteArray();
     } catch (IOException e) {
@@ -92,8 +98,8 @@ public class ImageUtil {
       Thumbnails.of(bufferedImage)
           .scale(1.0)
           .sourceRegion(0, y, width, height)
-          .outputFormat("JPEG")
-          .outputQuality(1.0)
+          .outputFormat(IMAGE_OUTPUT_FORMAT)
+          .outputQuality(IMAGE_OUTPUT_QUALITY)
           .toOutputStream(output);
       return output.toByteArray();
     } catch (IOException e) {
