@@ -1,7 +1,5 @@
 package su.itpro.photogram.util.validation;
 
-import su.itpro.photogram.exception.ValidationException;
-
 public class ValidationValueUtil {
 
   private ValidationValueUtil() {

@@ -19,6 +19,7 @@
     <jstlVersion>1.2</jstlVersion>
     <postgresqlVersion>42.6.0</postgresqlVersion>
     <jackson-databindVersion>2.16.0</jackson-databindVersion>
+    <thumbnailatorVersion>0.4.20</thumbnailatorVersion>
     <slf4j-apiVersion>2.0.9</slf4j-apiVersion>
     <slf4j-simpleVersion>2.0.9</slf4j-simpleVersion>
     <junit-jupiter-apiVersion>5.10.1</junit-jupiter-apiVersion>
@@ -66,6 +67,13 @@
       <artifactId>jackson-databind</artifactId>
       <version>${jackson-databindVersion}</version>
     </dependency>
+
+    <dependency>
+      <groupId>net.coobird</groupId>
+      <artifactId>thumbnailator</artifactId>
+      <version>${thumbnailatorVersion}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.slf4j</groupId>

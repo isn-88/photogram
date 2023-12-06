@@ -20,7 +20,7 @@
         </div>
         <div class="card-body">
           <div class="card-text">
-            <form class="row gy-4" action="${pageContext.request.contextPath}/register"
+            <form class="row gy-4" action="${pageContext.request.contextPath}/registration"
                   method="post">
 
               <div class="col-12">
@@ -57,7 +57,7 @@
                 </div>
               </div>
               <div class="d-grid">
-                <input class="btn btn-primary" type="submit" value="Зарегистрировать">
+                <input class="btn btn-outline-secondary" type="submit" value="Зарегистрировать">
               </div>
             </form>
           </div>

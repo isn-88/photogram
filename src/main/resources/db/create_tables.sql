@@ -36,4 +36,23 @@ CREATE TABLE profile
 );
 
 
+CREATE TABLE post
+(
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    account_id uuid REFERENCES account (id) NOT NULL,
+    is_active boolean NOT NULL DEFAULT true,
+    create_date timestamp with time zone NOT NULL DEFAULT now(),
+    description text
+);
+
+
+CREATE TABLE image
+(
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    account_id uuid REFERENCES account (id) NOT NULL,
+    post_id uuid REFERENCES post (id),
+    file_name varchar(255) NOT NULL,
+    ordinal smallint NOT NULL
+);
+
 

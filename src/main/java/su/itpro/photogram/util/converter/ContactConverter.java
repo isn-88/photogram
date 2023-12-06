@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.util.HashMap;
 import java.util.Map;
-import su.itpro.photogram.exception.JsonConvertException;
 
 public class ContactConverter {
 

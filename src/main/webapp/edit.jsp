@@ -6,17 +6,47 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="${contextPath}/css/bootstrap.min.css" rel="stylesheet">
+  <link href="${contextPath}/css/main.css" rel="stylesheet">
   <title>Account</title>
 </head>
 
 <body>
-<nav class="navbar bg-primary" data-bs-theme="dark">
-  <div class="container-fluid">
+<div class="container-fluid">
+  <nav class="navbar navbar-expand-md border-bottom">
     <div class="container">
-      <span class="navbar-brand mb-3 p-3 h1 text-uppercase">Photogram</span>
+      <i class="fa-solid fa-camera-retro"></i>
+      <a class="navbar-brand text-uppercase p-1" href="#">Photogram</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+              aria-expanded="false" aria-label="Переключатель навигации">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="${pageContext.request.contextPath}/home/${username}">
+              <i class="fa-solid fa-house-user"></i></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="${pageContext.request.contextPath}/post/create/${username}">
+              <i class="fa-solid fa-camera"></i></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="${pageContext.request.contextPath}/edit/${username}">
+              <i class="fa-solid fa-id-card"></i></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="${pageContext.request.contextPath}/logout">
+              <i class="fa-solid fa-right-from-bracket"></i></a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</div>
+
 <section class="main-content">
   <div class="container">
     <div class="row p-5">
@@ -24,36 +54,30 @@
         <div class="card">
           <div class="row g-0">
             <div class="col-12 col-md-4 col-xl-3">
-              <div class="card-header">
+              <div class="card-header border-end">
                 <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
                      aria-orientation="vertical">
-                  <button class="nav-link active" id="v-pills-overview-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary active" id="v-pills-overview-tab"
+                          data-bs-toggle="pill"
                           data-bs-target="#v-pills-overview" type="button" role="tab"
                           aria-controls="v-pills-overview" aria-selected="true">
                     <h5>Обзор</h5>
                   </button>
-                  <button class="nav-link" id="v-pills-account-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary" id="v-pills-account-tab" data-bs-toggle="pill"
                           data-bs-target="#v-pills-account" type="button" role="tab"
                           aria-controls="v-pills-account" aria-selected="false">
                     <h5>Аккаунт</h5>
                   </button>
-                  <button class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary" id="v-pills-profile-tab" data-bs-toggle="pill"
                           data-bs-target="#v-pills-profile" type="button" role="tab"
                           aria-controls="v-pills-profile" aria-selected="false">
                     <h5>Профиль</h5>
                   </button>
-                  <button class="nav-link" id="v-pills-password-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary" id="v-pills-password-tab" data-bs-toggle="pill"
                           data-bs-target="#v-pills-password" type="button" role="tab"
                           aria-controls="v-pills-password" aria-selected="false">
                     <h5>Пароль</h5>
                   </button>
-
-<%--                  <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill"--%>
-<%--                          data-bs-target="#v-pills-settings" type="button" role="tab"--%>
-<%--                          aria-controls="v-pills-settings" aria-selected="false">--%>
-<%--                    <h5>Settings</h5>--%>
-<%--                  </button>--%>
-
                 </div>
               </div>
             </div>
@@ -132,7 +156,7 @@
                           <div class="col-lg-3">
                           </div>
                           <div class="col">
-                            <input class="btn btn-primary" type="submit" value="Сохранить">
+                            <input class="btn btn-outline-secondary" type="submit" value="Сохранить">
                           </div>
                         </div>
                       </form>
@@ -182,7 +206,7 @@
                           <div class="col-lg-3">
                           </div>
                           <div class="col">
-                            <input class="btn btn-primary" type="submit" value="Сохранить">
+                            <input class="btn btn-outline-secondary" type="submit" value="Сохранить">
                           </div>
                         </div>
                       </form>
@@ -240,19 +264,12 @@
                           <div class="col-lg-3">
                           </div>
                           <div class="col">
-                            <input class="btn btn-primary" type="submit" value="Изменить">
+                            <input class="btn btn-outline-secondary" type="submit" value="Изменить">
                           </div>
                         </div>
                       </form>
                     </div>
                   </div>
-
-
-<%--                  <div class="tab-pane fade" id="v-pills-settings" role="tabpanel"--%>
-<%--                       aria-labelledby="v-pills-settings-tab">--%>
-<%--                  </div>--%>
-
-
                 </div>
               </div>
             </div>
@@ -263,6 +280,8 @@
   </div>
 </section>
 
+
 <script src="${contextPath}/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/f297933945.js" crossorigin="anonymous"></script>
 </body>
 </html>

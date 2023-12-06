@@ -1,0 +1,26 @@
+html {
+  font-size: 16px;
+}
+
+body {
+  font-size: 16px;
+  min-width: 320px;
+}
+
+section {
+  padding: 50px 0;
+}
+
+.nav-link[data-bs-target] {
+  color: var(--bs-btn-hover-bg);
+}
+.nav-link[data-bs-target]:hover {
+  color: var(--bs-btn-hover-color);
+  background-color: var(--bs-btn-hover-bg);
+  border-color: var(--bs-btn-hover-border-color);
+}
+.nav-link[data-bs-target].active {
+  color: var(--bs-btn-hover-color);
+  background-color: var(--bs-btn-hover-bg);
+  border-color: var(--bs-btn-hover-border-color);
+}

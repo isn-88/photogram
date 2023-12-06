@@ -1,12 +1,11 @@
 package su.itpro.photogram.service.impl;
 
-import su.itpro.photogram.exception.PasswordServiceException;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.PasswordService;
+import su.itpro.photogram.service.exception.PasswordServiceException;
 import su.itpro.photogram.util.validation.ValidationPasswordUtil;
 import su.itpro.photogram.util.validation.ValidationValueUtil;
-
 
 public class PasswordServiceImpl implements PasswordService {
 

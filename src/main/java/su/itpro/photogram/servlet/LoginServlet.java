@@ -15,15 +15,13 @@ import su.itpro.photogram.util.ServletUtil;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-  private static final String EDIT_JSP = "/edit.jsp";
-
   private final LoginService loginService = LoginServiceImpl.getInstance();
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    getServletContext().getRequestDispatcher("/login.jsp").forward(req, resp);
+    getServletContext().getRequestDispatcher(SelectPage.LOGIN.get()).forward(req, resp);
   }
 
   @Override
@@ -36,6 +34,6 @@ public class LoginServlet extends HttpServlet {
     Account account = loginService.login(login, password);
 
     req.setAttribute("account", account);
-    getServletContext().getRequestDispatcher(EDIT_JSP).forward(req, resp);
+    resp.sendRedirect("/home/" + account.getUsername());
   }
 }
