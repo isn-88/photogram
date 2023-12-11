@@ -1,4 +1,4 @@
-package su.itpro.photogram.util.validation;
+package su.itpro.photogram.util.validator;
 
 import su.itpro.photogram.model.entity.Account;
 

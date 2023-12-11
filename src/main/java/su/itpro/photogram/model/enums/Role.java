@@ -1,4 +1,4 @@
-package su.itpro.photogram.model.entity;
+package su.itpro.photogram.model.enums;
 
 public enum Role {
 

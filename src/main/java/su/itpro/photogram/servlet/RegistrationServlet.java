@@ -6,17 +6,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import su.itpro.photogram.model.entity.Account;
-import su.itpro.photogram.service.AccountService;
-import su.itpro.photogram.service.impl.AccountServiceImpl;
-import su.itpro.photogram.service.impl.ProfileServiceImpl;
+import su.itpro.photogram.model.dto.RegistrationDto;
+import su.itpro.photogram.service.RegistrationService;
+import su.itpro.photogram.service.impl.RegistrationServiceImpl;
 import su.itpro.photogram.util.ServletUtil;
 
 @WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
 
-  private final AccountService accountService = AccountServiceImpl.getInstance();
-  private final ProfileServiceImpl profileService = ProfileServiceImpl.getInstance();
+  private final RegistrationService registrationService;
+
+
+  public RegistrationServlet() {
+    registrationService = RegistrationServiceImpl.getInstance();
+  }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -30,17 +33,16 @@ public class RegistrationServlet extends HttpServlet {
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
 
-    String phone = ServletUtil.getValueAndStrip(req, "phone");
-    String email = ServletUtil.getValueAndStrip(req, "email");
-    String username = ServletUtil.getValueAndStrip(req, "username");
-    String password = ServletUtil.getValue(req, "password");
-    String fullName = ServletUtil.getValueAndStrip(req, "full_name");
+    RegistrationDto registrationDto = new RegistrationDto(
+        ServletUtil.getValue(req, "phone"),
+        ServletUtil.getValue(req, "email"),
+        ServletUtil.getValue(req, "username"),
+        ServletUtil.getValue(req, "password"),
+        ServletUtil.getValue(req, "full_name")
+    );
 
-    Account newAccount = accountService.registerNewAccount(phone, email, username, password);
-    newAccount.setProfile(profileService.registerNewProfile(newAccount.getId(), fullName));
+    registrationService.registerNewAccount(registrationDto);
 
-    req.setAttribute("account", newAccount);
-
-    getServletContext().getRequestDispatcher(SelectPage.EDIT.get()).forward(req, resp);
+    getServletContext().getRequestDispatcher(SelectPage.LOGIN.get()).forward(req, resp);
   }
 }

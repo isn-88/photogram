@@ -3,6 +3,8 @@ package su.itpro.photogram.model.entity;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import su.itpro.photogram.model.enums.Role;
+import su.itpro.photogram.model.enums.Status;
 
 public class Account {
 
@@ -13,7 +15,7 @@ public class Account {
   private String username;
   private String password;
   private Role role;
-  private Boolean isActive;
+  private Status status;
   private Boolean isVerifiedPhone;
   private Boolean isVerifiedEmail;
   private Instant createDate;
@@ -30,6 +32,8 @@ public class Account {
     this.email = email;
     this.username = username;
     this.password = password;
+    role = Role.USER;
+    status = Status.ACTIVE;
   }
 
   public Account(UUID id,
@@ -39,7 +43,7 @@ public class Account {
                  String username,
                  String password,
                  Role role,
-                 Boolean isActive,
+                 Status status,
                  Boolean isVerifiedPhone,
                  Boolean isVerifiedEmail,
                  Instant createDate) {
@@ -50,7 +54,7 @@ public class Account {
     this.username = username;
     this.password = password;
     this.role = role;
-    this.isActive = isActive;
+    this.status = status;
     this.isVerifiedPhone = isVerifiedPhone;
     this.isVerifiedEmail = isVerifiedEmail;
     this.createDate = createDate;
@@ -84,8 +88,8 @@ public class Account {
     return role;
   }
 
-  public Boolean getActive() {
-    return isActive;
+  public Status getStatus() {
+    return status;
   }
 
   public Boolean getVerifiedPhone() {
@@ -128,8 +132,8 @@ public class Account {
     this.role = role;
   }
 
-  public void setActive(Boolean active) {
-    isActive = active;
+  public void setStatus(Status status) {
+    this.status = status;
   }
 
   public void setVerifiedPhone(Boolean isVerifiedPhone) {

@@ -13,12 +13,12 @@ public class ContactConverter {
   private ContactConverter() {
   }
 
-  public static String toJson(Map<String, String> map) {
-    if (map == null) {
+  public static String toJson(Map<String, String> contacts) {
+    if (contacts == null) {
       return null;
     }
     try {
-      return mapper.writeValueAsString(map);
+      return mapper.writeValueAsString(contacts);
     } catch (JsonProcessingException e) {
       throw new JsonConvertException("Error convert Map to Json");
     }

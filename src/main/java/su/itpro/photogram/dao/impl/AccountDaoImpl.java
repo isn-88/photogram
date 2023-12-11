@@ -13,7 +13,8 @@ import su.itpro.photogram.dao.AccountDao;
 import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
 import su.itpro.photogram.model.entity.Account;
-import su.itpro.photogram.model.entity.Role;
+import su.itpro.photogram.model.enums.Role;
+import su.itpro.photogram.model.enums.Status;
 
 public class AccountDaoImpl implements AccountDao {
 
@@ -23,7 +24,7 @@ public class AccountDaoImpl implements AccountDao {
   private static final String USERNAME = "username";
   private static final String PASSWORD = "password";
   private static final String ROLE = "role";
-  private static final String IS_ACTIVE = "is_active";
+  private static final String STATUS = "status";
   private static final String IS_VERIFIED_PHONE = "is_verified_phone";
   private static final String IS_VERIFIED_EMAIL = "is_verified_email";
   private static final String CREATE_DATE = "create_date";
@@ -31,25 +32,31 @@ public class AccountDaoImpl implements AccountDao {
   private static final AccountDao INSTANCE = new AccountDaoImpl();
 
   private static final String FIND_BY_USERNAME_SQL = """
-      SELECT  id, phone, email, username, password, role,
-              is_active, is_verified_phone, is_verified_email, create_date
-      FROM account
+      SELECT  a.id, phone, email, username, password, role, status,
+              is_verified_phone, is_verified_email, create_date
+      FROM account a
+        JOIN role r ON r.id = a.role_id
+        JOIN status s ON s.id = a.status_id
       WHERE username = ?
       ;
       """;
 
   private static final String FIND_BY_EMAIL_SQL = """
-      SELECT  id, phone, email, username, password, role,
-              is_active, is_verified_phone, is_verified_email, create_date
-      FROM account
+      SELECT  a.id, phone, email, username, password, role, status,
+              is_verified_phone, is_verified_email, create_date
+      FROM account a
+        JOIN role r ON r.id = a.role_id
+        JOIN status s ON s.id = a.status_id
       WHERE email = ?
       ;
       """;
 
   private static final String FIND_BY_PHONE_SQL = """
-      SELECT  id, phone, email, username, password, role,
-              is_active, is_verified_phone, is_verified_email, create_date
-      FROM account
+      SELECT  a.id, phone, email, username, password, role, status,
+              is_verified_phone, is_verified_email, create_date
+      FROM account a
+        JOIN role r ON r.id = a.role_id
+        JOIN status s ON s.id = a.status_id
       WHERE phone = ?
       ;
       """;
@@ -62,8 +69,17 @@ public class AccountDaoImpl implements AccountDao {
       """;
 
   private static final String SAVE_SQL = """
-      INSERT INTO account (phone, email, username, password)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO account (
+          phone,
+          email,
+          username,
+          password,
+          role_id,
+          status_id
+      )
+      VALUES (?, ?, ?, ?,
+          (SELECT id FROM role WHERE role = ?),
+          (SELECT id FROM status WHERE status = ?))
       ;
       """;
 
@@ -76,6 +92,12 @@ public class AccountDaoImpl implements AccountDao {
       ;
       """;
 
+  private static final String DELETE_SQL = """
+      UPDATE account
+      SET status_id = (SELECT id FROM status WHERE status = ?)
+      WHERE id = ?
+      ;
+      """;
 
   private AccountDaoImpl() {
   }
@@ -174,13 +196,15 @@ public class AccountDaoImpl implements AccountDao {
   }
 
   @Override
-  public void save(Account account) {
+  public Account save(Account account) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
       prepared.setString(1, account.getPhone());
       prepared.setString(2, account.getEmail());
       prepared.setString(3, account.getUsername());
       prepared.setString(4, account.getPassword());
+      prepared.setString(5, account.getRole().name());
+      prepared.setString(6, account.getStatus().name());
       prepared.executeUpdate();
 
       var generatedKeys = prepared.getGeneratedKeys();
@@ -191,6 +215,7 @@ public class AccountDaoImpl implements AccountDao {
     } catch (SQLException e) {
       throw new DaoException("Error save Account", e.getMessage());
     }
+    return account;
   }
 
   @Override
@@ -209,9 +234,16 @@ public class AccountDaoImpl implements AccountDao {
   }
 
   @Override
-  public boolean delete(UUID id) {
-    // TODO add implementation
-    return false;
+  public void delete(UUID id) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(UPDATE_SQL)) {
+      prepared.setString(1, Status.DELETED.name());
+      prepared.setObject(2, id);
+
+      prepared.executeUpdate();
+    } catch (SQLException e) {
+      throw new DaoException("Error update Account", e.getMessage());
+    }
   }
 
   private Account parseAccount(ResultSet resultSet) throws SQLException {
@@ -221,7 +253,7 @@ public class AccountDaoImpl implements AccountDao {
     account.setUsername(resultSet.getString(USERNAME));
     account.setPassword(resultSet.getString(PASSWORD));
     account.setRole(Role.valueOf(resultSet.getString(ROLE)));
-    account.setActive(resultSet.getBoolean(IS_ACTIVE));
+    account.setStatus(Status.valueOf(resultSet.getString(STATUS)));
     account.setVerifiedPhone(resultSet.getBoolean(IS_VERIFIED_PHONE));
     account.setVerifiedEmail(resultSet.getBoolean(IS_VERIFIED_EMAIL));
     fromTimestamp(resultSet.getTimestamp(CREATE_DATE)).ifPresent(account::setCreateDate);

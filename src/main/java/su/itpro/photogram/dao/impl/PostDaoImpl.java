@@ -18,25 +18,42 @@ public class PostDaoImpl implements PostDao {
 
   private static final String ID = "id";
   private static final String ACCOUNT_ID = "account_id";
+  private static final String IS_ACTIVE = "is_active";
   private static final String CREATE_DATE = "create_date";
   private static final String DESCRIPTION = "description";
 
   private static final PostDao INSTANCE = new PostDaoImpl();
 
-  private static final String SAVE_SQL = """
-      INSERT INTO post (account_id, description)
-      VALUES (?, ?)
+  private static final String FIND_BY_ID_SQL = """
+      SELECT id, account_id, is_active, create_date, description
+      FROM post
+      WHERE id = ?
       ;
       """;
 
   private static final String FIND_BY_TOP_SQL = """
-      SELECT id, account_id, create_date, description
+      SELECT id, account_id, is_active, create_date, description
       FROM post
-      WHERE account_id = ? AND is_active = true
+      WHERE account_id = ? AND is_active IN (true, ?)
       ORDER BY create_date DESC
       LIMIT ?
       ;
       """;
+
+  private static final String SAVE_SQL = """
+      INSERT INTO post (account_id, is_active, description)
+      VALUES (?, ?, ?)
+      ;
+      """;
+
+  private static final String UPDATE_SQL = """
+      UPDATE post
+      SET is_active = ?,
+          description = ?
+      WHERE id = ?
+      ;
+      """;
+
 
   private PostDaoImpl() {
   }
@@ -47,16 +64,30 @@ public class PostDaoImpl implements PostDao {
 
   @Override
   public Optional<Post> findById(UUID id) {
-    // TODO add implementation
-    return Optional.empty();
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(FIND_BY_ID_SQL)) {
+      prepared.setObject(1, id);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      Post post = null;
+      if (resultSet.next()) {
+        post = parsePost(resultSet);
+      }
+      return Optional.ofNullable(post);
+    } catch (SQLException e) {
+      throw new DaoException("Error findById Post", e.getMessage());
+    }
   }
 
   @Override
-  public List<Post> findTopByAccountIdAndLimit(UUID accountId, int limit) {
+  public List<Post> findTopByAccountIdAndLimit(UUID accountId, boolean onlyIsActive, int limit) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(FIND_BY_TOP_SQL)) {
       prepared.setObject(1, accountId);
-      prepared.setInt(2, limit);
+      prepared.setBoolean(2, onlyIsActive);
+      prepared.setInt(3, limit);
 
       prepared.executeQuery();
       var resultSet = prepared.getResultSet();
@@ -78,11 +109,12 @@ public class PostDaoImpl implements PostDao {
   }
 
   @Override
-  public void save(Post post) {
+  public Post save(Post post) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
       prepared.setObject(1, post.getAccountId());
-      prepared.setString(2, post.getDescription());
+      prepared.setBoolean(2, post.getActive());
+      prepared.setString(3, post.getDescription());
       prepared.executeUpdate();
 
       var generatedKeys = prepared.getGeneratedKeys();
@@ -92,22 +124,32 @@ public class PostDaoImpl implements PostDao {
     } catch (SQLException e) {
       throw new DaoException("Error save Post", e.getMessage());
     }
+    return post;
   }
 
   @Override
   public void update(Post post) {
-    // TODO add implementation
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(UPDATE_SQL)) {
+      prepared.setBoolean(1, post.getActive());
+      prepared.setString(2, post.getDescription());
+      prepared.setObject(3, post.getId());
+
+      prepared.executeUpdate();
+    } catch (SQLException e) {
+      throw new DaoException("Error update Post", e.getMessage());
+    }
   }
 
   @Override
-  public boolean delete(UUID id) {
+  public void delete(UUID id) {
     // TODO add implementation
-    return false;
   }
 
   private Post parsePost(ResultSet resultSet) throws SQLException {
     Post post = new Post(resultSet.getObject(ID, UUID.class));
     post.setAccountId(resultSet.getObject(ACCOUNT_ID, UUID.class));
+    post.setActive(resultSet.getBoolean(IS_ACTIVE));
     fromTimestamp(resultSet.getTimestamp(CREATE_DATE)).ifPresent(post::setCreateDate);
     post.setDescription(resultSet.getString(DESCRIPTION));
     return post;

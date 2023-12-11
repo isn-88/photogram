@@ -1,19 +1,44 @@
 package su.itpro.photogram.service;
 
-import su.itpro.photogram.model.entity.Account;
+import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.dto.AccountUpdateDto;
 
+/**
+ * Интерфейс сервиса по работе с аккаунтами
+ */
 public interface AccountService {
 
-  Account registerNewAccount(String phone, String email, String username, String password);
+  /**
+   * Производит поиск аккаунта по уникальному имени пользователя
+   *
+   * @param username - имя пользователя
+   * @return аккаунт
+   */
+  AccountDto findByUsername(String username);
 
-  void updatePassword(Account account, String newPassword);
+  /**
+   * Производит поиск аккаунта по email-у пользователя
+   *
+   * @param email - email пользователя
+   * @return аккаунт
+   */
+  AccountDto findByEmail(String email);
 
-  Account findByUsername(String username);
+  /**
+   * Производит поиск аккаунта по номеру телефона пользователя
+   *
+   * @param phone - номер телефона пользователя
+   * @return аккаунт
+   */
+  AccountDto findByPhone(String phone);
 
-  Account findByEmail(String email);
-
-  Account findByPhone(String phone);
-
-  Account update(String username, String newPhone, String newEmail, String newUsername);
+  /**
+   * Обновляет данные для входа в ЛК
+   *
+   * @param username - имя пользователя
+   * @param dto - обновляемые данные
+   * @return обновлённый аккаунт
+   */
+  AccountDto update(String username, AccountUpdateDto dto);
 
 }

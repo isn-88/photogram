@@ -1,12 +1,17 @@
 package su.itpro.photogram.service.impl;
 
-import java.util.Collection;
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import javax.servlet.http.Part;
 import su.itpro.photogram.dao.PostDao;
+import su.itpro.photogram.exception.service.PostServiceException;
 import su.itpro.photogram.factory.DaoFactory;
-import su.itpro.photogram.model.entity.Account;
+import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.dto.PostCreateDto;
+import su.itpro.photogram.model.dto.PostDto;
+import su.itpro.photogram.model.dto.PostUpdateDto;
 import su.itpro.photogram.model.entity.Post;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.ImageService;
@@ -31,15 +36,40 @@ public class PostServiceImpl implements PostService {
     return INSTANCE;
   }
 
-  public void createNewPost(String username, String description, Collection<Part> files) {
-    Account account = accountService.findByUsername(username);
-    Post post = new Post(account.getId(), description);
+  @Override
+  public void createNewPost(String username, PostCreateDto dto) {
+    AccountDto accountDto = accountService.findByUsername(username);
+    Post post = new Post(accountDto.id(), dto.isActive(), dto.description());
     postDao.save(post);
-    imageService.saveImages(account, post, files);
+    imageService.saveImages(accountDto.id(), post.getId(), dto.parts());
   }
 
-  public List<Post> findTopByAccountIdAndLimit(UUID accountId, int limit) {
-    return postDao.findTopByAccountIdAndLimit(accountId, limit);
+  @Override
+  public List<PostDto> findTopPostIdByAccountIdAndLimit(UUID accountId,
+                                                        boolean onlyIsActive, int limit) {
+    return postDao.findTopByAccountIdAndLimit(accountId, onlyIsActive, limit)
+        .stream()
+        .map(PostDto::of)
+        .collect(toList());
+  }
+
+  @Override
+  public PostDto findById(UUID postId) {
+    return PostDto.of(postDao.findById(postId).orElseThrow(
+        () -> new PostServiceException("Post with id [%s] not found".formatted(postId))
+    ));
+  }
+
+  @Override
+  public void update(PostUpdateDto dto) {
+    Post post = postDao.findById(dto.id()).orElseThrow(
+        () -> new PostServiceException("Post not found")
+    );
+
+    Optional.ofNullable(dto.description()).ifPresent(post::setDescription);
+    Optional.ofNullable(dto.isActive()).ifPresent(post::setActive);
+
+    postDao.update(post);
   }
 
 }

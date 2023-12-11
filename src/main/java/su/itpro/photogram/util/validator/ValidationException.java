@@ -1,4 +1,4 @@
-package su.itpro.photogram.util.validation;
+package su.itpro.photogram.util.validator;
 
 public class ValidationException extends RuntimeException {
 

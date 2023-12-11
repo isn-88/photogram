@@ -2,18 +2,26 @@ package su.itpro.photogram.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class PropertiesUtilTest {
 
-  @Test
-  void getProperty() {
-    String propertyKey = "test.key";
-    String propertyValue = "value";
+  @ParameterizedTest
+  @MethodSource("getPropertyArguments")
+  void checkGetProperty(String key, String expectedValue) {
+    String actualResult = PropertiesUtil.getProperty(key);
 
-    String actual = PropertiesUtil.getProperty(propertyKey);
+    assertEquals(expectedValue, actualResult);
+  }
 
-    assertNotNull(actual);
-    assertEquals(propertyValue, actual);
+  static Stream<Arguments> getPropertyArguments() {
+    return Stream.of(
+        Arguments.of("db.url", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"),
+        Arguments.of("db.user", ""),
+        Arguments.of("db.password", "")
+    );
   }
 }

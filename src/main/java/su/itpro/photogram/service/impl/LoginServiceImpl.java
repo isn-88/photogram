@@ -1,23 +1,26 @@
 package su.itpro.photogram.service.impl;
 
+import java.util.Optional;
+import su.itpro.photogram.dao.AccountDao;
 import su.itpro.photogram.dao.exception.DaoException;
+import su.itpro.photogram.exception.service.LoginServiceException;
+import su.itpro.photogram.factory.DaoFactory;
+import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.entity.Account;
-import su.itpro.photogram.service.AccountService;
+import su.itpro.photogram.model.enums.Status;
 import su.itpro.photogram.service.LoginService;
-import su.itpro.photogram.service.ProfileService;
-import su.itpro.photogram.service.exception.PasswordServiceException;
-import su.itpro.photogram.util.validation.ValidationPasswordUtil;
-import su.itpro.photogram.util.validation.ValidationValueUtil;
+import su.itpro.photogram.util.validator.ValidationPasswordUtil;
+import su.itpro.photogram.util.validator.ValidationValueUtil;
 
 public class LoginServiceImpl implements LoginService {
 
   private static final LoginService INSTANCE = new LoginServiceImpl();
 
-  private final AccountService accountService = AccountServiceImpl.getInstance();
+  private final AccountDao accountDao;
 
-  private final ProfileService profileService = ProfileServiceImpl.getInstance();
 
   private LoginServiceImpl() {
+    accountDao = DaoFactory.INSTANCE.getAccountDao();
   }
 
   public static LoginService getInstance() {
@@ -25,27 +28,33 @@ public class LoginServiceImpl implements LoginService {
   }
 
   @Override
-  public Account login(String login, String password) {
+  public AccountDto login(String login, String password) {
     ValidationValueUtil.validationNullOrBlanc(login, "Login must be empty");
     ValidationValueUtil.validationNullOrBlanc(password, "Password must be empty");
 
-    Account account;
+    Optional<Account> accountOpt;
     try {
       if (login.contains("@")) {
-        account = accountService.findByEmail(login);
+        accountOpt = accountDao.findByEmail(login);
       } else if (login.startsWith("+")) {
-        account = accountService.findByPhone(login.substring(1));
+        accountOpt = accountDao.findByPhone(login.substring(1));
       } else if (Character.isDigit(login.charAt(0))) {
-        account = accountService.findByPhone(login);
+        accountOpt = accountDao.findByPhone(login);
       } else {
-        account = accountService.findByUsername(login);
+        accountOpt = accountDao.findByUsername(login);
       }
     } catch (DaoException e) {
-      throw new PasswordServiceException("Login or password incorrect");
+      throw new LoginServiceException("Login or password incorrect");
+    }
+
+    Account account = accountOpt.orElseThrow(
+        () -> new LoginServiceException("Account not found"));
+
+    if (!account.getStatus().equals(Status.ACTIVE)) {
+      throw new LoginServiceException("Account not active");
     }
 
     ValidationPasswordUtil.validationLogin(account, password);
-    account.setProfile(profileService.loadProfile(account.getId()));
-    return account;
+    return AccountDto.of(account);
   }
 }

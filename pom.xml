@@ -20,9 +20,11 @@
     <postgresqlVersion>42.6.0</postgresqlVersion>
     <jackson-databindVersion>2.16.0</jackson-databindVersion>
     <thumbnailatorVersion>0.4.20</thumbnailatorVersion>
-    <slf4j-apiVersion>2.0.9</slf4j-apiVersion>
-    <slf4j-simpleVersion>2.0.9</slf4j-simpleVersion>
-    <junit-jupiter-apiVersion>5.10.1</junit-jupiter-apiVersion>
+    <slf4jVersion>2.0.9</slf4jVersion>
+    <junit-jupiterVersion>5.10.1</junit-jupiterVersion>
+    <junit-jupiterVersion>5.10.1</junit-jupiterVersion>
+    <assertj-coreVersion>3.24.2</assertj-coreVersion>
+    <h2Version>2.2.224</h2Version>
 
     <maven-compiler-pluginVersion>3.11.0</maven-compiler-pluginVersion>
     <maven-checkstyle-pluginVersion>3.3.1</maven-checkstyle-pluginVersion>
@@ -74,23 +76,43 @@
       <version>${thumbnailatorVersion}</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${slf4j-apiVersion}</version>
+      <version>${slf4jVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j-simpleVersion}</version>
+      <version>${slf4jVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit-jupiter-apiVersion}</version>
+      <version>${junit-jupiterVersion}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit-jupiterVersion}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj-coreVersion}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2Version}</version>
       <scope>test</scope>
     </dependency>
 

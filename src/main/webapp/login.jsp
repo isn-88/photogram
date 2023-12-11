@@ -6,6 +6,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="${contextPath}/css/bootstrap.min.css" rel="stylesheet">
+  <link href="${contextPath}/css/main.css" rel="stylesheet">
   <title>Login</title>
 </head>
 <body>

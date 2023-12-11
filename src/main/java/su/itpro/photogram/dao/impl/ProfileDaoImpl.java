@@ -30,21 +30,29 @@ public class ProfileDaoImpl implements ProfileDao {
 
   private static final String FIND_BY_ID_SQL = """
       SELECT account_id, full_name, gender, birthdate, contacts, about_me
-      FROM profile
+      FROM profile p
+          JOIN gender g on g.id = p.gender_id
       WHERE account_id = ?
       ;
       """;
 
   private static final String SAVE_SQL = """
-      INSERT INTO profile (account_id, full_name, gender, birthdate, contacts, about_me)
-      VALUES (?, ?, ?, ?, ?::JSON, ?)
+      INSERT INTO profile (
+          account_id,
+          full_name,
+          birthdate,
+          gender_id,
+          contacts,
+          about_me
+          )
+      VALUES (?, ?, ?, (SELECT id FROM gender WHERE gender = ?), ?::JSON, ?)
       ;
       """;
 
   private static final String UPDATE_SQL = """
       UPDATE profile
       SET full_name = ?,
-          gender = ?,
+          gender_id = (SELECT id FROM gender WHERE gender = ?),
           birthdate = ?,
           contacts = ?::JSON,
           about_me = ?
@@ -60,10 +68,10 @@ public class ProfileDaoImpl implements ProfileDao {
   }
 
   @Override
-  public Optional<Profile> findById(UUID accountId) {
+  public Optional<Profile> findById(UUID id) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(FIND_BY_ID_SQL)) {
-      prepared.setObject(1, accountId);
+      prepared.setObject(1, id);
 
       prepared.executeQuery();
 
@@ -84,16 +92,14 @@ public class ProfileDaoImpl implements ProfileDao {
     return new ArrayList<>();
   }
 
-
   @Override
-  public void save(Profile profile) {
+  public Profile save(Profile profile) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(SAVE_SQL)) {
-
       prepared.setObject(1, profile.getAccountId());
       prepared.setString(2, profile.getFullName());
-      prepared.setString(3, genderToString(profile.getGender()));
-      prepared.setDate(4, toSqlDate(profile.getBirthdate()));
+      prepared.setDate(3, toSqlDate(profile.getBirthdate()));
+      prepared.setString(4, profile.getGender().name());
       prepared.setObject(5, toJson(profile.getContacts()));
       prepared.setString(6, profile.getAboutMe());
       prepared.executeUpdate();
@@ -101,6 +107,7 @@ public class ProfileDaoImpl implements ProfileDao {
     } catch (SQLException e) {
       throw new DaoException("Error save Person", e.getMessage());
     }
+    return profile;
   }
 
   @Override
@@ -108,7 +115,7 @@ public class ProfileDaoImpl implements ProfileDao {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setString(1, profile.getFullName());
-      prepared.setString(2, genderToString(profile.getGender()));
+      prepared.setString(2, profile.getGender().name());
       prepared.setDate(3, toSqlDate(profile.getBirthdate()));
       prepared.setObject(4, toJson(profile.getContacts()));
       prepared.setString(5, profile.getAboutMe());
@@ -121,31 +128,18 @@ public class ProfileDaoImpl implements ProfileDao {
   }
 
   @Override
-  public boolean delete(UUID id) {
-    // TODO add implementation
-    return false;
+  public void delete(UUID id) {
+    // Profile not deleting
   }
 
   private Profile parsePerson(ResultSet resultSet) throws SQLException {
     Profile profile = new Profile(resultSet.getObject(ACCOUNT_ID, UUID.class));
-    genderFromString(resultSet.getString(GENDER)).ifPresent(profile::setGender);
-    profile.setFullName(resultSet.getString(FULL_NAME));
     fromSqlDate(resultSet.getDate(BIRTHDATE)).ifPresent(profile::setBirthdate);
+    profile.setGender(Gender.valueOf(resultSet.getString(GENDER)));
+    profile.setFullName(resultSet.getString(FULL_NAME));
     profile.setContacts(toMap(resultSet.getString(CONTACTS)));
     profile.setAboutMe(resultSet.getString(ABOUT_ME));
     return profile;
   }
 
-  private static String genderToString(Gender gender) {
-    return Optional.ofNullable(gender)
-        .map(Enum::toString)
-        .orElse(null);
-  }
-
-  private static Optional<Gender> genderFromString(String gender) {
-    if (gender != null && !gender.isBlank()) {
-      return Optional.of(Gender.valueOf(gender));
-    }
-    return Optional.empty();
-  }
 }

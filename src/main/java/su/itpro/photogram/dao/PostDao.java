@@ -17,6 +17,6 @@ public interface PostDao extends BaseDao<UUID, Post> {
    * @param limit - ограничение количества получаемых публикаций
    * @return - список публикаций
    */
-  List<Post> findTopByAccountIdAndLimit(UUID accountId, int limit);
+  List<Post> findTopByAccountIdAndLimit(UUID accountId, boolean onlyIsActive, int limit);
 
 }
