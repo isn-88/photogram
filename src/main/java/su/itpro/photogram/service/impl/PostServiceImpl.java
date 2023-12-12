@@ -8,6 +8,7 @@ import java.util.UUID;
 import su.itpro.photogram.dao.PostDao;
 import su.itpro.photogram.exception.service.PostServiceException;
 import su.itpro.photogram.factory.DaoFactory;
+import su.itpro.photogram.mapper.PostMapper;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.PostCreateDto;
 import su.itpro.photogram.model.dto.PostDto;
@@ -24,12 +25,14 @@ public class PostServiceImpl implements PostService {
   private final AccountService accountService;
   private final ImageService imageService;
   private final PostDao postDao;
+  private final PostMapper postMapper;
 
 
   private PostServiceImpl() {
     accountService = AccountServiceImpl.getInstance();
     imageService = ImageServiceImpl.getInstance();
     postDao = DaoFactory.INSTANCE.getPostDao();
+    postMapper = PostMapper.getInstance();
   }
 
   public static PostService getInstance() {
@@ -49,13 +52,13 @@ public class PostServiceImpl implements PostService {
                                                         boolean onlyIsActive, int limit) {
     return postDao.findTopByAccountIdAndLimit(accountId, onlyIsActive, limit)
         .stream()
-        .map(PostDto::of)
+        .map(postMapper::mapToPostDto)
         .collect(toList());
   }
 
   @Override
   public PostDto findById(UUID postId) {
-    return PostDto.of(postDao.findById(postId).orElseThrow(
+    return postMapper.mapToPostDto(postDao.findById(postId).orElseThrow(
         () -> new PostServiceException("Post with id [%s] not found".formatted(postId))
     ));
   }

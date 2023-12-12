@@ -5,6 +5,7 @@ import su.itpro.photogram.dao.AccountDao;
 import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.exception.service.LoginServiceException;
 import su.itpro.photogram.factory.DaoFactory;
+import su.itpro.photogram.mapper.AccountMapper;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.model.enums.Status;
@@ -17,10 +18,12 @@ public class LoginServiceImpl implements LoginService {
   private static final LoginService INSTANCE = new LoginServiceImpl();
 
   private final AccountDao accountDao;
+  private final AccountMapper accountMapper;
 
 
   private LoginServiceImpl() {
     accountDao = DaoFactory.INSTANCE.getAccountDao();
+    accountMapper = AccountMapper.getInstance();
   }
 
   public static LoginService getInstance() {
@@ -55,6 +58,6 @@ public class LoginServiceImpl implements LoginService {
     }
 
     ValidationPasswordUtil.validationLogin(account, password);
-    return AccountDto.of(account);
+    return accountMapper.mapToAccountDto(account);
   }
 }
