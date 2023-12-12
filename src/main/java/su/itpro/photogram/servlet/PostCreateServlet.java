@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import su.itpro.photogram.model.dto.PostCreateDto;
 import su.itpro.photogram.service.PostService;
 import su.itpro.photogram.service.impl.PostServiceImpl;
 import su.itpro.photogram.util.ServletUtil;
@@ -34,9 +35,16 @@ public class PostCreateServlet extends HttpServlet {
     req.setCharacterEncoding("UTF-8");
 
     String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    postService.createNewPost(username, req.getParameter("description"), req.getParts());
+    var postCreateDto = new PostCreateDto(
+        ServletUtil.getBoolean(req, "isActive"),
+        ServletUtil.getValue(req, "description"),
+        req.getParts()
+    );
+
+    postService.createNewPost(username, postCreateDto);
 
     req.setAttribute("username", username);
+
     resp.sendRedirect("/home/" + username);
   }
 }

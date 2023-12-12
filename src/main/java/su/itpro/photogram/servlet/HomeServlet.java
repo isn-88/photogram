@@ -9,9 +9,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import su.itpro.photogram.model.dto.ImageBase64Dto;
-import su.itpro.photogram.model.entity.Account;
-import su.itpro.photogram.model.entity.Post;
+import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.dto.ImageIdAndBase64Dto;
+import su.itpro.photogram.model.dto.PostDto;
+import su.itpro.photogram.model.dto.ProfileDto;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.ImageService;
 import su.itpro.photogram.service.PostService;
@@ -25,15 +26,11 @@ import su.itpro.photogram.util.ServletUtil;
 @WebServlet("/home/*")
 public class HomeServlet extends HttpServlet {
 
-  private static final int POST_PER_PAGE = 12;
-
+  private static final int POSTS_PER_PAGE = 12;
 
   private final AccountService accountService;
-
   private final ProfileService profileService;
-
   private final PostService postService;
-
   private final ImageService imageService;
 
 
@@ -49,14 +46,17 @@ public class HomeServlet extends HttpServlet {
       throws ServletException, IOException {
 
     String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    Account account = accountService.findByUsername(username);
-    account.setProfile(profileService.loadProfile(account.getId()));
-    List<Post> posts = postService.findTopByAccountIdAndLimit(account.getId(), POST_PER_PAGE);
-    Map<UUID, ImageBase64Dto> images = imageService.loadPreviewImageFilesBy(posts);
+    AccountDto accountDto = accountService.findByUsername(username);
+    ProfileDto profileDto = profileService.loadProfile(accountDto.id());
+
+    List<PostDto> postDtos = postService
+        .findTopPostIdByAccountIdAndLimit(accountDto.id(), false, POSTS_PER_PAGE);
+    Map<UUID, ImageIdAndBase64Dto> images = imageService.loadPreviewImageFilesBy(postDtos);
 
     req.setAttribute("username", username);
-    req.setAttribute("account", account);
-    req.setAttribute("posts", posts);
+    req.setAttribute("account", accountDto);
+    req.setAttribute("profile", profileDto);
+    req.setAttribute("posts", postDtos);
     req.setAttribute("images", images);
 
     getServletContext().getRequestDispatcher(SelectPage.HOME.get()).forward(req, resp);

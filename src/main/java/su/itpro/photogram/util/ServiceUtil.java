@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public class ServiceUtil {
 
+
   private ServiceUtil() {
   }
-
 
   public static Optional<String> optionalOf(String value) {
     if (value != null && !value.isBlank()) {
@@ -14,5 +14,6 @@ public class ServiceUtil {
     }
     return Optional.empty();
   }
+
 }
 

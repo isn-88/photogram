@@ -1,4 +1,4 @@
-package su.itpro.photogram.service.exception;
+package su.itpro.photogram.exception.service;
 
 public class AccountServiceException extends RuntimeException {
 

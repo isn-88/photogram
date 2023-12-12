@@ -6,6 +6,7 @@ public enum SelectPage {
   HOME("/home.jsp"),
   LOGIN("/login.jsp"),
   POST_CREATE("/postCreate.jsp"),
+  POST_VIEW("/postView.jsp"),
   REG("/registration.jsp");
 
 

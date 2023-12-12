@@ -1,5 +1,6 @@
 package su.itpro.photogram.model.entity;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -8,8 +9,10 @@ public class Post {
 
   private UUID id;
   private UUID accountId;
+  private Boolean isActive;
   private String description;
   private Instant createDate;
+
 
   public Post() {
   }
@@ -18,21 +21,30 @@ public class Post {
     this.id = id;
   }
 
-  public Post(UUID accountId, String description) {
-    this(accountId, description, Instant.now());
-    this.accountId = accountId;
-    this.description = description;
+  public Post(UUID accountId, Boolean isActive, String description) {
+    this(accountId, isActive, description, Instant.now());
   }
 
-  public Post(UUID accountId, String description, Instant createDate) {
-    this(UUID.randomUUID(), accountId, description, createDate);
+  public Post(UUID accountId, Boolean isActive, String description, Instant createDate) {
+    this(UUID.randomUUID(), accountId, isActive, description, createDate);
   }
 
-  public Post(UUID id, UUID accountId, String description, Instant createDate) {
+  public Post(UUID id, UUID accountId, Boolean isActive, String description, Instant createDate) {
     this.id = id;
     this.accountId = accountId;
+    this.isActive = isActive;
     this.description = description;
     this.createDate = createDate;
+  }
+
+  public String getTimeLater() {
+    long value;
+    if ((value = Duration.between(Instant.now(), createDate).toDays()) > 0) {
+      return "С момента публикации прошло " + value + " дней.";
+    } else if ((value = Duration.between(Instant.now(), createDate).toMinutes()) > 0) {
+      return "С момента публикации прошло " + value + " минут.";
+    }
+    return "";
   }
 
   public UUID getId() {
@@ -41,6 +53,10 @@ public class Post {
 
   public UUID getAccountId() {
     return accountId;
+  }
+
+  public Boolean getActive() {
+    return isActive;
   }
 
   public String getDescription() {
@@ -57,6 +73,10 @@ public class Post {
 
   public void setAccountId(UUID accountId) {
     this.accountId = accountId;
+  }
+
+  public void setActive(Boolean active) {
+    isActive = active;
   }
 
   public void setDescription(String description) {

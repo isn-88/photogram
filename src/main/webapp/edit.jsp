@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="su.itpro.photogram.model.enums.Gender" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!DOCTYPE html>
@@ -6,55 +8,59 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="${contextPath}/css/bootstrap.min.css" rel="stylesheet">
+  <link href="${contextPath}/css/icons.all.min.css" rel="stylesheet">
   <link href="${contextPath}/css/main.css" rel="stylesheet">
   <title>Account</title>
 </head>
 
 <body>
-<div class="container-fluid">
-  <nav class="navbar navbar-expand-md border-bottom">
-    <div class="container">
-      <i class="fa-solid fa-camera-retro"></i>
-      <a class="navbar-brand text-uppercase p-1" href="#">Photogram</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-              aria-expanded="false" aria-label="Переключатель навигации">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        </ul>
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="${pageContext.request.contextPath}/home/${username}">
-              <i class="fa-solid fa-house-user"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="${pageContext.request.contextPath}/post/create/${username}">
-              <i class="fa-solid fa-camera"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="${pageContext.request.contextPath}/edit/${username}">
-              <i class="fa-solid fa-id-card"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="${pageContext.request.contextPath}/logout">
-              <i class="fa-solid fa-right-from-bracket"></i></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</div>
 
-<section class="main-content">
+<section>
+  <div class="container-fluid">
+    <nav class="navbar navbar-expand-md border-bottom bg-body-tertiary fixed-top">
+      <div class="container">
+        <i class="fa-solid fa-camera-retro fa-lg"></i>
+        <a class="navbar-brand text-uppercase p-1" href="#">Photogram</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Переключатель навигации">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          </ul>
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/home/${username}">
+                <i class="fa-solid fa-house-user fa-lg"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/post/create/${username}">
+                <i class="fa-solid fa-camera fa-lg"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/edit/${username}">
+                <i class="fa-solid fa-id-card fa-lg"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/logout">
+                <i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section style="padding-top: 80px; padding-bottom: 10px;">
   <div class="container">
-    <div class="row p-5">
+    <div class="row p-3">
       <div class="col-12">
         <div class="card">
           <div class="row g-0">
             <div class="col-12 col-md-4 col-xl-3">
-              <div class="card-header border-end">
+              <div class="card-header h-100 border-end">
                 <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
                      aria-orientation="vertical">
                   <button class="nav-link btn-outline-secondary active" id="v-pills-overview-tab"
@@ -63,17 +69,20 @@
                           aria-controls="v-pills-overview" aria-selected="true">
                     <h5>Обзор</h5>
                   </button>
-                  <button class="nav-link btn-outline-secondary" id="v-pills-account-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary" id="v-pills-account-tab"
+                          data-bs-toggle="pill"
                           data-bs-target="#v-pills-account" type="button" role="tab"
                           aria-controls="v-pills-account" aria-selected="false">
                     <h5>Аккаунт</h5>
                   </button>
-                  <button class="nav-link btn-outline-secondary" id="v-pills-profile-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary" id="v-pills-profile-tab"
+                          data-bs-toggle="pill"
                           data-bs-target="#v-pills-profile" type="button" role="tab"
                           aria-controls="v-pills-profile" aria-selected="false">
                     <h5>Профиль</h5>
                   </button>
-                  <button class="nav-link btn-outline-secondary" id="v-pills-password-tab" data-bs-toggle="pill"
+                  <button class="nav-link btn-outline-secondary" id="v-pills-password-tab"
+                          data-bs-toggle="pill"
                           data-bs-target="#v-pills-password" type="button" role="tab"
                           aria-controls="v-pills-password" aria-selected="false">
                     <h5>Пароль</h5>
@@ -102,7 +111,7 @@
                   <div class="tab-pane fade" id="v-pills-account" role="tabpanel"
                        aria-labelledby="v-pills-account-tab">
                     <div class="container">
-                      <form action="/account/edit/${account.username}" method="post">
+                      <form action="/account/edit/${username}" method="post">
                         <div class="row p-3">
                           <div class="col">
                             <h6>При необходимости можно изменить данные для входа в личный
@@ -119,7 +128,7 @@
                               <span class="input-group-text" id="basic-addon-plus">+</span>
                               <input type="text" class="form-control" name="phone"
                                      placeholder="Номер телефона" aria-label="" id="editPhone"
-                                     value="${account.phone}" aria-describedby="basic-addon-plus">
+                                     value="${account.phone()}" aria-describedby="basic-addon-plus">
                             </div>
                           </div>
                         </div>
@@ -131,7 +140,7 @@
                           <div class="col">
                             <div class="input-group">
                               <input type="email" class="form-control" name="email" id="editEmail"
-                                     value="${account.email}" placeholder="Адрес электронной почты"
+                                     value="${account.email()}" placeholder="Адрес электронной почты"
                                      aria-describedby="emailHelp">
                             </div>
                           </div>
@@ -146,7 +155,7 @@
                               <span class="input-group-text" id="basic-addon-email">@</span>
                               <input type="text" class="form-control" name="username"
                                      placeholder="Имя пользователя" aria-label="" id="editUsername"
-                                     value="${account.username}"
+                                     value="${account.username()}"
                                      aria-describedby="basic-addon-email">
                             </div>
                           </div>
@@ -156,22 +165,25 @@
                           <div class="col-lg-3">
                           </div>
                           <div class="col">
-                            <input class="btn btn-outline-secondary" type="submit" value="Сохранить">
+                            <input class="btn btn-outline-secondary" type="submit"
+                                   value="Сохранить">
                           </div>
                         </div>
                       </form>
                     </div>
                   </div>
+
                   <%--  Вкладка Профиль  --%>
                   <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
                        aria-labelledby="v-pills-profile-tab">
                     <div class="container">
-                      <form action="/profile/edit/${account.username}" method="post">
+                      <form action="/profile/edit/${username}" method="post">
                         <div class="row p-3">
                           <div class="col">
                             <h6>При необходимости можно изменить личные данные</h6>
                           </div>
                         </div>
+
                         <%--  Имя и фамилия  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
@@ -180,7 +192,7 @@
                           <div class="col">
                             <div class="input-group">
                               <input type="text" class="form-control" name="full_name" id="editName"
-                                     value="${account.profile.fullName}" placeholder="Имя и фамилия"
+                                     value="${profile.fullName()}" placeholder="Имя и фамилия"
                                      aria-describedby="fullNameHelp">
                             </div>
                           </div>
@@ -193,20 +205,95 @@
                           </div>
                           <div class="col">
                             <div class="input-group">
-                              <input type="text" class="form-control" name="birth_date" id="editBirthDate"
-                                     value="${account.profile.birthdate}" placeholder="Дата рождения"
+                              <input type="date" class="form-control" name="birthdate"
+                                     id="editBirthDate"
+                                     value="${profile.birthdate()}"
+                                     placeholder="Дата рождения"
                                      aria-describedby="birthDateHelp">
                             </div>
                           </div>
-
-
                         </div>
+
+                        <%--  Пол  --%>
+                        <div class="row p-3">
+                          <div class="col-lg-3 text-start text-lg-end">
+                            <label for="flexRadioUndefine" class="form-label">Пол</label>
+                          </div>
+                          <div class="col">
+                            <%--  Мужской  --%>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="gender"
+                                     id="flexRadioMale" value="MALE"
+                                     <c:if test="${profile.gender() eq Gender.MALE}">checked</c:if>>
+                              <label class="form-check-label" for="flexRadioMale">
+                                Мужской
+                              </label>
+                            </div>
+                            <%--  Женский  --%>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="gender"
+                                     id="flexRadioFemale" value="FEMALE"
+                                     <c:if
+                                         test="${profile.gender() eq Gender.FEMALE}">checked</c:if>>
+                              <label class="form-check-label" for="flexRadioFemale">
+                                Женский
+                              </label>
+                            </div>
+                            <%--  Не выбран  --%>
+                            <div class="form-check form-check-inline" hidden>
+                              <input class="form-check-input" type="radio" name="gender"
+                                     id="flexRadioUndefine" value="UNDEFINE"
+                                     <c:if test="${profile.gender() eq Gender.UNDEFINE}">checked</c:if>>
+                              <label class="form-check-label" for="flexRadioUndefine"></label>
+                            </div>
+                          </div>
+                        </div>
+
+
+                        <%--  Контакты  --%>
+<%--                        <div class="row p-3">--%>
+<%--                          <div class="col-lg-3 text-start text-lg-end">--%>
+<%--                            <label for="editContactTitle1" class="form-label">Контакт 1</label>--%>
+<%--                          </div>--%>
+<%--                          <div class="col">--%>
+<%--                            <div class="input-group">--%>
+<%--                              <input type="text" class="form-control" name="full_name"--%>
+<%--                                     id="editContactTitle1"--%>
+<%--                                     value="" placeholder="Название"--%>
+<%--                                     aria-describedby="fullNameHelp">--%>
+<%--                            </div>--%>
+<%--                          </div>--%>
+<%--                          <div class="col">--%>
+<%--                            <div class="input-group">--%>
+<%--                              <input type="text" class="form-control" name="full_name"--%>
+<%--                                     id="editContactValue1"--%>
+<%--                                     value="" placeholder="Контакт"--%>
+<%--                                     aria-describedby="fullNameHelp">--%>
+<%--                            </div>--%>
+<%--                          </div>--%>
+<%--                        </div>--%>
+
+                        <%--  Обо мне  --%>
+                        <div class="row p-3">
+                          <div class="col-lg-3 text-start text-lg-end">
+                            <label for="editAboutMe" class="form-label">Обо мне</label>
+                          </div>
+                          <div class="col">
+                            <div class="input-group">
+                              <textarea class="form-control" name="about_me"
+                                        id="editAboutMe" rows="10"
+                                        maxlength="1000">${profile.aboutMe()}</textarea>
+                            </div>
+                          </div>
+                        </div>
+
 
                         <div class="row p-5">
                           <div class="col-lg-3">
                           </div>
                           <div class="col">
-                            <input class="btn btn-outline-secondary" type="submit" value="Сохранить">
+                            <input class="btn btn-outline-secondary" type="submit"
+                                   value="Сохранить">
                           </div>
                         </div>
                       </form>
@@ -216,7 +303,7 @@
                   <div class="tab-pane fade" id="v-pills-password" role="tabpanel"
                        aria-labelledby="v-pills-password-tab">
                     <div class="container">
-                      <form action="/password/${account.username}" method="post">
+                      <form action="/password/${username}" method="post">
                         <%--  Текущий пароль  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
@@ -282,6 +369,5 @@
 
 
 <script src="${contextPath}/js/bootstrap.bundle.min.js"></script>
-<script src="https://kit.fontawesome.com/f297933945.js" crossorigin="anonymous"></script>
 </body>
 </html>

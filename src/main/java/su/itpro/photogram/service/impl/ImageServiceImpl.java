@@ -1,11 +1,11 @@
 package su.itpro.photogram.service.impl;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static su.itpro.photogram.util.image.ImageUtil.checkAndResize;
 import static su.itpro.photogram.util.image.ImageUtil.convertToBase64;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -17,10 +17,10 @@ import org.slf4j.LoggerFactory;
 import su.itpro.photogram.dao.ImageDataDao;
 import su.itpro.photogram.dao.ImageInfoDao;
 import su.itpro.photogram.factory.DaoFactory;
-import su.itpro.photogram.model.dto.ImageBase64Dto;
-import su.itpro.photogram.model.entity.Account;
+import su.itpro.photogram.model.dto.ImageAndBase64Dto;
+import su.itpro.photogram.model.dto.ImageIdAndBase64Dto;
+import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.entity.Image;
-import su.itpro.photogram.model.entity.Post;
 import su.itpro.photogram.service.ImageService;
 import su.itpro.photogram.util.PropertiesUtil;
 
@@ -51,26 +51,36 @@ public class ImageServiceImpl implements ImageService {
     return INSTANCE;
   }
 
-  public List<Image> saveImages(Account account, Post post, Collection<Part> files) {
-    List<Image> images = new ArrayList<>();
-    int ordinal = 0;
+  @Override
+  public List<ImageAndBase64Dto> findImagesBy(UUID postId) {
+    List<Image> images = imageInfoDao.findAllByPostId(postId);
+    return images.stream()
+        .map(image -> new ImageAndBase64Dto(
+            image,
+            convertToBase64(imageDataDao.loadImage(image.getId()))
+        ))
+        .collect(toList());
+  }
+
+  public void saveImages(UUID accountId, UUID postId, Collection<Part> files) {
     for (Part file : files) {
       if (checkContentType(file.getContentType())) {
-        images.add(saveImage(account, post, file, ++ordinal));
+        if (file.getName() != null && file.getName().startsWith("image-")) {
+          saveImage(accountId, postId, file, getOrdinal(file.getName()));
+        }
       }
     }
-    return images;
   }
 
   @Override
-  public Map<UUID, ImageBase64Dto> loadPreviewImageFilesBy(List<Post> posts) {
+  public Map<UUID, ImageIdAndBase64Dto> loadPreviewImageFilesBy(List<PostDto> posts) {
     return posts.stream()
-        .collect(toMap(Post::getId, post -> getBase64ImageByPostId(post.getId())));
+        .collect(toMap(PostDto::id, post -> getBase64ImageByPostId(post.id())));
   }
 
-  private Image saveImage(Account account, Post post, Part file, int ordinal) {
+  private void saveImage(UUID accountId, UUID postId, Part file, int ordinal) {
     String fileName = file.getSubmittedFileName();
-    Image image = new Image(account.getId(), post.getId(), fileName, ordinal);
+    Image image = new Image(accountId, postId, fileName, ordinal);
     try {
       imageDataDao.saveImage(image.getId(), checkAndResize(
           file.getInputStream().readAllBytes(), imageWidth, imageHeight
@@ -79,20 +89,19 @@ public class ImageServiceImpl implements ImageService {
       log.error("Error save Image with file name {}", fileName);
     }
     imageInfoDao.save(image);
-    return image;
   }
 
-  private ImageBase64Dto getBase64ImageByPostId(UUID postId) {
+  private ImageIdAndBase64Dto getBase64ImageByPostId(UUID postId) {
     var optionalImageId = imageInfoDao.findPreviewImageId(postId);
     if (optionalImageId.isEmpty()) {
       log.error("For postId [{}] absent image", postId);
-      return new ImageBase64Dto(null, null);
+      return new ImageIdAndBase64Dto(null, null);
     }
     return loadBase64Image(optionalImageId.get());
   }
 
-  private ImageBase64Dto loadBase64Image(UUID imageId) {
-    return new ImageBase64Dto(imageId, convertToBase64(imageDataDao.loadImage(imageId)));
+  private ImageIdAndBase64Dto loadBase64Image(UUID imageId) {
+    return new ImageIdAndBase64Dto(imageId, convertToBase64(imageDataDao.loadImage(imageId)));
   }
 
   private boolean checkContentType(String type) {
@@ -101,6 +110,10 @@ public class ImageServiceImpl implements ImageService {
     }
     String[] types = CONTENT_TYPES.split(",");
     return Arrays.asList(types).contains(type);
+  }
+
+  private int getOrdinal(String filename) {
+    return Integer.parseInt(filename.substring("image-".length()));
   }
 
 }

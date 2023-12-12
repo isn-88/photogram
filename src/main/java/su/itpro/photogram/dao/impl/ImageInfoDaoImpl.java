@@ -1,5 +1,6 @@
 package su.itpro.photogram.dao.impl;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -14,14 +15,26 @@ import su.itpro.photogram.model.entity.Image;
 public class ImageInfoDaoImpl implements ImageInfoDao {
 
   private static final String ID = "id";
-
+  private static final String ACCOUNT_ID = "account_id";
   private static final String POST_ID = "post_id";
+  private static final String FILE_NAME = "file_name";
+  private static final String ORDINAL = "ordinal";
 
 
-  private static final String FIND_PREVIEW_IMAGE_SQL = """
+  private static final String FIND_PREVIEW_IMAGE_ID_SQL = """
       SELECT id
       FROM image
-      WHERE post_id = ? AND ordinal = 1
+      WHERE post_id = ?
+      ORDER BY ordinal
+      LIMIT 1
+      ;
+      """;
+
+  private static final String FIND_ALL_BY_POST_ID_SQL = """
+      SELECT id, account_id, post_id, file_name, ordinal
+      FROM image
+      WHERE post_id = ?
+      ORDER BY ordinal
       ;
       """;
 
@@ -62,9 +75,28 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
   }
 
   @Override
+  public List<Image> findAllByPostId(UUID postId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(FIND_ALL_BY_POST_ID_SQL)) {
+      prepared.setObject(1, postId);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      List<Image> images = new ArrayList<>();
+      while (resultSet.next()) {
+        images.add(parseImage(resultSet));
+      }
+      return images;
+    } catch (SQLException e) {
+      throw new DaoException("Error findAllByPostId", e.getMessage());
+    }
+  }
+
+  @Override
   public Optional<UUID> findPreviewImageId(UUID postId) {
     try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(FIND_PREVIEW_IMAGE_SQL)) {
+        var prepared = connection.prepareStatement(FIND_PREVIEW_IMAGE_ID_SQL)) {
       prepared.setObject(1, postId);
 
       prepared.executeQuery();
@@ -81,7 +113,7 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
   }
 
   @Override
-  public void save(Image image) {
+  public Image save(Image image) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
       prepared.setObject(1, image.getId());
@@ -98,6 +130,7 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
     } catch (SQLException e) {
       throw new DaoException("Error save Image", e.getMessage());
     }
+    return image;
   }
 
   @Override
@@ -116,9 +149,17 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
   }
 
   @Override
-  public boolean delete(UUID id) {
+  public void delete(UUID id) {
     // TODO add implementation
-    return false;
+  }
+
+  private Image parseImage(ResultSet resultSet) throws SQLException {
+    Image image = new Image(resultSet.getObject(ID, UUID.class));
+    image.setAccountId(resultSet.getObject(ACCOUNT_ID, UUID.class));
+    image.setPostId(resultSet.getObject(POST_ID, UUID.class));
+    image.setFileName(resultSet.getString(FILE_NAME));
+    image.setOrdinal(resultSet.getShort(ORDINAL));
+    return image;
   }
 
 }
