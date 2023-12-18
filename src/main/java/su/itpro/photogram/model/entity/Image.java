@@ -1,5 +1,6 @@
 package su.itpro.photogram.model.entity;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ public class Image {
   private UUID accountId;
   private UUID postId;
   private String fileName;
+  private Path fullPath;
   private int ordinal;
 
 
@@ -19,15 +21,17 @@ public class Image {
     this.id = id;
   }
 
-  public Image(UUID accountId, UUID postId, String fileName, int ordinal) {
-    this(UUID.randomUUID(), accountId, postId, fileName, ordinal);
+  public Image(UUID accountId, UUID postId, String fileName, Path fullPath, int ordinal) {
+    this(UUID.randomUUID(), accountId, postId, fileName, fullPath, ordinal);
   }
 
-  public Image(UUID id, UUID accountId, UUID postId, String fileName, int ordinal) {
+  public Image(UUID id, UUID accountId, UUID postId,
+               String fileName, Path fullPath, int ordinal) {
     this.id = id;
     this.accountId = accountId;
     this.postId = postId;
     this.fileName = fileName;
+    this.fullPath = fullPath;
     this.ordinal = ordinal;
   }
 
@@ -45,6 +49,10 @@ public class Image {
 
   public String getFileName() {
     return fileName;
+  }
+
+  public Path getFullPath() {
+    return fullPath;
   }
 
   public int getOrdinal() {
@@ -67,6 +75,9 @@ public class Image {
     this.fileName = fileName;
   }
 
+  public void setFullPath(Path fullPath) {
+    this.fullPath = fullPath;
+  }
 
   public void setOrdinal(int ordinal) {
     this.ordinal = ordinal;
@@ -96,6 +107,7 @@ public class Image {
            ", accountId=" + accountId +
            ", postId=" + postId +
            ", fileName='" + fileName + '\'' +
+           ", fullPath='" + fullPath + '\'' +
            ", ordinal=" + ordinal +
            '}';
   }

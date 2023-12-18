@@ -6,12 +6,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import su.itpro.photogram.exception.validation.ValidationException;
 import su.itpro.photogram.model.dto.AccountDto;
-import su.itpro.photogram.model.dto.ProfileDto;
+import su.itpro.photogram.model.dto.LoginDto;
 import su.itpro.photogram.service.LoginService;
-import su.itpro.photogram.service.ProfileService;
 import su.itpro.photogram.service.impl.LoginServiceImpl;
-import su.itpro.photogram.service.impl.ProfileServiceImpl;
+import su.itpro.photogram.servlet.enums.PageSelector;
+import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.ServletUtil;
 
 
@@ -19,34 +20,39 @@ import su.itpro.photogram.util.ServletUtil;
 public class LoginServlet extends HttpServlet {
 
   private final LoginService loginService;
-  private final ProfileService profileService;
 
 
   public LoginServlet() {
     loginService = LoginServiceImpl.getInstance();
-    profileService = ProfileServiceImpl.getInstance();
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    getServletContext().getRequestDispatcher(SelectPage.LOGIN.get()).forward(req, resp);
+    req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.LOGIN))
+        .forward(req, resp);
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    req.setCharacterEncoding("UTF-8");
 
-    String login = ServletUtil.getValueAndStrip(req, "login");
-    String password = ServletUtil.getValue(req, "password");
-    AccountDto accountDto = loginService.login(login, password);
-    ProfileDto profileDto = profileService.loadProfile(accountDto.id());
+    LoginDto loginDto = new LoginDto(
+        ServletUtil.getValueAndStrip(req, "login"),
+        ServletUtil.getValue(req, "password")
+    );
 
-    req.setAttribute("account", accountDto);
-    req.setAttribute("profile", profileDto);
+    try {
+      AccountDto accountDto = loginService.login(loginDto);
+      req.getSession().setAttribute("account", accountDto);
 
-    resp.sendRedirect("/home/" + accountDto.username());
+      resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
+    } catch (ValidationException e) {
+      req.setAttribute("errors", e.getErrors());
+      req.setAttribute("login", loginDto.login());
+      doGet(req, resp);
+    }
   }
+
 }

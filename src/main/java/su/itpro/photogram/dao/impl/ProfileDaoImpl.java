@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.ProfileDao;
-import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
+import su.itpro.photogram.exception.dao.DaoException;
 import su.itpro.photogram.model.entity.Profile;
 import su.itpro.photogram.model.enums.Gender;
 

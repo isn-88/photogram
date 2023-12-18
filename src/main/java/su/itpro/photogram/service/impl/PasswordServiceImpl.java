@@ -1,15 +1,15 @@
 package su.itpro.photogram.service.impl;
 
-import static su.itpro.photogram.util.validator.ValidationPasswordUtil.validationPasswordLength;
-import static su.itpro.photogram.util.validator.ValidationValueUtil.validationNullOrBlanc;
 
 import su.itpro.photogram.dao.AccountDao;
-import su.itpro.photogram.exception.service.LoginServiceException;
 import su.itpro.photogram.exception.service.PasswordServiceException;
+import su.itpro.photogram.exception.validation.ValidationException;
 import su.itpro.photogram.factory.DaoFactory;
 import su.itpro.photogram.model.dto.ChangePasswordDto;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.service.PasswordService;
+import su.itpro.photogram.validator.PasswordChangeValidator;
+import su.itpro.photogram.validator.ValidationResult;
 
 public class PasswordServiceImpl implements PasswordService {
 
@@ -17,41 +17,36 @@ public class PasswordServiceImpl implements PasswordService {
   private static final int MIN_LENGTH_PASSWORD = 8;
 
   private final AccountDao accountDao;
+  private final PasswordChangeValidator passwordChangeValidator;
 
 
   private PasswordServiceImpl() {
     accountDao = DaoFactory.INSTANCE.getAccountDao();
+    passwordChangeValidator = PasswordChangeValidator.getInstance();
   }
 
   public static PasswordService getInstance() {
     return INSTANCE;
   }
 
+
   @Override
   public void changePassword(ChangePasswordDto dto) {
+    ValidationResult validationResult = passwordChangeValidator.validate(dto);
+    if (validationResult.hasErrors()) {
+      throw new ValidationException(validationResult.getErrors());
+    }
 
-    validationNullOrBlanc(dto.username(), "Username must not be empty");
-    Account account = accountDao.findByUsername(dto.username()).orElseThrow(
+    Account account = accountDao.findById(dto.accountId()).orElseThrow(
         () -> new PasswordServiceException("Account not found")
     );
 
-    if (!(account.getPassword()).equals(dto.currentPassword())) {
-      throw new PasswordServiceException("Current password is incorrect");
+    passwordChangeValidator.validateMatch(account.getPassword(), dto);
+    if (validationResult.hasErrors()) {
+      throw new ValidationException(validationResult.getErrors());
     }
-    validationInputNewPassword(dto.newPassword(), dto.checkPassword());
+
     accountDao.changePassword(account, dto.newPassword());
-  }
-
-  private void validationInputNewPassword(String newPassword, String checkPassword) {
-    checkRules(newPassword);
-    if (!newPassword.equals(checkPassword)) {
-      throw new LoginServiceException("Passwords don't match");
-    }
-  }
-
-  private void checkRules(String password) {
-    validationNullOrBlanc(password);
-    validationPasswordLength(password, MIN_LENGTH_PASSWORD);
   }
 
 }

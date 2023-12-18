@@ -1,60 +1,37 @@
 package su.itpro.photogram.model.entity;
 
-import java.util.Arrays;
+
 import java.util.Objects;
 import java.util.UUID;
 
 public class Icon {
 
-  private UUID id;
-  private String name;
-  private String type;
+  private UUID accountId;
   private byte[] data;
+
 
   public Icon() {
   }
 
-  public Icon(UUID id) {
-    this.id = id;
+  public Icon(UUID accountId) {
+    this.accountId = accountId;
   }
 
-  public Icon(String name, String type, byte[] data) {
-    this(null, name, type, data);
+  public Icon(UUID accountId, byte[] data) {
+    this.accountId = accountId;
+    this.data = data;
   }
 
-  public Icon(UUID id, String name, String type, byte[] data) {
-    this.id = id;
-    this.name = name;
-    this.type = type;
-    this.data = data != null ? Arrays.copyOf(data, data.length) : new byte[0];
-  }
-
-  public UUID getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getType() {
-    return type;
+  public UUID getAccountId() {
+    return accountId;
   }
 
   public byte[] getData() {
-    return Arrays.copyOf(data, data.length);
+    return data;
   }
 
-  public void setId(UUID id) {
-    this.id = id;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setType(String type) {
-    this.type = type;
+  public void setAccountId(UUID accountId) {
+    this.accountId = accountId;
   }
 
   public void setData(byte[] data) {
@@ -70,20 +47,18 @@ public class Icon {
       return false;
     }
     Icon icon = (Icon) o;
-    return Objects.equals(id, icon.id);
+    return Objects.equals(accountId, icon.accountId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(accountId);
   }
 
   @Override
   public String toString() {
     return "Icon{" +
-           "id=" + id +
-           ", name='" + name + '\'' +
-           ", type='" + type + '\'' +
+           "accountId=" + accountId +
            '}';
   }
 }

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.AccountDao;
-import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
+import su.itpro.photogram.exception.dao.DaoException;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.model.enums.Role;
 import su.itpro.photogram.model.enums.Status;
@@ -30,6 +30,25 @@ public class AccountDaoImpl implements AccountDao {
   private static final String CREATE_DATE = "create_date";
 
   private static final AccountDao INSTANCE = new AccountDaoImpl();
+
+  private static final String CHECK_STATUS_SQL = """
+      SELECT status
+      FROM account
+        JOIN status s ON s.id = account.status_id
+      WHERE account.id = ?
+      ;
+      """;
+
+
+  private static final String FIND_BY_ID_SQL = """
+      SELECT  a.id, phone, email, username, password, role, status,
+              is_verified_phone, is_verified_email, create_date
+      FROM account a
+        JOIN role r ON r.id = a.role_id
+        JOIN status s ON s.id = a.status_id
+      WHERE a.id = ?
+      ;
+      """;
 
   private static final String FIND_BY_USERNAME_SQL = """
       SELECT  a.id, phone, email, username, password, role, status,
@@ -58,6 +77,27 @@ public class AccountDaoImpl implements AccountDao {
         JOIN role r ON r.id = a.role_id
         JOIN status s ON s.id = a.status_id
       WHERE phone = ?
+      ;
+      """;
+
+  private static final String PHONE_EXISTS_SQL = """
+      SELECT id
+      FROM account
+      WHERE phone = ?
+      ;
+      """;
+
+  private static final String EMAIL_EXISTS_SQL = """
+      SELECT id
+      FROM account
+      WHERE email = ?
+      ;
+      """;
+
+  private static final String USERNAME_EXISTS_SQL = """
+      SELECT id
+      FROM account
+      WHERE username = ?
       ;
       """;
 
@@ -104,6 +144,43 @@ public class AccountDaoImpl implements AccountDao {
 
   public static AccountDao getInstance() {
     return INSTANCE;
+  }
+
+  @Override
+  public boolean checkStatus(UUID accountId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(CHECK_STATUS_SQL)) {
+      prepared.setObject(1, accountId);
+
+      ResultSet resultSet = prepared.executeQuery();
+
+      if (resultSet.next()) {
+        Status status = Status.valueOf(resultSet.getString(STATUS));
+        return (status == Status.ACTIVE);
+      }
+      return false;
+    } catch (SQLException e) {
+      throw new DaoException("Error checkStatus Account", e.getMessage());
+    }
+  }
+
+  @Override
+  public Optional<Account> findById(UUID id) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(FIND_BY_ID_SQL)) {
+      prepared.setObject(1, id);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      Account account = null;
+      if (resultSet.next()) {
+        account = parseAccount(resultSet);
+      }
+      return Optional.ofNullable(account);
+    } catch (SQLException e) {
+      throw new DaoException("Error findById Account", e.getMessage());
+    }
   }
 
   @Override
@@ -164,6 +241,51 @@ public class AccountDaoImpl implements AccountDao {
   }
 
   @Override
+  public boolean existsByPhone(String phone) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(PHONE_EXISTS_SQL)) {
+      prepared.setString(1, phone);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      return resultSet.next();
+    } catch (SQLException e) {
+      throw new DaoException("Error existsByUsername Account", e.getMessage());
+    }
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(EMAIL_EXISTS_SQL)) {
+      prepared.setString(1, email);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      return resultSet.next();
+    } catch (SQLException e) {
+      throw new DaoException("Error existsByUsername Account", e.getMessage());
+    }
+  }
+
+  @Override
+  public boolean existsByUsername(String username) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(USERNAME_EXISTS_SQL)) {
+      prepared.setString(1, username);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      return resultSet.next();
+    } catch (SQLException e) {
+      throw new DaoException("Error existsByUsername Account", e.getMessage());
+    }
+  }
+
+  @Override
   public void changePassword(Account account, String password) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(CHANGE_PASSWORD_SQL)) {
@@ -181,12 +303,6 @@ public class AccountDaoImpl implements AccountDao {
     } catch (SQLException e) {
       throw new DaoException("Error change Password", e.getMessage());
     }
-  }
-
-  @Override
-  public Optional<Account> findById(UUID id) {
-    // TODO add implementation
-    return Optional.empty();
   }
 
   @Override
@@ -236,13 +352,13 @@ public class AccountDaoImpl implements AccountDao {
   @Override
   public void delete(UUID id) {
     try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(UPDATE_SQL)) {
+        var prepared = connection.prepareStatement(DELETE_SQL)) {
       prepared.setString(1, Status.DELETED.name());
       prepared.setObject(2, id);
 
       prepared.executeUpdate();
     } catch (SQLException e) {
-      throw new DaoException("Error update Account", e.getMessage());
+      throw new DaoException("Error delete Account", e.getMessage());
     }
   }
 

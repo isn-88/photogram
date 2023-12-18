@@ -6,6 +6,7 @@ CREATE TABLE status
     CONSTRAINT status_ch CHECK (status IN ('ACTIVE', 'BLOCKED', 'DELETED'))
 );
 
+
 CREATE TABLE role
 (
     id smallint PRIMARY KEY,
@@ -13,12 +14,14 @@ CREATE TABLE role
     CONSTRAINT role_ch CHECK (role IN ('USER', 'MANAGER', 'ADMIN'))
 );
 
+
 CREATE TABLE gender
 (
     id smallint PRIMARY KEY,
     gender varchar(8),
     CONSTRAINT gender_ch CHECK (gender IN ('MALE', 'FEMALE', 'UNDEFINE'))
 );
+
 
 CREATE TABLE account
 (
@@ -38,9 +41,7 @@ CREATE TABLE account
 CREATE TABLE icon
 (
     account_id uuid REFERENCES account (id),
-    name varchar(256),
-    type varchar(32),
-    data text,
+    data bytea,
     PRIMARY KEY (account_id)
 );
 
@@ -71,9 +72,19 @@ CREATE TABLE image
 (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     account_id uuid REFERENCES account (id) NOT NULL,
-    post_id uuid REFERENCES post (id),
-    file_name varchar(255) NOT NULL,
+    post_id uuid REFERENCES post (id) NOT NULL,
+    file_name varchar(256) NOT NULL,
+    full_path varchar(512) NOT NULL,
     ordinal smallint NOT NULL
 );
 
-
+CREATE TABLE comment
+(
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    account_id uuid REFERENCES account (id) NOT NULL,
+    post_id uuid REFERENCES post (id) NOT NULL,
+    create_time timestamp with time zone NOT NULL DEFAULT now(),
+    change_time timestamp with time zone,
+    is_deleted boolean NOT NULL DEFAULT false,
+    message text NOT NULL
+);

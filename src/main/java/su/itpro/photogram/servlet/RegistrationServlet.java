@@ -6,9 +6,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import su.itpro.photogram.model.dto.RegistrationDto;
+import su.itpro.photogram.exception.validation.ValidationException;
+import su.itpro.photogram.model.dto.CreateAccountDto;
 import su.itpro.photogram.service.RegistrationService;
 import su.itpro.photogram.service.impl.RegistrationServiceImpl;
+import su.itpro.photogram.servlet.enums.PageSelector;
 import su.itpro.photogram.util.ServletUtil;
 
 @WebServlet("/registration")
@@ -25,7 +27,8 @@ public class RegistrationServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    getServletContext().getRequestDispatcher(SelectPage.REG.get()).forward(req, resp);
+    req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.REG))
+        .forward(req, resp);
   }
 
   @Override
@@ -33,7 +36,7 @@ public class RegistrationServlet extends HttpServlet {
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
 
-    RegistrationDto registrationDto = new RegistrationDto(
+    CreateAccountDto createAccountDto = new CreateAccountDto(
         ServletUtil.getValue(req, "phone"),
         ServletUtil.getValue(req, "email"),
         ServletUtil.getValue(req, "username"),
@@ -41,8 +44,17 @@ public class RegistrationServlet extends HttpServlet {
         ServletUtil.getValue(req, "full_name")
     );
 
-    registrationService.registerNewAccount(registrationDto);
-
-    getServletContext().getRequestDispatcher(SelectPage.LOGIN.get()).forward(req, resp);
+    try {
+      registrationService.registerNewAccount(createAccountDto);
+      req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.LOGIN))
+          .forward(req, resp);
+    } catch (ValidationException e) {
+      req.setAttribute("errors", e.getErrors());
+      req.setAttribute("phone", createAccountDto.phone());
+      req.setAttribute("email", createAccountDto.email());
+      req.setAttribute("username", createAccountDto.username());
+      req.setAttribute("full_name", createAccountDto.fullName());
+      doGet(req, resp);
+    }
   }
 }

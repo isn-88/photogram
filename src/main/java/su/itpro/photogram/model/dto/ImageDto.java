@@ -1,6 +1,7 @@
 package su.itpro.photogram.model.dto;
 
-public record ImageDto(String filename,
-                       byte[] data) {
+import java.util.UUID;
+
+public record ImageDto(UUID id, String name) {
 
 }

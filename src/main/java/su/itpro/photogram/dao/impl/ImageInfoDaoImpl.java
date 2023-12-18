@@ -1,5 +1,6 @@
 package su.itpro.photogram.dao.impl;
 
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.ImageInfoDao;
-import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
+import su.itpro.photogram.exception.dao.DaoException;
 import su.itpro.photogram.model.entity.Image;
 
 public class ImageInfoDaoImpl implements ImageInfoDao {
@@ -18,9 +19,16 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
   private static final String ACCOUNT_ID = "account_id";
   private static final String POST_ID = "post_id";
   private static final String FILE_NAME = "file_name";
+  private static final String FULL_PATH = "full_path";
   private static final String ORDINAL = "ordinal";
 
 
+  private static final String FIND_BY_ID_SQL = """
+      SELECT id, account_id, post_id, file_name, full_path, ordinal
+      FROM image
+      WHERE id = ?
+      ;
+      """;
   private static final String FIND_PREVIEW_IMAGE_ID_SQL = """
       SELECT id
       FROM image
@@ -31,7 +39,7 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
       """;
 
   private static final String FIND_ALL_BY_POST_ID_SQL = """
-      SELECT id, account_id, post_id, file_name, ordinal
+      SELECT id, account_id, post_id, file_name, full_path, ordinal
       FROM image
       WHERE post_id = ?
       ORDER BY ordinal
@@ -39,8 +47,8 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
       """;
 
   private static final String SAVE_SQL = """
-      INSERT INTO image (id, account_id, post_id, file_name, ordinal)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO image (id, account_id, post_id, file_name, full_path, ordinal)
+      VALUES (?, ?, ?, ?, ?, ?)
       ;
       """;
 
@@ -50,6 +58,12 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
           file_name = ?,
           ordinal = ?
       WHERE id = ?
+      ;
+      """;
+
+  private static final String DELETE_BY_POST_ID_SQL = """
+      DELETE FROM image
+      WHERE post_id = ?
       ;
       """;
 
@@ -65,7 +79,21 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
 
   @Override
   public Optional<Image> findById(UUID id) {
-    return Optional.empty();
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(FIND_BY_ID_SQL)) {
+      prepared.setObject(1, id);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      Image image = null;
+      if (resultSet.next()) {
+        image = parseImage(resultSet);
+      }
+      return Optional.ofNullable(image);
+    } catch (SQLException e) {
+      throw new DaoException("Error findById Image", e.getMessage());
+    }
   }
 
   @Override
@@ -120,7 +148,8 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
       prepared.setObject(2, image.getAccountId());
       prepared.setObject(3, image.getPostId());
       prepared.setString(4, image.getFileName());
-      prepared.setInt(5, image.getOrdinal());
+      prepared.setString(5, image.getFullPath().toString());
+      prepared.setInt(6, image.getOrdinal());
       prepared.executeUpdate();
 
       var generatedKeys = prepared.getGeneratedKeys();
@@ -149,6 +178,18 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
   }
 
   @Override
+  public void deleteImagesByPostId(UUID postId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(DELETE_BY_POST_ID_SQL)) {
+      prepared.setObject(1, postId);
+
+      prepared.executeUpdate();
+    } catch (SQLException e) {
+      throw new DaoException("Error delete Image", e.getMessage());
+    }
+  }
+
+  @Override
   public void delete(UUID id) {
     // TODO add implementation
   }
@@ -158,6 +199,7 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
     image.setAccountId(resultSet.getObject(ACCOUNT_ID, UUID.class));
     image.setPostId(resultSet.getObject(POST_ID, UUID.class));
     image.setFileName(resultSet.getString(FILE_NAME));
+    image.setFullPath(Path.of(resultSet.getString(FULL_PATH)));
     image.setOrdinal(resultSet.getShort(ORDINAL));
     return image;
   }

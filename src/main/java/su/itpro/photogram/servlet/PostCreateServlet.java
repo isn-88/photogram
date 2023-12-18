@@ -7,12 +7,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.PostCreateDto;
 import su.itpro.photogram.service.PostService;
 import su.itpro.photogram.service.impl.PostServiceImpl;
+import su.itpro.photogram.servlet.enums.PageSelector;
+import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.ServletUtil;
 
-@WebServlet("/post/create/*")
+@WebServlet("/post/create")
 @MultipartConfig(maxFileSize = 128_000_000)
 public class PostCreateServlet extends HttpServlet {
 
@@ -23,28 +26,23 @@ public class PostCreateServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    req.setAttribute("username", username);
-
-    getServletContext().getRequestDispatcher(SelectPage.POST_CREATE.get()).forward(req, resp);
+    req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.POST_CREATE))
+        .forward(req, resp);
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    req.setCharacterEncoding("UTF-8");
 
-    String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
+    AccountDto accountDto = ServletUtil.getAccountFromSession(req);
     var postCreateDto = new PostCreateDto(
         ServletUtil.getBoolean(req, "isActive"),
         ServletUtil.getValue(req, "description"),
         req.getParts()
     );
 
-    postService.createNewPost(username, postCreateDto);
+    postService.createNewPost(accountDto.username(), postCreateDto);
 
-    req.setAttribute("username", username);
-
-    resp.sendRedirect("/home/" + username);
+    resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
   }
 }

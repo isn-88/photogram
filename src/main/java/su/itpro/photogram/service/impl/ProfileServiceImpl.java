@@ -7,7 +7,7 @@ import java.util.UUID;
 import su.itpro.photogram.dao.ProfileDao;
 import su.itpro.photogram.exception.service.ProfileServiceException;
 import su.itpro.photogram.factory.DaoFactory;
-import su.itpro.photogram.mapper.ProfileMapper;
+import su.itpro.photogram.mapper.ProfileDtoMapper;
 import su.itpro.photogram.model.dto.ProfileDto;
 import su.itpro.photogram.model.dto.ProfileEditDto;
 import su.itpro.photogram.model.entity.Profile;
@@ -18,12 +18,12 @@ public class ProfileServiceImpl implements ProfileService {
   private static final ProfileServiceImpl INSTANCE = new ProfileServiceImpl();
 
   private final ProfileDao profileDao;
-  private final ProfileMapper profileMapper;
+  private final ProfileDtoMapper profileDtoMapper;
 
 
   private ProfileServiceImpl() {
     profileDao = DaoFactory.INSTANCE.getProfileDao();
-    profileMapper = ProfileMapper.getInstance();
+    profileDtoMapper = ProfileDtoMapper.getInstance();
   }
 
   public static ProfileServiceImpl getInstance() {
@@ -31,7 +31,7 @@ public class ProfileServiceImpl implements ProfileService {
   }
 
   public ProfileDto loadProfile(UUID accountId) {
-    return profileMapper.mapToProfile(profileDao.findById(accountId).orElseThrow(
+    return profileDtoMapper.mapToProfile(profileDao.findById(accountId).orElseThrow(
         () -> new ProfileServiceException("Profile not found")
     ));
   }
@@ -47,7 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
     Optional.ofNullable(dto.aboutMe()).ifPresent(profile::setAboutMe);
 
     profileDao.update(profile);
-    return profileMapper.mapToProfile(profile);
+    return profileDtoMapper.mapToProfile(profile);
   }
 
 }

@@ -1,29 +1,36 @@
 package su.itpro.photogram.service.impl;
 
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import su.itpro.photogram.dao.AccountDao;
-import su.itpro.photogram.dao.exception.DaoException;
+import su.itpro.photogram.exception.dao.DaoException;
 import su.itpro.photogram.exception.service.LoginServiceException;
+import su.itpro.photogram.exception.validation.ValidationException;
 import su.itpro.photogram.factory.DaoFactory;
-import su.itpro.photogram.mapper.AccountMapper;
+import su.itpro.photogram.mapper.AccountDtoMapper;
 import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.dto.LoginDto;
 import su.itpro.photogram.model.entity.Account;
-import su.itpro.photogram.model.enums.Status;
 import su.itpro.photogram.service.LoginService;
-import su.itpro.photogram.util.validator.ValidationPasswordUtil;
-import su.itpro.photogram.util.validator.ValidationValueUtil;
+import su.itpro.photogram.validator.LoginValidator;
+import su.itpro.photogram.validator.ValidationResult;
 
 public class LoginServiceImpl implements LoginService {
 
   private static final LoginService INSTANCE = new LoginServiceImpl();
 
+  private final Logger log;
   private final AccountDao accountDao;
-  private final AccountMapper accountMapper;
+  private final AccountDtoMapper accountDtoMapper;
+  private final LoginValidator loginValidator;
 
 
   private LoginServiceImpl() {
+    log = LoggerFactory.getLogger(LoginServiceImpl.class);
     accountDao = DaoFactory.INSTANCE.getAccountDao();
-    accountMapper = AccountMapper.getInstance();
+    accountDtoMapper = AccountDtoMapper.getInstance();
+    loginValidator = LoginValidator.getInstance();
   }
 
   public static LoginService getInstance() {
@@ -31,11 +38,15 @@ public class LoginServiceImpl implements LoginService {
   }
 
   @Override
-  public AccountDto login(String login, String password) {
-    ValidationValueUtil.validationNullOrBlanc(login, "Login must be empty");
-    ValidationValueUtil.validationNullOrBlanc(password, "Password must be empty");
+  public AccountDto login(LoginDto dto) {
+
+    ValidationResult validationResult = loginValidator.validate(dto);
+    if (validationResult.hasErrors()) {
+      throw new ValidationException(validationResult.getErrors());
+    }
 
     Optional<Account> accountOpt;
+    String login = dto.login();
     try {
       if (login.contains("@")) {
         accountOpt = accountDao.findByEmail(login);
@@ -47,17 +58,15 @@ public class LoginServiceImpl implements LoginService {
         accountOpt = accountDao.findByUsername(login);
       }
     } catch (DaoException e) {
-      throw new LoginServiceException("Login or password incorrect");
+      log.error("Error load Account {}", e.getMessage());
+      throw new LoginServiceException(e.getMessage());
     }
 
-    Account account = accountOpt.orElseThrow(
-        () -> new LoginServiceException("Account not found"));
-
-    if (!account.getStatus().equals(Status.ACTIVE)) {
-      throw new LoginServiceException("Account not active");
+    validationResult = loginValidator.validateLogin(accountOpt, dto);
+    if (validationResult.hasErrors()) {
+      throw new ValidationException(validationResult.getErrors());
     }
 
-    ValidationPasswordUtil.validationLogin(account, password);
-    return accountMapper.mapToAccountDto(account);
+    return accountDtoMapper.mapFrom(accountOpt.get());
   }
 }

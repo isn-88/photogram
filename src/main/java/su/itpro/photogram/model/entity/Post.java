@@ -1,6 +1,5 @@
 package su.itpro.photogram.model.entity;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -35,16 +34,6 @@ public class Post {
     this.isActive = isActive;
     this.description = description;
     this.createDate = createDate;
-  }
-
-  public String getTimeLater() {
-    long value;
-    if ((value = Duration.between(Instant.now(), createDate).toDays()) > 0) {
-      return "С момента публикации прошло " + value + " дней.";
-    } else if ((value = Duration.between(Instant.now(), createDate).toMinutes()) > 0) {
-      return "С момента публикации прошло " + value + " минут.";
-    }
-    return "";
   }
 
   public UUID getId() {

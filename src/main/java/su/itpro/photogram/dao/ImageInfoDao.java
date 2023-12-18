@@ -25,4 +25,11 @@ public interface ImageInfoDao extends BaseDao<UUID, Image> {
    * @return список метаинформации о фотографиях
    */
   List<Image> findAllByPostId(UUID postId);
+
+  /**
+   * Удаляет информацию о всех фотографиях для указанной публикации
+   *
+   * @param postId - идентификатор публикации
+   */
+  void deleteImagesByPostId(UUID postId);
 }
