@@ -224,7 +224,7 @@
   window.addEventListener('load', handleResize);
 </script>
 
-<script src="https://code.jquery.com/jquery.js"></script>
+<script src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -16,7 +16,8 @@ import su.itpro.photogram.service.impl.AccountServiceImpl;
 import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.ServletUtil;
 
-@WebFilter("/*")
+@WebFilter({"/account/*", "/comment/*", "/edit", "/home", "/icon/*",
+            "/image/*", "/password", "/post/*", "/profile/*"})
 public class AuthFilter implements Filter {
 
   private final AccountService accountService = AccountServiceImpl.getInstance();
@@ -27,17 +28,15 @@ public class AuthFilter implements Filter {
                        FilterChain filterChain) throws IOException, ServletException {
 
     HttpServletRequest req = (HttpServletRequest) servletRequest;
-    String path = req.getServletPath();
-    if (!path.equals("/registration") && !path.equals("/login") && !path.equals("/logout")) {
-      HttpServletResponse resp = (HttpServletResponse) servletResponse;
-      HttpSession session = req.getSession(false);
+    HttpServletResponse resp = (HttpServletResponse) servletResponse;
+    HttpSession session = req.getSession(false);
+    if (session != null) {
       AccountDto account = (AccountDto) session.getAttribute("account");
-      if (account == null || !accountService.checkStatus(account.id())) {
-        resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.LOGIN));
+      if (account != null && accountService.checkStatus(account.id())) {
+        filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
     }
-
-    filterChain.doFilter(servletRequest, servletResponse);
+    resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.LOGIN));
   }
 }

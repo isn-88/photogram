@@ -426,7 +426,7 @@
   </div>
 </section>
 
-<script src="https://code.jquery.com/jquery.js"></script>
+<script src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/jasny-bootstrap.min.js"></script>
 </body>

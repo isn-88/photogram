@@ -1,18 +1,22 @@
 package su.itpro.photogram.service.impl;
 
 import static java.util.stream.Collectors.toMap;
-import static su.itpro.photogram.util.image.ImageUtil.checkAndResize;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,8 @@ import su.itpro.photogram.factory.DaoFactory;
 import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.entity.Image;
 import su.itpro.photogram.service.ImageService;
+import su.itpro.photogram.thread.SaveImageCallable;
+import su.itpro.photogram.thread.SaveImageThreadPool;
 import su.itpro.photogram.util.PropertiesUtil;
 
 public class ImageServiceImpl implements ImageService {
@@ -36,6 +42,7 @@ public class ImageServiceImpl implements ImageService {
   private final Logger log;
   private final ImageDataDao imageDataDao;
   private final ImageInfoDao imageInfoDao;
+  private final SaveImageThreadPool threadPool;
   private final int imageWidth;
   private final int imageHeight;
 
@@ -44,6 +51,7 @@ public class ImageServiceImpl implements ImageService {
     log = LoggerFactory.getLogger(PostServiceImpl.class);
     imageDataDao = DaoFactory.INSTANCE.getImageDataDao();
     imageInfoDao = DaoFactory.INSTANCE.getImageInfoDao();
+    threadPool = SaveImageThreadPool.getInstance();
     imageWidth = PropertiesUtil.getInt("app.post.image.width", DEFAULT_IMAGE_WIDTH);
     imageHeight = PropertiesUtil.getInt("app.post.image.height", DEFAULT_IMAGE_HEIGHT);
   }
@@ -67,13 +75,23 @@ public class ImageServiceImpl implements ImageService {
   }
 
   public void saveImages(UUID accountId, UUID postId, Collection<Part> files) {
+    Instant start = Instant.now();
+    List<Future<Image>> saveImageFutureList = new ArrayList<>();
     for (Part file : files) {
       if (checkContentType(file.getContentType())) {
         if (file.getName() != null && file.getName().startsWith("image-")) {
-          saveImage(accountId, postId, file, getOrdinal(file.getName()));
+          saveImageFutureList.add(saveImage(accountId, postId, file, getOrdinal(file.getName())));
         }
       }
     }
+    for (Future<Image> future : saveImageFutureList) {
+      try {
+        future.get();
+      } catch (InterruptedException | ExecutionException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    log.info("Images was saved in {}ms", Duration.between(start, Instant.now()).toMillis());
   }
 
   @Override
@@ -99,17 +117,11 @@ public class ImageServiceImpl implements ImageService {
     return imageInfoDao.findPreviewImageId(postId).orElse(null);
   }
 
-  private void saveImage(UUID accountId, UUID postId, Part file, int ordinal) {
-    String fileName = file.getSubmittedFileName();
-    Image image = new Image(accountId, postId, fileName, null, ordinal);
-    try (InputStream inputStream = file.getInputStream()) {
-      image.setFullPath(imageDataDao.saveImage(image, checkAndResize(
-          inputStream.readAllBytes(), imageWidth, imageHeight)));
-      imageInfoDao.save(image);
-    } catch (IOException e) {
-      log.error("Error save Image with file name {}", fileName);
-      throw new ImageOperationException(e.getMessage());
-    }
+  private Future<Image> saveImage(UUID accountId, UUID postId, Part file, int ordinal) {
+    return threadPool.getPool().submit(
+        new SaveImageCallable(imageDataDao, imageInfoDao, accountId, postId,
+                              file, ordinal, imageWidth, imageHeight)
+    );
   }
 
   private void deleteImage(Path path) {

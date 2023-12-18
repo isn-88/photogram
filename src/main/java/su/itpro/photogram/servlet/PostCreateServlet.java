@@ -13,14 +13,20 @@ import su.itpro.photogram.service.PostService;
 import su.itpro.photogram.service.impl.PostServiceImpl;
 import su.itpro.photogram.servlet.enums.PageSelector;
 import su.itpro.photogram.servlet.enums.PathSelector;
+import su.itpro.photogram.thread.SaveImageThreadPool;
 import su.itpro.photogram.util.ServletUtil;
 
 @WebServlet("/post/create")
 @MultipartConfig(maxFileSize = 128_000_000)
 public class PostCreateServlet extends HttpServlet {
 
-  private final PostService postService = PostServiceImpl.getInstance();
+  private final PostService postService;
+  private final SaveImageThreadPool threadPool;
 
+  public PostCreateServlet() {
+    postService = PostServiceImpl.getInstance();
+    threadPool = SaveImageThreadPool.getInstance();
+  }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -44,5 +50,10 @@ public class PostCreateServlet extends HttpServlet {
     postService.createNewPost(accountDto.username(), postCreateDto);
 
     resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
+  }
+
+  @Override
+  public void destroy() {
+    threadPool.shutdown(10);
   }
 }
