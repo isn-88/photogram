@@ -2,11 +2,36 @@ package su.itpro.photogram.util;
 
 import java.time.LocalDate;
 import javax.servlet.http.HttpServletRequest;
+import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.servlet.enums.PageSelector;
+import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.converter.DateConverter;
 
 public class ServletUtil {
 
+  private static final String ACCOUNT_ATTRIBUTE_NAME = "account";
+  private static final String PREFIX_JSP_PATH = "/WEB-INF/jsp/";
+  private static final String JSP_PATH_PATTERN = "%s%s.jsp";
+  private static final String SERVLET_PATH_PATTERN = "%s/%s";
+  private static final String SERVLET_PARAM_PATTERN = "%s/%s/%s";
+
   private ServletUtil() {
+  }
+
+  public static AccountDto getAccountFromSession(HttpServletRequest req) {
+    return (AccountDto) req.getSession().getAttribute(ACCOUNT_ATTRIBUTE_NAME);
+  }
+
+  public static String getJspPage(PageSelector selector) {
+    return JSP_PATH_PATTERN.formatted(PREFIX_JSP_PATH, selector.get());
+  }
+
+  public static String getServletPath(String contextPath, PathSelector selector) {
+    return SERVLET_PATH_PATTERN.formatted(contextPath, selector.get());
+  }
+
+  public static String getServletPath(String contextPath, PathSelector selector, String param) {
+    return SERVLET_PARAM_PATTERN.formatted(contextPath, selector.get(), param);
   }
 
   public static String variableOfQueryPath(String path) {
@@ -29,6 +54,11 @@ public class ServletUtil {
     return stringStrip(getValue(request, name));
   }
 
+  public static String getPreparedPhone(HttpServletRequest request, String name) {
+    return replaceOrNull("\\D", "", stringStrip(getValue(request, name)));
+
+  }
+
   public static LocalDate parseDate(HttpServletRequest request, String name) {
     String inputValue = valueOrNull(request.getParameter(name));
     return (inputValue != null) ? DateConverter.parseDate(inputValue) : null;
@@ -46,5 +76,12 @@ public class ServletUtil {
       return null;
     }
     return value.strip();
+  }
+
+  private static String replaceOrNull(String regex, String replacement, String value) {
+    if (value == null) {
+      return null;
+    }
+    return value.replaceAll(regex, replacement);
   }
 }

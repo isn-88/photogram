@@ -1,6 +1,8 @@
 package su.itpro.photogram.dao;
 
-import java.util.UUID;
+import java.io.InputStream;
+import java.nio.file.Path;
+import su.itpro.photogram.model.entity.Image;
 
 /**
  * Предназначен для работы с хранилищем изображений
@@ -10,17 +12,18 @@ public interface ImageDataDao {
   /**
    * Сохраняет изображение
    *
-   * @param imageId - id изображения
-   * @param data - массив байт
+   * @param image - информация об изображении
+   * @param data  - массив байт
+   * @return - полный путь к файлу изображения
    */
-  void saveImage(UUID imageId, byte[] data);
+  Path saveImage(Image image, byte[] data);
 
   /**
    * Загружает изображение
    *
-   * @param imageId id изображения
-   * @return массив байт
+   * @param image информация об изображении
+   * @return поток данных
    */
-  byte[] loadImage(UUID imageId);
+  InputStream loadImage(Image image);
 
 }

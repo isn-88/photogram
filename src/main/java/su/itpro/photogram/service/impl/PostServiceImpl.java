@@ -8,13 +8,14 @@ import java.util.UUID;
 import su.itpro.photogram.dao.PostDao;
 import su.itpro.photogram.exception.service.PostServiceException;
 import su.itpro.photogram.factory.DaoFactory;
-import su.itpro.photogram.mapper.PostMapper;
+import su.itpro.photogram.mapper.PostDtoMapper;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.PostCreateDto;
 import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.PostUpdateDto;
 import su.itpro.photogram.model.entity.Post;
 import su.itpro.photogram.service.AccountService;
+import su.itpro.photogram.service.CommentService;
 import su.itpro.photogram.service.ImageService;
 import su.itpro.photogram.service.PostService;
 
@@ -24,15 +25,17 @@ public class PostServiceImpl implements PostService {
 
   private final AccountService accountService;
   private final ImageService imageService;
+  private final CommentService commentService;
   private final PostDao postDao;
-  private final PostMapper postMapper;
+  private final PostDtoMapper postDtoMapper;
 
 
   private PostServiceImpl() {
     accountService = AccountServiceImpl.getInstance();
     imageService = ImageServiceImpl.getInstance();
+    commentService = CommentServiceImpl.getInstance();
     postDao = DaoFactory.INSTANCE.getPostDao();
-    postMapper = PostMapper.getInstance();
+    postDtoMapper = PostDtoMapper.getInstance();
   }
 
   public static PostService getInstance() {
@@ -52,15 +55,19 @@ public class PostServiceImpl implements PostService {
                                                         boolean onlyIsActive, int limit) {
     return postDao.findTopByAccountIdAndLimit(accountId, onlyIsActive, limit)
         .stream()
-        .map(postMapper::mapToPostDto)
+        .map(postDtoMapper::mapFrom)
         .collect(toList());
   }
 
   @Override
   public PostDto findById(UUID postId) {
-    return postMapper.mapToPostDto(postDao.findById(postId).orElseThrow(
+    return postDtoMapper.mapFrom(postDao.findById(postId).orElseThrow(
         () -> new PostServiceException("Post with id [%s] not found".formatted(postId))
     ));
+  }
+
+  public int countPosts(UUID accountId) {
+    return postDao.countPosts(accountId);
   }
 
   @Override
@@ -73,6 +80,13 @@ public class PostServiceImpl implements PostService {
     Optional.ofNullable(dto.isActive()).ifPresent(post::setActive);
 
     postDao.update(post);
+  }
+
+  @Override
+  public void delete(UUID postId) {
+    imageService.deleteImagesByPostId(postId);
+    commentService.deleteAllCommentsByPostId(postId);
+    postDao.delete(postId);
   }
 
 }

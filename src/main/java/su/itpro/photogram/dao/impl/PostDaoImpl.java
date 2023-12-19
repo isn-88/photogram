@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.PostDao;
-import su.itpro.photogram.dao.exception.DaoException;
 import su.itpro.photogram.datasource.DataSource;
+import su.itpro.photogram.exception.dao.DaoException;
 import su.itpro.photogram.model.entity.Post;
 
 public class PostDaoImpl implements PostDao {
@@ -40,6 +40,13 @@ public class PostDaoImpl implements PostDao {
       ;
       """;
 
+  private static final String COUNT_POSTS_SQL = """
+      SELECT count(id)
+      FROM post
+      WHERE account_id = ? AND is_active = true
+      ;
+      """;
+
   private static final String SAVE_SQL = """
       INSERT INTO post (account_id, is_active, description)
       VALUES (?, ?, ?)
@@ -54,6 +61,11 @@ public class PostDaoImpl implements PostDao {
       ;
       """;
 
+  private static final String DELETE_SQL = """
+      DELETE FROM post
+      WHERE id = ?
+      ;
+      """;
 
   private PostDaoImpl() {
   }
@@ -109,6 +121,24 @@ public class PostDaoImpl implements PostDao {
   }
 
   @Override
+  public int countPosts(UUID accountId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(COUNT_POSTS_SQL)) {
+      prepared.setObject(1, accountId);
+
+      prepared.executeQuery();
+      var resultSet = prepared.getResultSet();
+
+      if (resultSet.next()) {
+        return resultSet.getInt(1);
+      }
+      return 0;
+    } catch (SQLException e) {
+      throw new DaoException("Error findByTop Post", e.getMessage());
+    }
+  }
+
+  @Override
   public Post save(Post post) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -142,8 +172,15 @@ public class PostDaoImpl implements PostDao {
   }
 
   @Override
-  public void delete(UUID id) {
-    // TODO add implementation
+  public void delete(UUID postId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(DELETE_SQL)) {
+      prepared.setObject(1, postId);
+
+      prepared.executeUpdate();
+    } catch (SQLException e) {
+      throw new DaoException("Error delete Post", e.getMessage());
+    }
   }
 
   private Post parsePost(ResultSet resultSet) throws SQLException {

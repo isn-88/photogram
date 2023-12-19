@@ -4,7 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Base64;
+import java.util.UUID;
 import javax.imageio.ImageIO;
 import net.coobird.thumbnailator.Thumbnails;
 import su.itpro.photogram.util.PropertiesUtil;
@@ -16,8 +18,22 @@ public class ImageUtil {
       = PropertiesUtil.getProperty("image.output.format");
   private static final double IMAGE_OUTPUT_QUALITY
       = PropertiesUtil.getDouble("image.output.quality", 1.0);
+  private static final String BASE_FILE_PATH = PropertiesUtil.getProperty("app.root.file.path");
+  private static final String FILE_NAME_PATTERN = "%s.%s";
 
   private ImageUtil() {
+  }
+
+  public static String getImageExtension() {
+    return IMAGE_OUTPUT_FORMAT;
+  }
+
+  public static Path getFullPath(String name) {
+    return Path.of(BASE_FILE_PATH, FILE_NAME_PATTERN.formatted(name, IMAGE_OUTPUT_FORMAT));
+  }
+
+  public static String getImageName(UUID id, String type) {
+    return FILE_NAME_PATTERN.formatted(id, type);
   }
 
   public static String convertToBase64(byte[] data) {

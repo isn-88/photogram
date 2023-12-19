@@ -1,5 +1,6 @@
 package su.itpro.photogram.service;
 
+import java.util.UUID;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.AccountUpdateDto;
 
@@ -7,6 +8,14 @@ import su.itpro.photogram.model.dto.AccountUpdateDto;
  * Интерфейс сервиса по работе с аккаунтами
  */
 public interface AccountService {
+
+  /**
+   * Проверка статуса аккаунта на доступность
+   *
+   * @param accountId - идентификатор аккаунта
+   * @return - true если аккаунт действующий (не заблокирован)
+   */
+  boolean checkStatus(UUID accountId);
 
   /**
    * Производит поиск аккаунта по уникальному имени пользователя
@@ -35,10 +44,10 @@ public interface AccountService {
   /**
    * Обновляет данные для входа в ЛК
    *
-   * @param username - имя пользователя
+   * @param accountId - идентификатор аккаунта
    * @param dto - обновляемые данные
    * @return обновлённый аккаунт
    */
-  AccountDto update(String username, AccountUpdateDto dto);
+  AccountDto update(UUID accountId, AccountUpdateDto dto);
 
 }

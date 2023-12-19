@@ -10,55 +10,58 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import su.itpro.photogram.model.dto.AccountDto;
-import su.itpro.photogram.model.dto.ImageIdAndBase64Dto;
+import su.itpro.photogram.model.dto.IconBase64Dto;
 import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.ProfileDto;
-import su.itpro.photogram.service.AccountService;
+import su.itpro.photogram.service.IconService;
 import su.itpro.photogram.service.ImageService;
 import su.itpro.photogram.service.PostService;
 import su.itpro.photogram.service.ProfileService;
-import su.itpro.photogram.service.impl.AccountServiceImpl;
+import su.itpro.photogram.service.impl.IconServiceImpl;
 import su.itpro.photogram.service.impl.ImageServiceImpl;
 import su.itpro.photogram.service.impl.PostServiceImpl;
 import su.itpro.photogram.service.impl.ProfileServiceImpl;
+import su.itpro.photogram.servlet.enums.PageSelector;
 import su.itpro.photogram.util.ServletUtil;
 
-@WebServlet("/home/*")
+@WebServlet("/home")
 public class HomeServlet extends HttpServlet {
 
   private static final int POSTS_PER_PAGE = 12;
 
-  private final AccountService accountService;
   private final ProfileService profileService;
   private final PostService postService;
   private final ImageService imageService;
+  private final IconService iconService;
 
 
   public HomeServlet() {
-    accountService = AccountServiceImpl.getInstance();
     profileService = ProfileServiceImpl.getInstance();
     postService = PostServiceImpl.getInstance();
     imageService = ImageServiceImpl.getInstance();
+    iconService = IconServiceImpl.getInstance();
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
-    AccountDto accountDto = accountService.findByUsername(username);
+    AccountDto accountDto = ServletUtil.getAccountFromSession(req);
     ProfileDto profileDto = profileService.loadProfile(accountDto.id());
 
-    List<PostDto> postDtos = postService
-        .findTopPostIdByAccountIdAndLimit(accountDto.id(), false, POSTS_PER_PAGE);
-    Map<UUID, ImageIdAndBase64Dto> images = imageService.loadPreviewImageFilesBy(postDtos);
+    List<PostDto> postDtos = postService.findTopPostIdByAccountIdAndLimit(
+        accountDto.id(), false, POSTS_PER_PAGE);
+    int postCount = postService.countPosts(accountDto.id());
+    Map<UUID, UUID> postToImageMap = imageService.findPreviewImageIdByPostIds(postDtos);
+    IconBase64Dto iconBase64Dto = iconService.findById(accountDto.id());
 
-    req.setAttribute("username", username);
-    req.setAttribute("account", accountDto);
     req.setAttribute("profile", profileDto);
     req.setAttribute("posts", postDtos);
-    req.setAttribute("images", images);
+    req.setAttribute("postCount", postCount);
+    req.setAttribute("postToImageMap", postToImageMap);
+    req.setAttribute("icon", iconBase64Dto);
 
-    getServletContext().getRequestDispatcher(SelectPage.HOME.get()).forward(req, resp);
+    req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.HOME))
+        .forward(req, resp);
   }
 }

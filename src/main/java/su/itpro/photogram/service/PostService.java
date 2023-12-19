@@ -46,4 +46,18 @@ public interface PostService {
    */
   void update(PostUpdateDto dto);
 
+  /**
+   * Производит подсчёт активных публикаций
+   *
+   * @param accountId - идентификатор аккаунта
+   * @return - количество публикаций
+   */
+  int countPosts(UUID accountId);
+
+  /**
+   * Удаляет публикацию
+   *
+   * @param postId - идентификатор публикации
+   */
+  void delete(UUID postId);
 }

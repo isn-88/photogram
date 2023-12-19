@@ -19,4 +19,12 @@ public interface PostDao extends BaseDao<UUID, Post> {
    */
   List<Post> findTopByAccountIdAndLimit(UUID accountId, boolean onlyIsActive, int limit);
 
+  /**
+   * Производит подсчёт активных публикаций
+   *
+   * @param accountId - идентификатор аккаунта
+   * @return количество публикаций
+   */
+  int countPosts(UUID accountId);
+
 }

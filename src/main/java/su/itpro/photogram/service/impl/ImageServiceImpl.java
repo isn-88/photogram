@@ -1,27 +1,34 @@
 package su.itpro.photogram.service.impl;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static su.itpro.photogram.util.image.ImageUtil.checkAndResize;
-import static su.itpro.photogram.util.image.ImageUtil.convertToBase64;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import su.itpro.photogram.dao.ImageDataDao;
 import su.itpro.photogram.dao.ImageInfoDao;
+import su.itpro.photogram.exception.dao.ImageOperationException;
 import su.itpro.photogram.factory.DaoFactory;
-import su.itpro.photogram.model.dto.ImageAndBase64Dto;
-import su.itpro.photogram.model.dto.ImageIdAndBase64Dto;
 import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.entity.Image;
 import su.itpro.photogram.service.ImageService;
+import su.itpro.photogram.thread.SaveImageCallable;
+import su.itpro.photogram.thread.SaveImageThreadPool;
 import su.itpro.photogram.util.PropertiesUtil;
 
 public class ImageServiceImpl implements ImageService {
@@ -35,6 +42,7 @@ public class ImageServiceImpl implements ImageService {
   private final Logger log;
   private final ImageDataDao imageDataDao;
   private final ImageInfoDao imageInfoDao;
+  private final SaveImageThreadPool threadPool;
   private final int imageWidth;
   private final int imageHeight;
 
@@ -42,7 +50,8 @@ public class ImageServiceImpl implements ImageService {
   private ImageServiceImpl() {
     log = LoggerFactory.getLogger(PostServiceImpl.class);
     imageDataDao = DaoFactory.INSTANCE.getImageDataDao();
-    imageInfoDao = DaoFactory.INSTANCE.getImageDao();
+    imageInfoDao = DaoFactory.INSTANCE.getImageInfoDao();
+    threadPool = SaveImageThreadPool.getInstance();
     imageWidth = PropertiesUtil.getInt("app.post.image.width", DEFAULT_IMAGE_WIDTH);
     imageHeight = PropertiesUtil.getInt("app.post.image.height", DEFAULT_IMAGE_HEIGHT);
   }
@@ -52,56 +61,77 @@ public class ImageServiceImpl implements ImageService {
   }
 
   @Override
-  public List<ImageAndBase64Dto> findImagesBy(UUID postId) {
+  public List<UUID> findAllImageIdsByPostId(UUID postId) {
     List<Image> images = imageInfoDao.findAllByPostId(postId);
     return images.stream()
-        .map(image -> new ImageAndBase64Dto(
-            image,
-            convertToBase64(imageDataDao.loadImage(image.getId()))
-        ))
-        .collect(toList());
+        .map(Image::getId)
+        .toList();
+  }
+
+  @Override
+  public Map<UUID, UUID> findPreviewImageIdByPostIds(List<PostDto> posts) {
+    return posts.stream()
+        .collect(toMap(PostDto::id, post -> getImageIdByPostId(post.id())));
   }
 
   public void saveImages(UUID accountId, UUID postId, Collection<Part> files) {
+    Instant start = Instant.now();
+    List<Future<Image>> saveImageFutureList = new ArrayList<>();
     for (Part file : files) {
       if (checkContentType(file.getContentType())) {
         if (file.getName() != null && file.getName().startsWith("image-")) {
-          saveImage(accountId, postId, file, getOrdinal(file.getName()));
+          saveImageFutureList.add(saveImage(accountId, postId, file, getOrdinal(file.getName())));
         }
       }
+    }
+    for (Future<Image> future : saveImageFutureList) {
+      try {
+        future.get();
+      } catch (InterruptedException | ExecutionException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    log.info("Images was saved in {}ms", Duration.between(start, Instant.now()).toMillis());
+  }
+
+  @Override
+  public Optional<InputStream> loadImage(UUID imageId) {
+    Image image = imageInfoDao.findById(imageId).orElseThrow(
+        () -> new ImageOperationException("Image " + imageId + " not found")
+    );
+    try {
+      return Optional.of(imageDataDao.loadImage(image));
+    } catch (Exception e) {
+      return Optional.empty();
     }
   }
 
   @Override
-  public Map<UUID, ImageIdAndBase64Dto> loadPreviewImageFilesBy(List<PostDto> posts) {
-    return posts.stream()
-        .collect(toMap(PostDto::id, post -> getBase64ImageByPostId(post.id())));
+  public void deleteImagesByPostId(UUID postId) {
+    List<Image> images = imageInfoDao.findAllByPostId(postId);
+    images.forEach(image -> deleteImage(image.getFullPath()));
+    imageInfoDao.deleteImagesByPostId(postId);
   }
 
-  private void saveImage(UUID accountId, UUID postId, Part file, int ordinal) {
-    String fileName = file.getSubmittedFileName();
-    Image image = new Image(accountId, postId, fileName, ordinal);
-    try {
-      imageDataDao.saveImage(image.getId(), checkAndResize(
-          file.getInputStream().readAllBytes(), imageWidth, imageHeight
-      ));
-    } catch (IOException e) {
-      log.error("Error save Image with file name {}", fileName);
+  private UUID getImageIdByPostId(UUID postId) {
+    return imageInfoDao.findPreviewImageId(postId).orElse(null);
+  }
+
+  private Future<Image> saveImage(UUID accountId, UUID postId, Part file, int ordinal) {
+    return threadPool.getPool().submit(
+        new SaveImageCallable(imageDataDao, imageInfoDao, accountId, postId,
+                              file, ordinal, imageWidth, imageHeight)
+    );
+  }
+
+  private void deleteImage(Path path) {
+    if (Files.exists(path)) {
+      try {
+        Files.delete(path);
+      } catch (IOException e) {
+        log.error("Error delete Image from path {}", path);
+      }
     }
-    imageInfoDao.save(image);
-  }
-
-  private ImageIdAndBase64Dto getBase64ImageByPostId(UUID postId) {
-    var optionalImageId = imageInfoDao.findPreviewImageId(postId);
-    if (optionalImageId.isEmpty()) {
-      log.error("For postId [{}] absent image", postId);
-      return new ImageIdAndBase64Dto(null, null);
-    }
-    return loadBase64Image(optionalImageId.get());
-  }
-
-  private ImageIdAndBase64Dto loadBase64Image(UUID imageId) {
-    return new ImageIdAndBase64Dto(imageId, convertToBase64(imageDataDao.loadImage(imageId)));
   }
 
   private boolean checkContentType(String type) {
