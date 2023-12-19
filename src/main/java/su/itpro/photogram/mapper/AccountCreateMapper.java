@@ -1,9 +1,10 @@
 package su.itpro.photogram.mapper;
 
-import su.itpro.photogram.model.dto.CreateAccountDto;
+import java.util.Objects;
+import su.itpro.photogram.model.dto.AccountChangeDto;
 import su.itpro.photogram.model.entity.Account;
 
-public class AccountCreateMapper implements Mapper<CreateAccountDto, Account> {
+public class AccountCreateMapper implements Mapper<AccountChangeDto, Account> {
 
   private static final AccountCreateMapper INSTANCE = new AccountCreateMapper();
 
@@ -15,9 +16,14 @@ public class AccountCreateMapper implements Mapper<CreateAccountDto, Account> {
   }
 
   @Override
-  public Account mapFrom(CreateAccountDto dto) {
-    String phone = dto.phone().replaceAll("\\D", "");
-    return new Account(phone, dto.email(), dto.username(), dto.password());
+  public Account mapFrom(AccountChangeDto changeDto) {
+    if (Objects.isNull(changeDto)) {
+      return null;
+    }
+    return new Account(changeDto.phone(),
+                       changeDto.email(),
+                       changeDto.username(),
+                       changeDto.password());
   }
 
 }

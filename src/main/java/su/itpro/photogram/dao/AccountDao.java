@@ -2,6 +2,8 @@ package su.itpro.photogram.dao;
 
 import java.util.Optional;
 import java.util.UUID;
+import su.itpro.photogram.model.dto.LoginCheckExistsDto;
+import su.itpro.photogram.model.dto.LoginExistsResultDto;
 import su.itpro.photogram.model.entity.Account;
 
 /**
@@ -42,28 +44,13 @@ public interface AccountDao extends BaseDao<UUID, Account> {
   Optional<Account> findByPhone(String phone);
 
   /**
-   * Проверяет существование аккаунта с указанным номером телефона
+   * Проверяет наличие зарегистрированного Аккаунта
+   * с указанными номером телефона, email и именем пользователя
    *
-   * @param phone номер телефона пользователя
-   * @return true если аккаунт с данным номером телефона существует
+   * @param dto - проверяемые данные
+   * @return - результат проверки
    */
-  boolean existsByPhone(String phone);
-
-  /**
-   * Проверяет существование аккаунта с указанным email
-   *
-   * @param email электронная почта пользователя
-   * @return true если аккаунт с данной почтой существует
-   */
-  boolean existsByEmail(String email);
-
-  /**
-   * Проверяет существование аккаунта с указанным username
-   *
-   * @param username уникальное имя пользователя
-   * @return true если аккаунт с данным username существует
-   */
-  boolean existsByUsername(String username);
+  LoginExistsResultDto exists(LoginCheckExistsDto dto);
 
   /**
    * Обновляет пароль для указанного аккаунта

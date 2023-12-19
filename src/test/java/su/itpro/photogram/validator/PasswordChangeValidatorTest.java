@@ -9,7 +9,7 @@ import su.itpro.photogram.model.dto.ChangePasswordDto;
 
 class PasswordChangeValidatorTest {
 
-  private static final String CURRENT_PASSWORD = "currentPassword";
+  private static final String CURRENT_PASSWORD = "currentAccountPassword";
   private static final String NEW_PASSWORD = "newPass";
   private static final String CHECK_PASSWORD = "newPass";
 
@@ -123,25 +123,6 @@ class PasswordChangeValidatorTest {
 
     assertThat(actualResult.getErrors()).hasSize(1);
     assertThat(actualResult.getErrors().get(0).code()).isEqualTo("password.check.mismatch");
-  }
-
-  @Test
-  void validateMatch_correct() {
-    ChangePasswordDto dto = getChangePasswordDto();
-
-    ValidationResult actualResult = validator.validateMatch(CURRENT_PASSWORD, dto);
-
-    assertFalse(actualResult.hasErrors());
-  }
-
-  @Test
-  void validateMatch_mismatch() {
-    ChangePasswordDto dto = getChangePasswordDto();
-
-    ValidationResult actualResult = validator.validateMatch(CURRENT_PASSWORD + "p", dto);
-
-    assertThat(actualResult.getErrors()).hasSize(1);
-    assertThat(actualResult.getErrors().get(0).code()).isEqualTo("password.current.mismatch");
   }
 
 

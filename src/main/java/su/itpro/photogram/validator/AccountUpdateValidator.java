@@ -2,10 +2,10 @@ package su.itpro.photogram.validator;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
-import su.itpro.photogram.model.dto.CreateAccountDto;
+import su.itpro.photogram.model.dto.AccountUpdateDto;
 import su.itpro.photogram.util.PropertiesUtil;
 
-public class RegistrationValidator implements Validator<CreateAccountDto> {
+public class AccountUpdateValidator implements Validator<AccountUpdateDto> {
 
   private static final int PHONE_LENGTH_MIN =
       PropertiesUtil.getInt("validation.length.phone.min", 8);
@@ -19,10 +19,6 @@ public class RegistrationValidator implements Validator<CreateAccountDto> {
       PropertiesUtil.getInt("validation.length.username.min", 3);
   private static final int USERNAME_LENGTH_MAX =
       PropertiesUtil.getInt("validation.length.username.max", 32);
-  private static final int PASSWORD_LENGTH_MIN =
-      PropertiesUtil.getInt("validation.length.password.min", 8);
-  private static final int PASSWORD_LENGTH_MAX =
-      PropertiesUtil.getInt("validation.length.password.max", 64);
 
 
   private static final String PHONE_REGEX = """
@@ -32,25 +28,23 @@ public class RegistrationValidator implements Validator<CreateAccountDto> {
   private static final String USERNAME_REGEX = """
       [a-zA-Z][-a-zA-z0-9_\\.]+""";
 
-  private static final String PASSWORD_REGEX = """
-      \\S+""";
 
   private static final Pattern phonePattern = Pattern.compile(PHONE_REGEX);
   private static final Pattern emailPattern = Pattern.compile(EMAIL_REGEX);
   private static final Pattern usernamePattern = Pattern.compile(USERNAME_REGEX);
-  private static final Pattern passwordPattern = Pattern.compile(PASSWORD_REGEX);
 
-  private static final RegistrationValidator INSTANCE = new RegistrationValidator();
 
-  private RegistrationValidator() {
+  private static final AccountUpdateValidator INSTANCE = new AccountUpdateValidator();
+
+  private AccountUpdateValidator() {
   }
 
-  public static RegistrationValidator getInstance() {
+  public static AccountUpdateValidator getInstance() {
     return INSTANCE;
   }
 
   @Override
-  public ValidationResult validate(CreateAccountDto dto) {
+  public ValidationResult validate(AccountUpdateDto dto) {
     ValidationResult errors = new ValidationResult();
 
     if (Objects.isNull(dto.phone()) && Objects.isNull(dto.email())) {
@@ -67,9 +61,6 @@ public class RegistrationValidator implements Validator<CreateAccountDto> {
         if (phone.length() > PHONE_LENGTH_MAX) {
           errors.add(Error.of("phone.long", "Номер телефона слишком длинный"));
         }
-        //        if (accountService.existsByPhone(phone)) {
-        //          errors.add(Error.of("used.phone", "Указанный номер уже используется"));
-        //        }
       }
       if (Objects.nonNull(dto.email())) {
         String email = dto.email();
@@ -82,9 +73,6 @@ public class RegistrationValidator implements Validator<CreateAccountDto> {
         if (getLengthDomainEmail(email) > EMAIL_LENGTH_DOMAIN_MAX) {
           errors.add(Error.of("email.long", "Email слишком длинный"));
         }
-        //        if (accountService.existsByEmail(email)) {
-        //          errors.add(Error.of("used.email", "Email уже используется"));
-        //        }
       }
     }
 
@@ -101,25 +89,8 @@ public class RegistrationValidator implements Validator<CreateAccountDto> {
       if (username.length() > USERNAME_LENGTH_MAX) {
         errors.add(Error.of("username.long", "Имя пользователя слишком длинное"));
       }
-      //      if (accountService.existsByUsername(username)) {
-      //        errors.add(Error.of("username.used", "Указанное имя пользователя уже занято"));
-      //      }
     }
 
-    if (Objects.isNull(dto.password()) || dto.password().isBlank()) {
-      errors.add(Error.of("password.empty", "Пароль не должен быть пустым"));
-    } else {
-      String password = dto.password();
-      if (!passwordPattern.matcher(password).matches()) {
-        errors.add(Error.of("password.invalid", "Пароль содержит недопустимые символы"));
-      }
-      if (password.length() < PASSWORD_LENGTH_MIN) {
-        errors.add(Error.of("password.short", "Пароль слишком короткий"));
-      }
-      if (password.length() > PASSWORD_LENGTH_MAX) {
-        errors.add(Error.of("password.long", "Пароль слишком длинный"));
-      }
-    }
     return errors;
   }
 

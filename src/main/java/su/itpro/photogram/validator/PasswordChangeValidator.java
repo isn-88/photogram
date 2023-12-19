@@ -60,13 +60,4 @@ public class PasswordChangeValidator implements Validator<ChangePasswordDto> {
     return errors;
   }
 
-  public ValidationResult validateMatch(String accountPassword, ChangePasswordDto dto) {
-    ValidationResult errors = new ValidationResult();
-
-    if (!accountPassword.equals(dto.currentPassword())) {
-      errors.add(Error.of("password.current.mismatch", "Текущий пароль не совпадает"));
-    }
-    return errors;
-  }
-
 }

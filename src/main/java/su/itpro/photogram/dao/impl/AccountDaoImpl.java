@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import su.itpro.photogram.dao.AccountDao;
 import su.itpro.photogram.datasource.DataSource;
 import su.itpro.photogram.exception.dao.DaoException;
+import su.itpro.photogram.model.dto.LoginCheckExistsDto;
+import su.itpro.photogram.model.dto.LoginExistsResultDto;
 import su.itpro.photogram.model.entity.Account;
 import su.itpro.photogram.model.enums.Role;
 import su.itpro.photogram.model.enums.Status;
@@ -80,24 +83,10 @@ public class AccountDaoImpl implements AccountDao {
       ;
       """;
 
-  private static final String PHONE_EXISTS_SQL = """
-      SELECT id
+  private static final String EXISTS_SQL = """
+      SELECT phone, email, username
       FROM account
-      WHERE phone = ?
-      ;
-      """;
-
-  private static final String EMAIL_EXISTS_SQL = """
-      SELECT id
-      FROM account
-      WHERE email = ?
-      ;
-      """;
-
-  private static final String USERNAME_EXISTS_SQL = """
-      SELECT id
-      FROM account
-      WHERE username = ?
+      WHERE phone = ? OR email = ? OR username = ?
       ;
       """;
 
@@ -240,48 +229,17 @@ public class AccountDaoImpl implements AccountDao {
     }
   }
 
-  @Override
-  public boolean existsByPhone(String phone) {
+  public LoginExistsResultDto exists(LoginCheckExistsDto dto) {
     try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(PHONE_EXISTS_SQL)) {
-      prepared.setString(1, phone);
+        var prepared = connection.prepareStatement(EXISTS_SQL)) {
+      prepared.setString(1, dto.phone());
+      prepared.setString(2, dto.email());
+      prepared.setString(3, dto.username());
 
-      prepared.executeQuery();
-      var resultSet = prepared.getResultSet();
-
-      return resultSet.next();
+      ResultSet resultSet = prepared.executeQuery();
+      return parseExists(dto, resultSet);
     } catch (SQLException e) {
-      throw new DaoException("Error existsByUsername Account", e.getMessage());
-    }
-  }
-
-  @Override
-  public boolean existsByEmail(String email) {
-    try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(EMAIL_EXISTS_SQL)) {
-      prepared.setString(1, email);
-
-      prepared.executeQuery();
-      var resultSet = prepared.getResultSet();
-
-      return resultSet.next();
-    } catch (SQLException e) {
-      throw new DaoException("Error existsByUsername Account", e.getMessage());
-    }
-  }
-
-  @Override
-  public boolean existsByUsername(String username) {
-    try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(USERNAME_EXISTS_SQL)) {
-      prepared.setString(1, username);
-
-      prepared.executeQuery();
-      var resultSet = prepared.getResultSet();
-
-      return resultSet.next();
-    } catch (SQLException e) {
-      throw new DaoException("Error existsByUsername Account", e.getMessage());
+      throw new DaoException("Error check exist Login", e.getMessage());
     }
   }
 
@@ -374,6 +332,30 @@ public class AccountDaoImpl implements AccountDao {
     account.setVerifiedEmail(resultSet.getBoolean(IS_VERIFIED_EMAIL));
     fromTimestamp(resultSet.getTimestamp(CREATE_DATE)).ifPresent(account::setCreateDate);
     return account;
+  }
+
+  private LoginExistsResultDto parseExists(LoginCheckExistsDto existsDto, ResultSet resultSet)
+      throws SQLException {
+    boolean existPhone = false;
+    boolean existEmail = false;
+    boolean existUsername = false;
+
+    while (resultSet.next()) {
+      if (!existPhone && checkExists(existsDto.phone(), resultSet.getString(PHONE))) {
+        existPhone = true;
+      }
+      if (!existEmail && checkExists(existsDto.email(), resultSet.getString(EMAIL))) {
+        existEmail = true;
+      }
+      if (!existUsername && checkExists(existsDto.username(), resultSet.getString(USERNAME))) {
+        existUsername = true;
+      }
+    }
+    return new LoginExistsResultDto(existPhone, existEmail, existUsername);
+  }
+
+  private boolean checkExists(String checkField, String tableField) {
+    return (Objects.nonNull(checkField) && Objects.equals(checkField, tableField));
   }
 
 }

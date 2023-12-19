@@ -42,36 +42,12 @@ public interface AccountService {
   AccountDto findByPhone(String phone);
 
   /**
-   * Проверяет наличие аккаунта с указанным номером телефона
-   *
-   * @param phone - номер телефона
-   * @return - true если указанный номер телефона зарегистрирован
-   */
-  boolean existsByPhone(String phone);
-
-  /**
-   * Проверяет наличие аккаунта с указанной электронной почтой
-   *
-   * @param email - электронная почта
-   * @return - true если указанная почта зарегистрирована
-   */
-  boolean existsByEmail(String email);
-
-  /**
-   * Проверяет наличие аккаунта с указанным именем пользователя
-   *
-   * @param username - уникальное имя пользователя
-   * @return true если данное имя пользователя зарегистрировано
-   */
-  boolean existsByUsername(String username);
-
-  /**
    * Обновляет данные для входа в ЛК
    *
-   * @param username - имя пользователя
+   * @param accountId - идентификатор аккаунта
    * @param dto - обновляемые данные
    * @return обновлённый аккаунт
    */
-  AccountDto update(String username, AccountUpdateDto dto);
+  AccountDto update(UUID accountId, AccountUpdateDto dto);
 
 }

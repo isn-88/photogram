@@ -1,6 +1,6 @@
 package su.itpro.photogram.service;
 
-import su.itpro.photogram.model.dto.CreateAccountDto;
+import su.itpro.photogram.model.dto.AccountChangeDto;
 
 /**
  * Интерфейс регистрации новых пользователей
@@ -12,6 +12,6 @@ public interface RegistrationService {
    *
    * @param dto - данные из формы регистрации
    */
-  void registerNewAccount(CreateAccountDto dto);
+  void registerNewAccount(AccountChangeDto dto);
 
 }

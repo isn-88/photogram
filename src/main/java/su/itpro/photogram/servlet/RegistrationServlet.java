@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import su.itpro.photogram.exception.validation.ValidationException;
-import su.itpro.photogram.model.dto.CreateAccountDto;
+import su.itpro.photogram.model.dto.AccountChangeDto;
 import su.itpro.photogram.service.RegistrationService;
 import su.itpro.photogram.service.impl.RegistrationServiceImpl;
 import su.itpro.photogram.servlet.enums.PageSelector;
@@ -36,8 +36,8 @@ public class RegistrationServlet extends HttpServlet {
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
 
-    CreateAccountDto createAccountDto = new CreateAccountDto(
-        ServletUtil.getValue(req, "phone"),
+    AccountChangeDto accountChangeDto = new AccountChangeDto(
+        ServletUtil.getPreparedPhone(req, "phone"),
         ServletUtil.getValue(req, "email"),
         ServletUtil.getValue(req, "username"),
         ServletUtil.getValue(req, "password"),
@@ -45,15 +45,15 @@ public class RegistrationServlet extends HttpServlet {
     );
 
     try {
-      registrationService.registerNewAccount(createAccountDto);
+      registrationService.registerNewAccount(accountChangeDto);
       req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.LOGIN))
           .forward(req, resp);
     } catch (ValidationException e) {
       req.setAttribute("errors", e.getErrors());
-      req.setAttribute("phone", createAccountDto.phone());
-      req.setAttribute("email", createAccountDto.email());
-      req.setAttribute("username", createAccountDto.username());
-      req.setAttribute("full_name", createAccountDto.fullName());
+      req.setAttribute("phone", accountChangeDto.phone());
+      req.setAttribute("email", accountChangeDto.email());
+      req.setAttribute("username", accountChangeDto.username());
+      req.setAttribute("full_name", accountChangeDto.fullName());
       doGet(req, resp);
     }
   }

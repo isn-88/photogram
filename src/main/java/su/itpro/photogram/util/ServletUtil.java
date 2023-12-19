@@ -1,9 +1,6 @@
 package su.itpro.photogram.util;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.servlet.enums.PageSelector;
@@ -37,16 +34,6 @@ public class ServletUtil {
     return SERVLET_PARAM_PATTERN.formatted(contextPath, selector.get(), param);
   }
 
-  public static String getServletPath(String contextPath, PathSelector selector, String param,
-                                      Map<String, String> queryParams) {
-    String servletPath = getServletPath(contextPath, selector, param);
-    return (Objects.isNull(queryParams) || queryParams.isEmpty())
-           ? servletPath
-           : servletPath + '?' + queryParams.entrySet().stream()
-               .map(e -> e.getKey() + '=' + e.getValue())
-               .collect(Collectors.joining("&"));
-  }
-
   public static String variableOfQueryPath(String path) {
     if (valueOrNull(path) == null) {
       return null;
@@ -67,6 +54,11 @@ public class ServletUtil {
     return stringStrip(getValue(request, name));
   }
 
+  public static String getPreparedPhone(HttpServletRequest request, String name) {
+    return replaceOrNull("\\D", "", stringStrip(getValue(request, name)));
+
+  }
+
   public static LocalDate parseDate(HttpServletRequest request, String name) {
     String inputValue = valueOrNull(request.getParameter(name));
     return (inputValue != null) ? DateConverter.parseDate(inputValue) : null;
@@ -84,5 +76,12 @@ public class ServletUtil {
       return null;
     }
     return value.strip();
+  }
+
+  private static String replaceOrNull(String regex, String replacement, String value) {
+    if (value == null) {
+      return null;
+    }
+    return value.replaceAll(regex, replacement);
   }
 }
