@@ -22,7 +22,7 @@
     <div class="row row-cols-1 row-cols-lg-3 g-3">
       <div class="col">
         <div class="card shadow" id="cardImages"
-          style="min-height: 300px;">
+             style="min-height: 300px;">
           <div id="carouselImages" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               <c:set var="isFirstImage" value="${true}"/>
@@ -84,13 +84,11 @@
                     data-bs-target="#carouselImages" data-bs-slide="prev"
                 <c:if test="${requestScope.imageIds.size() == 1}"><c:out value=" hidden"/></c:if>>
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <%--              <span class="visually-hidden">Предыдущий</span>--%>
             </button>
             <button class="carousel-control-next" type="button"
                     data-bs-target="#carouselImages" data-bs-slide="next"
                 <c:if test="${requestScope.imageIds.size() == 1}"><c:out value=" hidden"/></c:if>>
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <%--              <span class="visually-hidden">Следующий</span>--%>
             </button>
           </div>
 
@@ -104,21 +102,36 @@
           </div>
           <div class="card-body" style="overflow-y: auto">
             <p class="card-text">${requestScope.post.getDescriptionForPage()}</p>
-            <%--            <p class="card-text"><small class="text-body-secondary">Последнее обновление 3 мин. назад</small></p>--%>
           </div>
           <div class="card-footer">
             <div
                 class="d-grid gap-2 p-3 d-md-flex justify-content-md-around d-lg-grid justify-content-lg-center d-xl-flex justify-content-xl-between">
-              <a href="${pageContext.request.contextPath}/home"
+              <c:if test="${not empty requestScope.view}">
+                <c:set var="viewEndpoint" value="/${requestScope.view}"/>
+              </c:if>
+              <a href="${pageContext.request.contextPath}/home${viewEndpoint}"
                  class="btn btn-outline-secondary" type="button">
                 <i class="fa-solid fa-arrow-left"></i> Назад</a>
+
               <button class="btn btn-outline-warning" type="button"
-                      data-bs-toggle="modal" data-bs-target="#editModal">
+                      data-bs-toggle="modal" data-bs-target="#editModal"
+                  <c:if test="${requestScope.post.accountId() ne sessionScope.account.id()}">
+                    <c:out value=" hidden"/></c:if> >
                 <i class="fa-solid fa-pen-to-square"></i> Редактировать
               </button>
+
               <button class="btn btn-outline-danger" type="button"
-                      data-bs-toggle="modal" data-bs-target="#deletePostModal">
+                      data-bs-toggle="modal" data-bs-target="#deletePostModal"
+                  <c:if test="${requestScope.post.accountId() ne sessionScope.account.id()}">
+                    <c:out value=" hidden"/></c:if> >
                 <i class="fa-regular fa-trash-can"></i> Удалить
+              </button>
+
+              <button class="btn btn-outline-danger" type="button"
+                      data-bs-toggle="modal" data-bs-target="#oopsPostModal"
+                  <c:if test="${requestScope.post.accountId() eq sessionScope.account.id()}">
+                    <c:out value=" hidden"/></c:if> >
+                <i class="fa-solid fa-triangle-exclamation"></i> Пожаловаться
               </button>
             </div>
           </div>
@@ -126,7 +139,7 @@
       </div>
 
 
-      <!-- Модальное окно -->
+      <!-- Модальное окно: удалить публикацию -->
       <div class="modal fade" id="deletePostModal" tabindex="-1"
            aria-labelledby="deletePostModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -142,10 +155,8 @@
             <form action="${pageContext.request.contextPath}/post/delete/${requestScope.post.id()}"
                   method="post">
               <div class="modal-footer">
-                <form
-                    action="${pageContext.request.contextPath}/post/delete/${requestScope.post.id()}"></form>
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                  Отмена
+                <button type="button" class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">Отмена
                 </button>
                 <button type="submit" class="btn btn-outline-danger">Удалить</button>
               </div>
@@ -154,7 +165,7 @@
         </div>
       </div>
 
-
+      <!-- Комментарии -->
       <div class="col" onload="handleResize();">
         <div class="card shadow" id="cardComment">
           <div class="card-header">
@@ -163,12 +174,40 @@
           <div class="card-body" style="overflow-y: auto">
             <div class="card-text">
               <c:forEach var="comment" items="${requestScope.comments}">
-                <div class="row p-1">
-                  <div class="col-2">
+                <div class="row row-cols-2 p-1">
+                  <div class="col-2 col-md-1 col-lg-3 col-xl-3 col-xxl-2 g-0">
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                      <form action="${pageContext.request.contextPath}/comment/delete" method="post">
+
+                        <a href="${pageContext.request.contextPath}/home/${comment.username()}">
+                          <img
+                              src="${pageContext.request.contextPath}/icon/download/${comment.accountId()}"
+                              alt="profile icon" class="img-fluid rounded-circle mb-2"
+                              onError="this.onerror=null;this.src='${pageContext.request.contextPath}/img/default-profile-icon.jpg';"
+                              style="width: 48px; height: 48px"/></a>
+
+                        <label>
+                          <input name="postId" value="${requestScope.post.id()}" hidden>
+                        </label>
+
+                        <label>
+                          <input name="commentId" value="${comment.id()}" hidden>
+                        </label>
+                        <label>
+                          <input name="view" value="${requestScope.view}" hidden>
+                        </label>
+
+                        <button type="submit" class="btn btn-link link-danger"
+                            <c:if test="${(sessionScope.account.id() ne comment.accountId()) or comment.isDeleted() eq 'true'}">
+                              <c:out value=" hidden"/></c:if> >
+                          <i class="fa-regular fa-trash-can"></i></button>
+                      </form>
+                    </div>
                   </div>
-                  <div class="col-10">
+                  <div class="col-10 col-md-11 col-lg-9 col-xl-9 col-xxl-10">
                     <figure>
                       <blockquote class="blockquote fs-6">
+                        <span class="lead"><c:out value="${comment.username()}"/></span>
                         <p><c:out value="${comment.message()}"/></p>
                       </blockquote>
                       <figcaption class="blockquote-footer">
@@ -183,7 +222,7 @@
 
           <div class="card-footer">
             <form
-                action="${pageContext.request.contextPath}/comment/send/${requestScope.post.id()}"
+                action="${pageContext.request.contextPath}/comment/send"
                 method="post">
               <div class="row row-cols-1 g-2">
                 <div class="col">
@@ -192,10 +231,15 @@
                   <textarea class="form-control" name="message" id="createCommentMessage"
                             rows="3" maxlength="500" required></textarea>
                 </div>
+                <label>
+                  <input name="postId" value="${requestScope.post.id()}" hidden>
+                </label>
+                <label>
+                  <input name="view" value="${requestScope.view}" hidden>
+                </label>
                 <div class="col d-flex justify-content-center">
                   <button class="btn btn-outline-primary" type="submit">
-                    <i class="fa-solid fa-paper-plane"></i> Опубликовать
-                  </button>
+                    <i class="fa-solid fa-paper-plane"></i> Опубликовать</button>
                 </div>
               </div>
             </form>

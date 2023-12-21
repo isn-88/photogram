@@ -154,7 +154,6 @@
                             <h6>При необходимости можно изменить личные данные</h6>
                           </div>
                         </div>
-
                         <%--  Имя и фамилия  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
@@ -169,7 +168,6 @@
                             </div>
                           </div>
                         </div>
-
                         <%--  Дата рождения  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
@@ -185,7 +183,6 @@
                             </div>
                           </div>
                         </div>
-
                         <%--  Пол  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
@@ -222,31 +219,6 @@
                             </div>
                           </div>
                         </div>
-
-
-                        <%--  Контакты  --%>
-                        <%--                        <div class="row p-3">--%>
-                        <%--                          <div class="col-lg-3 text-start text-lg-end">--%>
-                        <%--                            <label for="editContactTitle1" class="form-label">Контакт 1</label>--%>
-                        <%--                          </div>--%>
-                        <%--                          <div class="col">--%>
-                        <%--                            <div class="input-group">--%>
-                        <%--                              <input type="text" class="form-control" name="full_name"--%>
-                        <%--                                     id="editContactTitle1"--%>
-                        <%--                                     value="" placeholder="Название"--%>
-                        <%--                                     aria-describedby="fullNameHelp">--%>
-                        <%--                            </div>--%>
-                        <%--                          </div>--%>
-                        <%--                          <div class="col">--%>
-                        <%--                            <div class="input-group">--%>
-                        <%--                              <input type="text" class="form-control" name="full_name"--%>
-                        <%--                                     id="editContactValue1"--%>
-                        <%--                                     value="" placeholder="Контакт"--%>
-                        <%--                                     aria-describedby="fullNameHelp">--%>
-                        <%--                            </div>--%>
-                        <%--                          </div>--%>
-                        <%--                        </div>--%>
-
                         <%--  Обо мне  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
@@ -260,7 +232,6 @@
                             </div>
                           </div>
                         </div>
-
 
                         <div class="row p-5">
                           <div class="col-lg-3">
@@ -290,7 +261,7 @@
 
                             <div class="col">
                               <div class="mb-3 d-flex flex-column align-items-center">
-                                <img src="data:image/jpg;base64,${requestScope.icon.iconBase64()}"
+                                <img src="${pageContext.request.contextPath}/icon/download/${sessionScope.account.id()}"
                                      alt="profile icon"
                                      class="img-fluid rounded-circle mb-2"
                                      onError="this.onerror=null;this.src='${pageContext.request.contextPath}/img/default-profile-icon.jpg';"

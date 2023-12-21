@@ -16,8 +16,8 @@ import su.itpro.photogram.service.impl.AccountServiceImpl;
 import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.ServletUtil;
 
-@WebFilter({"/account/*", "/comment/*", "/edit", "/home", "/icon/*",
-            "/image/*", "/password", "/post/*", "/profile/*"})
+@WebFilter({"/account/*", "/comment/*", "/edit", "/home", "/home/*", "/icon/*", "/image/*",
+            "/password", "/post/*", "/profile/*", "/subscribe/*", "/unsubscribe/*"})
 public class AuthFilter implements Filter {
 
   private final AccountService accountService = AccountServiceImpl.getInstance();

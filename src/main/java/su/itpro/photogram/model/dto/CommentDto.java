@@ -7,6 +7,7 @@ public record CommentDto(UUID id,
                          UUID postId,
                          String elapsedTimeInfo,
                          Boolean isDeleted,
+                         String username,
                          String message) {
 
 }

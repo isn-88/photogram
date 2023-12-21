@@ -53,6 +53,17 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public AccountDto findById(UUID id) {
+    return accountDtoMapper.mapFrom(
+        accountDao.findById(id).orElseThrow(
+            () -> {
+              log.info("findById id: " + id);
+              return new AccountServiceException("Account not found by username: " + id);
+            }
+        ));
+  }
+
+  @Override
   public AccountDto findByUsername(String username) {
     return accountDtoMapper.mapFrom(
         accountDao.findByUsername(username).orElseThrow(

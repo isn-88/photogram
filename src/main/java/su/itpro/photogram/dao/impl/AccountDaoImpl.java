@@ -173,6 +173,11 @@ public class AccountDaoImpl implements AccountDao {
   }
 
   @Override
+  public List<Account> findAll() {
+    return new ArrayList<>();
+  }
+
+  @Override
   public Optional<Account> findByUsername(String username) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(FIND_BY_USERNAME_SQL)) {
@@ -261,12 +266,6 @@ public class AccountDaoImpl implements AccountDao {
     } catch (SQLException e) {
       throw new DaoException("Error change Password", e.getMessage());
     }
-  }
-
-  @Override
-  public List<Account> findAll() {
-    // TODO add implementation
-    return new ArrayList<>();
   }
 
   @Override

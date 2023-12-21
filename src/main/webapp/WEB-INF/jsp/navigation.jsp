@@ -6,7 +6,8 @@
     <nav class="navbar navbar-expand-md border-bottom bg-body-tertiary fixed-top">
       <div class="container">
         <i class="fa-solid fa-camera-retro fa-lg"></i>
-        <a class="navbar-brand text-uppercase p-1" href="#">Photogram</a>
+        <a class="navbar-brand fst-italic fs-4 p-1"
+           href="${pageContext.request.contextPath}/home">Photogram</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                 aria-expanded="false" aria-label="Переключатель навигации">

@@ -18,6 +18,14 @@ public interface AccountService {
   boolean checkStatus(UUID accountId);
 
   /**
+   * Производит поиск аккаунта по идентификатору
+   *
+   * @param id - идентификатор аккаунта
+   * @return аккаунт
+   */
+  AccountDto findById(UUID id);
+
+  /**
    * Производит поиск аккаунта по уникальному имени пользователя
    *
    * @param username - имя пользователя

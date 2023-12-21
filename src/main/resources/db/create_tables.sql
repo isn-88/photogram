@@ -78,6 +78,7 @@ CREATE TABLE image
     ordinal smallint NOT NULL
 );
 
+
 CREATE TABLE comment
 (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -88,3 +89,13 @@ CREATE TABLE comment
     is_deleted boolean NOT NULL DEFAULT false,
     message text NOT NULL
 );
+
+
+CREATE TABLE subscribe
+(
+    account_id uuid REFERENCES account (id),
+    subscribe_id uuid REFERENCES account (id),
+    subscribe_time timestamp with time zone NOT NULL DEFAULT now(),
+    PRIMARY KEY (account_id, subscribe_id)
+);
+

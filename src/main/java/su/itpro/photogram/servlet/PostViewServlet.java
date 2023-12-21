@@ -37,13 +37,14 @@ public class PostViewServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-
     UUID postId = UUID.fromString(ServletUtil.variableOfQueryPath(req.getPathInfo()));
+    String view = ServletUtil.getValue(req, "view");
 
     PostDto postDto = postService.findById(postId);
     List<UUID> imageIds = imageService.findAllImageIdsByPostId(postId);
     List<CommentDto> comments = commentService.findAllBy(postDto.id());
 
+    req.setAttribute("view", view);
     req.setAttribute("post", postDto);
     req.setAttribute("imageIds", imageIds);
     req.setAttribute("comments", comments);

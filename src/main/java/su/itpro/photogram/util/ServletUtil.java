@@ -1,7 +1,15 @@
 package su.itpro.photogram.util;
 
+import static java.util.stream.Collectors.joining;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.servlet.enums.PageSelector;
 import su.itpro.photogram.servlet.enums.PathSelector;
@@ -32,6 +40,16 @@ public class ServletUtil {
 
   public static String getServletPath(String contextPath, PathSelector selector, String param) {
     return SERVLET_PARAM_PATTERN.formatted(contextPath, selector.get(), param);
+  }
+
+  public static String getServletPath(String contextPath, PathSelector selector, String param,
+                                      Map<String, String> queryParams) {
+    String servletPath = getServletPath(contextPath, selector, param);
+    return (Objects.isNull(queryParams) || queryParams.isEmpty())
+           ? servletPath
+           : servletPath + '?' + queryParams.entrySet().stream()
+               .map(e -> e.getKey() + '=' + e.getValue())
+               .collect(joining("&"));
   }
 
   public static String variableOfQueryPath(String path) {
@@ -69,6 +87,18 @@ public class ServletUtil {
       return value;
     }
     return null;
+  }
+
+  public static void writeDate(InputStream inputStream, HttpServletResponse resp, int bufferSize) {
+    try (inputStream; OutputStream outputStream = resp.getOutputStream()) {
+      byte[] buffer = new byte[bufferSize];
+      int read;
+      while ((read = inputStream.read(buffer)) > 0) {
+        outputStream.write(buffer, 0, read);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private static String stringStrip(String value) {

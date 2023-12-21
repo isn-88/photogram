@@ -26,6 +26,13 @@ public interface CommentService {
   void saveComment(CommentCreateDto dto);
 
   /**
+   * Помечает комментарий как удалённый
+   *
+   * @param id - идентификатор комментария
+   */
+  void deleteComment(UUID id);
+
+  /**
    * Удаляет все комментарии к посту
    *
    * @param postId - идентификатор поста
