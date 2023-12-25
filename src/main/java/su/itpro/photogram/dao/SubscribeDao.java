@@ -58,6 +58,15 @@ public interface SubscribeDao {
   int subscribersCount(UUID accountId);
 
   /**
+   * Проверяет возможность подписаться
+   *
+   * @param accountId - идентификатор аккаунта
+   * @param subscribeId - идентификатор подписки
+   * @return - true если можно подписаться
+   */
+  boolean readyToSubscribe(UUID accountId, UUID subscribeId);
+
+  /**
    * Производит подписку на публикации пользователя
    *
    * @param dto - данные для подписки
@@ -70,5 +79,4 @@ public interface SubscribeDao {
    * @param dto - данные для отписки
    */
   void unsubscribe(Subscribe dto);
-
 }

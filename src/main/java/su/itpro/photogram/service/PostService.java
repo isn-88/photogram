@@ -25,11 +25,11 @@ public interface PostService {
    * а так же с ограничением количества запрашиваемых постов
    *
    * @param accountId - идентификатор аккаунта пользователя
-   * @param onlyIsActive - true = только активные посты
+   * @param onlyPublic - true = только опубликованные посты
    * @param limit - ограничение по количеству запрашиваемых постов
    * @return - список постов пользователя
    */
-  List<PostDto> findTopPostIdByAccountIdAndLimit(UUID accountId, boolean onlyIsActive, int limit);
+  List<PostDto> findTopPostIdByAccountIdAndLimit(UUID accountId, boolean onlyPublic, int limit);
 
   /**
    * Производит поиск поста по указанному идентификатору

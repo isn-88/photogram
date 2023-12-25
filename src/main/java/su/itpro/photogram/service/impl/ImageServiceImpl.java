@@ -114,7 +114,8 @@ public class ImageServiceImpl implements ImageService {
   }
 
   private UUID getImageIdByPostId(UUID postId) {
-    return imageInfoDao.findPreviewImageId(postId).orElse(null);
+    //TODO подготовить идентификатор изображения-заглушки
+    return imageInfoDao.findPreviewImageId(postId).orElse(UUID.randomUUID());
   }
 
   private Future<Image> saveImage(UUID accountId, UUID postId, Part file, int ordinal) {

@@ -10,6 +10,14 @@ import java.util.UUID;
 public interface IconService {
 
   /**
+   * Проверяет наличие установленной иконки у аккаунта
+   *
+   * @param accountId - идентификатор аккаунта
+   * @return true - если есть иконка
+   */
+  boolean exists(UUID accountId);
+
+  /**
    * Сохраняет или обновляет иконку
    *
    * @param accountId - идентификатор аккаунта

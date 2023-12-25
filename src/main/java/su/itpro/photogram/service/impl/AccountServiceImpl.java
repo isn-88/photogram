@@ -2,6 +2,8 @@ package su.itpro.photogram.service.impl;
 
 import static su.itpro.photogram.util.ServiceUtil.optionalOf;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -12,9 +14,11 @@ import su.itpro.photogram.exception.validation.ValidationException;
 import su.itpro.photogram.factory.DaoFactory;
 import su.itpro.photogram.mapper.AccountDtoMapper;
 import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.dto.AccountFindDto;
 import su.itpro.photogram.model.dto.AccountUpdateDto;
 import su.itpro.photogram.model.dto.LoginCheckExistsDto;
 import su.itpro.photogram.model.entity.Account;
+import su.itpro.photogram.model.enums.Status;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.validator.AccountUpdateValidator;
 import su.itpro.photogram.validator.LoginExistsValidator;
@@ -97,6 +101,14 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public List<AccountDto> findAllBy(AccountFindDto searchDto) {
+    List<Account> accounts = accountDao.findAllBy(searchDto);
+    List<AccountDto> accountDtoList = new ArrayList<>();
+    accounts.forEach(account -> accountDtoList.add(accountDtoMapper.mapFrom(account)));
+    return accountDtoList;
+  }
+
+  @Override
   public AccountDto update(UUID accountId, AccountUpdateDto updateDto) {
 
     var validationResult = accountUpdateValidator.validate(updateDto);
@@ -124,6 +136,11 @@ public class AccountServiceImpl implements AccountService {
 
     accountDao.update(account);
     return accountDtoMapper.mapFrom(account);
+  }
+
+  @Override
+  public void updateStatus(UUID id, Status status) {
+    accountDao.updateStatus(id, status);
   }
 
   private LoginCheckExistsDto prepareExistsDto(Account account, AccountUpdateDto updateDto) {

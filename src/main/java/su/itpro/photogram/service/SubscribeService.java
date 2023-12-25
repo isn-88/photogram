@@ -73,6 +73,15 @@ public interface SubscribeService {
   int subscribersCount(UUID accountId);
 
   /**
+   * Проверяет возможность подписаться
+   *
+   * @param accountId - идентификатор аккаунта
+   * @param subscribeId - идентификатор аккаунта для подписки
+   * @return true если можно подписаться
+   */
+  boolean readyToSubscribe(UUID accountId, UUID subscribeId);
+
+  /**
    * Осуществляет подписку
    *
    * @param dto - данные для подписки

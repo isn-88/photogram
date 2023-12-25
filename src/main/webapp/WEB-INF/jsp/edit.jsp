@@ -31,20 +31,21 @@
                   <button class="nav-link btn-outline-secondary active fs-5"
                           id="v-pills-overview-tab"
                           data-bs-toggle="pill"
-                          data-bs-target="#v-pills-overview" type="button" role="tab"
-                          aria-controls="v-pills-overview" aria-selected="true">Обзор
-                  </button>
+                          data-bs-target="#v-pills-overview" type="button"
+                          aria-controls="v-pills-overview" role="tab"
+                          aria-selected="true">Обзор</button>
 
                   <button class="nav-link btn-outline-secondary fs-5" id="v-pills-account-tab"
                           data-bs-toggle="pill"
-                          data-bs-target="#v-pills-account" type="button" role="tab"
-                          aria-controls="v-pills-account" aria-selected="false">Аккаунт
-                  </button>
+                          data-bs-target="#v-pills-account" type="button"
+                          aria-controls="v-pills-account" role="tab"
+                          aria-selected="false">Аккаунт</button>
+
                   <button class="nav-link btn-outline-secondary fs-5" id="v-pills-profile-tab"
                           data-bs-toggle="pill"
-                          data-bs-target="#v-pills-profile" type="button" role="tab"
-                          aria-controls="v-pills-profile" aria-selected="false">Профиль
-                  </button>
+                          data-bs-target="#v-pills-profile" type="button"
+                          aria-controls="v-pills-profile" role="tab"
+                          aria-selected="false">Профиль</button>
                   <button class="nav-link btn-outline-secondary fs-5" id="v-pills-icon-tab"
                           data-bs-toggle="pill"
                           data-bs-target="#v-pills-icon" type="button" role="tab"
@@ -53,9 +54,9 @@
 
                   <button class="nav-link btn-outline-secondary fs-5" id="v-pills-password-tab"
                           data-bs-toggle="pill"
-                          data-bs-target="#v-pills-password" type="button" role="tab"
-                          aria-controls="v-pills-password" aria-selected="false">Пароль
-                  </button>
+                          data-bs-target="#v-pills-password" type="button"
+                          aria-controls="v-pills-password" role="tab"
+                          aria-selected="false">Пароль</button>
                 </div>
               </div>
             </div>
@@ -68,9 +69,53 @@
                   <div class="tab-pane fade show active" id="v-pills-overview" role="tabpanel"
                        aria-labelledby="v-pills-overview-tab">
                     <div class="container">
-                      <div class="row p-5">
+                      <div class="row row-cols-1 p-3">
                         <div class="col">
-                          <h5>Краткая информация</h5>
+                          <h5>Проверка профиля пользователя</h5>
+                        </div>
+                        <div class="col">
+                          <ul>
+                            <c:if test="${empty sessionScope.account.phone()}">
+                              <li><span style="color: darkred">Не указан номер телефона</span>
+                              </li>
+                            </c:if>
+
+                            <c:if test="${empty sessionScope.account.email()}">
+                              <li><span style="color: darkred">Не указан email-адрес</span></li>
+                            </c:if>
+
+                            <c:if test="${empty requestScope.profile.fullName()}">
+                              <li><span style="color: darkred">Не указаны Имя и фамилия</span></li>
+                            </c:if>
+
+                            <c:if test="${empty requestScope.profile.birthdate()}">
+                              <li><span style="color: darkred">Не указана дата рождения</span></li>
+                            </c:if>
+
+                            <c:if test="${requestScope.profile.gender() eq Gender.UNDEFINE}">
+                              <li><span style="color: darkred">Не указан пол</span></li>
+                            </c:if>
+
+                            <c:if test="${empty requestScope.profile.aboutMe()}">
+                              <li><span style="color: darkred">Не указана информация о себе</span>
+                              </li>
+                            </c:if>
+
+                            <c:if test="${empty requestScope.iconIsExists or requestScope.iconIsExists eq 'false'}">
+                              <li><span style="color: darkred">Не загружено фото профиля</span>
+                              </li>
+                            </c:if>
+
+                          </ul>
+
+
+                          <div class="mt-5">
+                            <h5>Уровень заполнения профиля</h5>
+                            <div class="progress" role="progressbar" aria-label="Basic example"
+                                 aria-valuenow="${requestScope.progress}" aria-valuemin="0" aria-valuemax="100">
+                              <div class="progress-bar" style="width: ${requestScope.progress}%"></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -119,7 +164,7 @@
                         <%--  Username  --%>
                         <div class="row p-3">
                           <div class="col-lg-3 text-start text-lg-end">
-                            <label for="editUsername" class="form-label">Логин</label>
+                            <label for="editUsername" class="form-label">Имя</label>
                           </div>
                           <div class="col">
                             <div class="input-group">

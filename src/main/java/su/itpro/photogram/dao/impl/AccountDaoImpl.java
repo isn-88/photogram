@@ -2,6 +2,7 @@ package su.itpro.photogram.dao.impl;
 
 import static su.itpro.photogram.util.converter.DateConverter.fromTimestamp;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,9 +14,11 @@ import java.util.UUID;
 import su.itpro.photogram.dao.AccountDao;
 import su.itpro.photogram.datasource.DataSource;
 import su.itpro.photogram.exception.dao.DaoException;
+import su.itpro.photogram.model.dto.AccountFindDto;
 import su.itpro.photogram.model.dto.LoginCheckExistsDto;
 import su.itpro.photogram.model.dto.LoginExistsResultDto;
 import su.itpro.photogram.model.entity.Account;
+import su.itpro.photogram.model.enums.Gender;
 import su.itpro.photogram.model.enums.Role;
 import su.itpro.photogram.model.enums.Status;
 
@@ -41,7 +44,6 @@ public class AccountDaoImpl implements AccountDao {
       WHERE account.id = ?
       ;
       """;
-
 
   private static final String FIND_BY_ID_SQL = """
       SELECT  a.id, phone, email, username, password, role, status,
@@ -83,6 +85,21 @@ public class AccountDaoImpl implements AccountDao {
       ;
       """;
 
+  private static final String FIND_ALL_BY_SQL = """
+      SELECT a.id, phone, email, username, password, role, status,
+             is_verified_phone, is_verified_email, create_date
+      FROM account a
+        JOIN role r ON r.id = a.role_id
+        JOIN status s ON s.id = a.status_id
+      WHERE (phone LIKE ? ESCAPE '!' OR phone IS NOT DISTINCT FROM ?) AND
+            (email LIKE ? ESCAPE '!' OR email IS NOT DISTINCT FROM ?) AND
+            username LIKE ? ESCAPE '!'
+            AND status = ANY (?)
+            AND role = ANY (?)
+      LIMIT 100
+      ;
+      """;
+
   private static final String EXISTS_SQL = """
       SELECT phone, email, username
       FROM account
@@ -112,11 +129,24 @@ public class AccountDaoImpl implements AccountDao {
       ;
       """;
 
+  private static final String SAVE_EMPTY_PROFILE_SQL = """
+      INSERT INTO profile (account_id, gender_id)
+      VALUES (?, (SELECT id FROM gender WHERE gender = ?))
+      ;
+      """;
+
   private static final String UPDATE_SQL = """
       UPDATE account
       SET phone = ?,
           email = ?,
           username = ?
+      WHERE id = ?
+      ;
+      """;
+
+  private static final String UPDATE_STATUS_SQL = """
+      UPDATE account
+      SET status_id = (SELECT id FROM status WHERE status = ?)
       WHERE id = ?
       ;
       """;
@@ -170,11 +200,6 @@ public class AccountDaoImpl implements AccountDao {
     } catch (SQLException e) {
       throw new DaoException("Error findById Account", e.getMessage());
     }
-  }
-
-  @Override
-  public List<Account> findAll() {
-    return new ArrayList<>();
   }
 
   @Override
@@ -234,6 +259,39 @@ public class AccountDaoImpl implements AccountDao {
     }
   }
 
+  public List<Account> findAllBy(AccountFindDto findDto) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(FIND_ALL_BY_SQL)) {
+      prepared.setString(1, prepareValue(findDto.phone()));
+      prepared.setString(2, presentValue(findDto.phone()));
+      prepared.setString(3, prepareValue(findDto.email()));
+      prepared.setString(4, presentValue(findDto.email()));
+      prepared.setString(5, prepareValue(findDto.username()));
+      List<String> listStatuses = findDto.statuses().stream().map(Status::name).toList();
+      String[] arrayStatuses = listStatuses.toArray(new String[0]);
+      Array statuses = connection.createArrayOf("varchar", arrayStatuses);
+      prepared.setArray(6, statuses);
+      List<String> listRoles = findDto.roles().stream().map(Role::name).toList();
+      String[] arrayRoles = listRoles.toArray(new String[0]);
+      Array roles = connection.createArrayOf("varchar", arrayRoles);
+      prepared.setArray(7, roles);
+
+      ResultSet resultSet = prepared.executeQuery();
+      List<Account> accounts = new ArrayList<>();
+      while (resultSet.next()) {
+        accounts.add(parseAccount(resultSet));
+      }
+      return accounts;
+    } catch (SQLException e) {
+      throw new DaoException("Error findAllBy Account", e.getMessage());
+    }
+  }
+
+  @Override
+  public List<Account> findAll() {
+    return new ArrayList<>();
+  }
+
   public LoginExistsResultDto exists(LoginCheckExistsDto dto) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(EXISTS_SQL)) {
@@ -271,7 +329,8 @@ public class AccountDaoImpl implements AccountDao {
   @Override
   public Account save(Account account) {
     try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS);
+        var profilePrepared = connection.prepareStatement(SAVE_EMPTY_PROFILE_SQL)) {
       prepared.setString(1, account.getPhone());
       prepared.setString(2, account.getEmail());
       prepared.setString(3, account.getUsername());
@@ -281,10 +340,13 @@ public class AccountDaoImpl implements AccountDao {
       prepared.executeUpdate();
 
       var generatedKeys = prepared.getGeneratedKeys();
-
       if (generatedKeys.next()) {
         account.setId(generatedKeys.getObject(1, UUID.class));
       }
+
+      profilePrepared.setObject(1, account.getId());
+      profilePrepared.setString(2, Gender.UNDEFINE.name());
+      profilePrepared.executeUpdate();
     } catch (SQLException e) {
       throw new DaoException("Error save Account", e.getMessage());
     }
@@ -299,6 +361,19 @@ public class AccountDaoImpl implements AccountDao {
       prepared.setString(2, account.getEmail());
       prepared.setString(3, account.getUsername());
       prepared.setObject(4, account.getId());
+
+      prepared.executeUpdate();
+    } catch (SQLException e) {
+      throw new DaoException("Error update Account", e.getMessage());
+    }
+  }
+
+  @Override
+  public void updateStatus(UUID id, Status status) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(UPDATE_STATUS_SQL)) {
+      prepared.setString(1, status.name());
+      prepared.setObject(2, id);
 
       prepared.executeUpdate();
     } catch (SQLException e) {
@@ -355,6 +430,22 @@ public class AccountDaoImpl implements AccountDao {
 
   private boolean checkExists(String checkField, String tableField) {
     return (Objects.nonNull(checkField) && Objects.equals(checkField, tableField));
+  }
+
+  private String prepareValue(String value) {
+    if (value == null || value.isBlank()) {
+      return "%";
+    }
+    return value.replace("!", "!!")
+               .replace("%", "!%")
+               .replace("_", "!_") + '%';
+  }
+
+  private String presentValue(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    return value;
   }
 
 }

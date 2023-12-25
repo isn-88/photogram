@@ -30,6 +30,11 @@ public class IconServiceImpl implements IconService {
   }
 
   @Override
+  public boolean exists(UUID accountId) {
+    return iconDao.exists(accountId);
+  }
+
+  @Override
   public void saveOrUpdate(UUID accountId, byte[] iconData) {
     if (iconDao == null || iconData.length == 0) {
       return;

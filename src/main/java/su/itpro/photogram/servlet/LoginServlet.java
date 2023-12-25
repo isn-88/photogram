@@ -49,7 +49,16 @@ public class LoginServlet extends HttpServlet {
       req.getSession().setAttribute("account", accountDto);
       req.getSession().setMaxInactiveInterval(INACTIVE_INTERVAL);
 
-      resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
+      switch (accountDto.role()) {
+        case USER -> resp.sendRedirect(
+            ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
+        case ADMIN -> resp.sendRedirect(
+            ServletUtil.getServletPath(req.getContextPath(), PathSelector.ADMIN));
+        case MODERATOR -> resp.sendRedirect(
+            ServletUtil.getServletPath(req.getContextPath(), PathSelector.MODERATOR));
+        default -> throw new IllegalStateException();
+      }
+
     } catch (ValidationException e) {
       req.setAttribute("errors", e.getErrors());
       req.setAttribute("login", loginDto.login());

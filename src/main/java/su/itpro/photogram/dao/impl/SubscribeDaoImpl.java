@@ -26,9 +26,10 @@ public class SubscribeDaoImpl implements SubscribeDao {
   private static final String FIND_TOP_100_BY_COUNT_POST_SQL = """
       SELECT account_id, a.username, count(p.id) AS count
       FROM post p
+          JOIN post_status ps ON ps.id = p.status_id
           JOIN account a ON a.id = p.account_id
-          JOIN status s ON s.id = a.status_id
-      WHERE status = 'ACTIVE' AND p.is_active = true
+          JOIN status ast ON ast.id = a.status_id
+      WHERE ast.status = 'ACTIVE' AND ps.status = 'PUBLIC'
       GROUP BY account_id, a.username
       ORDER BY count DESC
       LIMIT 100
@@ -38,8 +39,8 @@ public class SubscribeDaoImpl implements SubscribeDao {
   private static final String FIND_TOP_100_BY_COUNT_SUBSCRIBES_SQL = """
       SELECT account_id, username, count(subscribe_id) AS count
       FROM subscribe
-          JOIN public.account a ON a.id = subscribe.account_id
-          JOIN public.status s ON s.id = a.status_id
+          JOIN account a ON a.id = subscribe.account_id
+          JOIN status s ON s.id = a.status_id
       WHERE status = 'ACTIVE'
       GROUP BY account_id, username
       ORDER BY count DESC
@@ -80,6 +81,13 @@ public class SubscribeDaoImpl implements SubscribeDao {
           JOIN status s ON s.id = a.status_id
        WHERE status = 'ACTIVE' AND subscribe_id = ?
        ;
+      """;
+
+  private static final String READY_TO_SUBSCRIBE_SQL = """
+      SELECT account_id, subscribe_id
+      FROM subscribe
+      WHERE account_id = ? AND subscribe_id = ?
+      ;
       """;
 
   private static final String SUBSCRIBE_SQL = """
@@ -203,6 +211,20 @@ public class SubscribeDaoImpl implements SubscribeDao {
       return 0;
     } catch (SQLException e) {
       throw new DaoException("Error subscribersCount Subscribe", e.getMessage());
+    }
+  }
+
+  @Override
+  public boolean readyToSubscribe(UUID accountId, UUID subscribeId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(READY_TO_SUBSCRIBE_SQL)) {
+      prepared.setObject(1, accountId);
+      prepared.setObject(2, subscribeId);
+
+      var resultSet = prepared.executeQuery();
+      return !resultSet.next();
+    } catch (SQLException e) {
+      throw new DaoException("Error readyToSubscribe Subscribe", e.getMessage());
     }
   }
 

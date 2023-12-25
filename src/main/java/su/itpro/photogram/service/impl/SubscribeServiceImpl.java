@@ -94,6 +94,11 @@ public class SubscribeServiceImpl implements SubscribeService {
   }
 
   @Override
+  public boolean readyToSubscribe(UUID accountId, UUID subscribeId) {
+    return subscribeDao.readyToSubscribe(accountId, subscribeId);
+  }
+
+  @Override
   public void subscribe(SubscribeDto dto) {
     Subscribe subscribe = new Subscribe(dto.accountId(), dto.subscribeId());
     subscribeDao.subscribe(subscribe);

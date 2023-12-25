@@ -53,23 +53,30 @@ public class HomeServlet extends HttpServlet {
 
     String username = ServletUtil.variableOfQueryPath(req.getPathInfo());
     final boolean isOwner = Objects.isNull(username);
+    AccountDto loginAccountDto = ServletUtil.getAccountFromSession(req);
     AccountDto accountDto = (Objects.isNull(username))
-                            ? ServletUtil.getAccountFromSession(req)
+                            ? loginAccountDto
                             : accountService.findByUsername(username);
     ProfileDto profileDto = profileService.loadProfile(accountDto.id());
 
     // Публикации пользователя
     List<PostDto> postDtoList = postService.findTopPostIdByAccountIdAndLimit(
         accountDto.id(), !isOwner, POSTS_PER_PAGE);
-    Map<UUID, UUID> postToImageMap = imageService.findPreviewImageIdByPostIds(postDtoList);
-    int postCount = postService.countPosts(accountDto.id());
+    final Map<UUID, UUID> postToImageMap = imageService.findPreviewImageIdByPostIds(postDtoList);
+    final int postCount = postService.countPosts(accountDto.id());
 
     // Публикации по подписке
     List<UUID> subscribeList = subscribeService.findAllSubscribe(accountDto.id());
     List<PostDto> subscribePostDtoList =
         subscribeService.getSubscribePost(subscribeList, POSTS_PER_PAGE);
-    Map<UUID, UUID> postSubscribeToImageMap = imageService
+    final Map<UUID, UUID> postSubscribeToImageMap = imageService
         .findPreviewImageIdByPostIds(subscribePostDtoList);
+
+
+    if (!loginAccountDto.id().equals(accountDto.id())) {
+      req.setAttribute("readyToSubscribe",
+                       subscribeService.readyToSubscribe(loginAccountDto.id(), accountDto.id()));
+    }
 
     req.setAttribute("account", accountDto);
     req.setAttribute("profile", profileDto);

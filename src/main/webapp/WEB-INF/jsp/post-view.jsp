@@ -1,5 +1,7 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="su.itpro.photogram.model.enums.PostStatus" %>
+<%@ page import="su.itpro.photogram.model.enums.Role" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -14,12 +16,18 @@
 
 <body>
 
-<%@ include file="navigation.jsp" %>
+
+<c:if test="${sessionScope.account.role() eq Role.MODERATOR}">
+  <%@ include file="navigation-moder.jsp" %>
+</c:if>
+<c:if test="${sessionScope.account.role() ne Role.MODERATOR}">
+  <%@ include file="navigation.jsp" %>
+</c:if>
 
 
 <section style="padding-top: 80px; padding-bottom: 10px;">
   <div class="container">
-    <div class="row row-cols-1 row-cols-lg-3 g-3">
+    <div class="row row-cols-1 row-cols-lg-3 g-3 mt-2">
       <div class="col">
         <div class="card shadow" id="cardImages"
              style="min-height: 300px;">
@@ -38,7 +46,7 @@
                     action="${pageContext.request.contextPath}/post/edit/${requestScope.post.id()}"
                     method="post">
 
-                  <!-- Модальное окно -->
+                  <!-- Модальное окно: редактирование публикации -->
                   <div class="modal fade" id="editModal" tabindex="-1"
                        aria-labelledby="editModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -57,10 +65,16 @@
 
                           <div class="form-check form-switch p-5">
                             <input class="form-check-input" type="checkbox" role="switch"
-                                   id="flexSwitchCheckChecked" name="isActive" value="true"
-                            <c:if test="${requestScope.post.isActive()}">
-                              <c:out value="checked"/>
-                            </c:if>>
+                                   id="flexSwitchCheckChecked" name="postStatus"
+                                   value="${PostStatus.PUBLIC}"
+                            <c:if test="${requestScope.post.status() eq PostStatus.PUBLIC}">
+                              <c:out value=" checked"/>
+                            </c:if>
+
+                            <c:if test="${requestScope.post.status() eq PostStatus.BLOCKED}">
+                              <c:out value=" disabled"/>
+                            </c:if>
+                            >
                             <label class="form-check-label"
                                    for="flexSwitchCheckChecked">Опубликовано</label>
                           </div>
@@ -68,11 +82,9 @@
                         <div class="modal-footer">
                           <button type="button" class="btn btn-outline-secondary"
                                   data-bs-dismiss="modal">
-                            <i class="fa-solid fa-xmark"></i> Закрыть
-                          </button>
+                            <i class="fa-solid fa-xmark"></i> Закрыть</button>
                           <button type="submit" class="btn btn-outline-success">
-                            <i class="fa-solid fa-check"></i> Сохранить изменения
-                          </button>
+                            <i class="fa-solid fa-check"></i> Сохранить изменения</button>
                         </div>
                       </div>
                     </div>
@@ -94,11 +106,19 @@
 
         </div>
       </div>
+
+
       <%--  Описание  --%>
       <div class="col" onload="handleResize();">
         <div class="card shadow" id="cardDescription">
           <div class="card-header">
-            <h5 class="card-title text-center">Описание</h5>
+            <c:if test="${requestScope.post.status() ne PostStatus.BLOCKED}">
+              <h5 class="card-title text-center">Описание</h5>
+            </c:if>
+
+            <c:if test="${requestScope.post.status() eq PostStatus.BLOCKED}">
+              <h5 class="card-title text-center text-danger">Заблокировано</h5>
+            </c:if>
           </div>
           <div class="card-body" style="overflow-y: auto">
             <p class="card-text">${requestScope.post.getDescriptionForPage()}</p>
@@ -109,30 +129,77 @@
               <c:if test="${not empty requestScope.view}">
                 <c:set var="viewEndpoint" value="/${requestScope.view}"/>
               </c:if>
-              <a href="${pageContext.request.contextPath}/home${viewEndpoint}"
-                 class="btn btn-outline-secondary" type="button">
-                <i class="fa-solid fa-arrow-left"></i> Назад</a>
 
+              <c:if test="${sessionScope.account.role() eq Role.MODERATOR}">
+                <c:set var="backPath" value="${pageContext.request.contextPath}/moderator"/>
+              </c:if>
+
+              <c:if test="${sessionScope.account.role() ne Role.MODERATOR}">
+                <c:set var="backPath" value="${pageContext.request.contextPath}/home${viewEndpoint}"/>
+              </c:if>
+
+              <a href="${backPath}"
+                 class="btn btn-outline-secondary" type="button">
+                <i class="fa-solid fa-arrow-left fa-lg"></i></a>
+
+
+              <div class="input-group"
+              <c:if test="${requestScope.post.status() eq PostStatus.BLOCKED}">
+                <c:out value=" hidden"/>
+              </c:if> >
+              <form action="${pageContext.request.contextPath}/like/${requestScope.post.id()}"
+                    method="post" id="formLike">
+                <label>
+                  <input name="like" value="true" hidden>
+                </label>
+                <label>
+                  <input name="view" value="${requestScope.view}" hidden>
+                </label>
+              </form>
+              <button class="btn btn-outline-success" type="submit" form="formLike">
+                <i class="fa-regular fa-heart fa-lg"></i></button>
+
+              <input type="text" class="form-control" placeholder="" aria-label=""
+                     value="${requestScope.likeScore}" readonly>
+
+              <button class="btn btn-outline-danger" type="submit" form="formDislike">
+                <i class="fa-solid fa-heart-crack fa-lg"></i></button>
+              <form action="${pageContext.request.contextPath}/like/${requestScope.post.id()}"
+                    method="post" id="formDislike">
+                <label>
+                  <input name="dislike" value="true" hidden>
+                </label>
+                <label>
+                  <input name="view" value="${requestScope.view}" hidden>
+                </label>
+              </form>
+            </div>
+
+              <%-- Редактировать --%>
               <button class="btn btn-outline-warning" type="button"
                       data-bs-toggle="modal" data-bs-target="#editModal"
                   <c:if test="${requestScope.post.accountId() ne sessionScope.account.id()}">
                     <c:out value=" hidden"/></c:if> >
-                <i class="fa-solid fa-pen-to-square"></i> Редактировать
-              </button>
+                <i class="fa-solid fa-pen-to-square fa-lg"></i></button>
 
+              <%-- Удалить --%>
               <button class="btn btn-outline-danger" type="button"
                       data-bs-toggle="modal" data-bs-target="#deletePostModal"
                   <c:if test="${requestScope.post.accountId() ne sessionScope.account.id()}">
                     <c:out value=" hidden"/></c:if> >
-                <i class="fa-regular fa-trash-can"></i> Удалить
-              </button>
+                <i class="fa-regular fa-trash-can fa-lg"></i></button>
 
+              <%-- Обращение --%>
               <button class="btn btn-outline-danger" type="button"
-                      data-bs-toggle="modal" data-bs-target="#oopsPostModal"
-                  <c:if test="${requestScope.post.accountId() eq sessionScope.account.id()}">
-                    <c:out value=" hidden"/></c:if> >
-                <i class="fa-solid fa-triangle-exclamation"></i> Пожаловаться
-              </button>
+                      data-bs-toggle="modal" data-bs-target="#complaintPostModal"
+                  <c:if test="${requestScope.post.accountId() eq sessionScope.account.id()
+                  and requestScope.post.status() ne PostStatus.BLOCKED}">
+                    <c:out value=" hidden"/></c:if>
+                  <c:if test="${requestScope.isComplaint eq 'true' or
+                  sessionScope.account.role() eq Role.MODERATOR}">
+                    <c:out value=" disabled"/>
+                  </c:if> >
+                <i class="fa-solid fa-triangle-exclamation fa-lg"></i></button>
             </div>
           </div>
         </div>
@@ -165,6 +232,47 @@
         </div>
       </div>
 
+      <!-- Модальное окно: модерация -->
+      <div class="modal fade" id="complaintPostModal" tabindex="-1"
+           aria-labelledby="complaintPostModal" aria-hidden="true">
+
+        <form action="${pageContext.request.contextPath}/complaint" method="post">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="complaintPostModalLabel">Отправка жалобы</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+              </div>
+              <div class="modal-body">
+                <div class="col">
+                  <label for="complaintMessage"
+                         class="form-label ms-2 fs-5">Укажите причину обращения</label>
+                  <textarea class="form-control" name="message" id="complaintMessage"
+                            rows="5" maxlength="500" required></textarea>
+                </div>
+
+                <label>
+                  <input name="postId" value="${requestScope.post.id()}" hidden>
+                </label>
+                <label>
+                  <input name="view" value="${requestScope.view}" hidden>
+                </label>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-outline-danger">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Отправить</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+
+
       <!-- Комментарии -->
       <div class="col" onload="handleResize();">
         <div class="card shadow" id="cardComment">
@@ -189,7 +297,6 @@
                         <label>
                           <input name="postId" value="${requestScope.post.id()}" hidden>
                         </label>
-
                         <label>
                           <input name="commentId" value="${comment.id()}" hidden>
                         </label>
@@ -221,15 +328,14 @@
           </div>
 
           <div class="card-footer">
-            <form
-                action="${pageContext.request.contextPath}/comment/send"
-                method="post">
+            <form action="${pageContext.request.contextPath}/comment/send" method="post">
               <div class="row row-cols-1 g-2">
                 <div class="col">
                   <label for="createCommentMessage"
                          class="form-label ms-2 fs-5">Написать сообщение</label>
                   <textarea class="form-control" name="message" id="createCommentMessage"
                             rows="3" maxlength="500" required></textarea>
+
                 </div>
                 <label>
                   <input name="postId" value="${requestScope.post.id()}" hidden>
@@ -238,8 +344,11 @@
                   <input name="view" value="${requestScope.view}" hidden>
                 </label>
                 <div class="col d-flex justify-content-center">
-                  <button class="btn btn-outline-primary" type="submit">
-                    <i class="fa-solid fa-paper-plane"></i> Опубликовать</button>
+                  <button class="btn btn-outline-primary" type="submit"
+                      <c:if test="${sessionScope.account.role() eq Role.MODERATOR}">
+                        <c:out value=" disabled"/>
+                      </c:if> >
+                    <i class="fa-solid fa-paper-plane fa-lg"></i></button>
                 </div>
               </div>
             </form>

@@ -14,9 +14,12 @@ import su.itpro.photogram.model.dto.PostCreateDto;
 import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.PostUpdateDto;
 import su.itpro.photogram.model.entity.Post;
+import su.itpro.photogram.model.enums.PostStatus;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.CommentService;
+import su.itpro.photogram.service.ComplaintService;
 import su.itpro.photogram.service.ImageService;
+import su.itpro.photogram.service.LikeService;
 import su.itpro.photogram.service.PostService;
 
 public class PostServiceImpl implements PostService {
@@ -26,6 +29,8 @@ public class PostServiceImpl implements PostService {
   private final AccountService accountService;
   private final ImageService imageService;
   private final CommentService commentService;
+  private final ComplaintService complaintService;
+  private final LikeService likeService;
   private final PostDao postDao;
   private final PostDtoMapper postDtoMapper;
 
@@ -34,6 +39,8 @@ public class PostServiceImpl implements PostService {
     accountService = AccountServiceImpl.getInstance();
     imageService = ImageServiceImpl.getInstance();
     commentService = CommentServiceImpl.getInstance();
+    complaintService = ComplaintServiceImpl.getInstance();
+    likeService = LikeServiceImpl.getInstance();
     postDao = DaoFactory.INSTANCE.getPostDao();
     postDtoMapper = PostDtoMapper.getInstance();
   }
@@ -45,15 +52,18 @@ public class PostServiceImpl implements PostService {
   @Override
   public void createNewPost(String username, PostCreateDto dto) {
     AccountDto accountDto = accountService.findByUsername(username);
-    Post post = new Post(accountDto.id(), dto.isActive(), dto.description());
+    Post post = new Post(accountDto.id(), dto.status(), dto.description());
     postDao.save(post);
     imageService.saveImages(accountDto.id(), post.getId(), dto.parts());
   }
 
   @Override
   public List<PostDto> findTopPostIdByAccountIdAndLimit(UUID accountId,
-                                                        boolean onlyIsActive, int limit) {
-    return postDao.findTopByAccountIdAndLimit(accountId, onlyIsActive, limit)
+                                                        boolean onlyPublic, int limit) {
+    List<PostStatus> findStatuses = (onlyPublic)
+                                ? List.of(PostStatus.PUBLIC)
+                                : List.of(PostStatus.values());
+    return postDao.findTopByAccountIdAndLimit(accountId, findStatuses, limit)
         .stream()
         .map(postDtoMapper::mapFrom)
         .collect(toList());
@@ -77,15 +87,17 @@ public class PostServiceImpl implements PostService {
     );
 
     Optional.ofNullable(dto.description()).ifPresent(post::setDescription);
-    Optional.ofNullable(dto.isActive()).ifPresent(post::setActive);
+    Optional.ofNullable(dto.status()).ifPresent(post::setStatus);
 
     postDao.update(post);
   }
 
   @Override
   public void delete(UUID postId) {
-    imageService.deleteImagesByPostId(postId);
+    likeService.deleteBy(postId);
     commentService.deleteAllCommentsByPostId(postId);
+    complaintService.deleteByPost(postId);
+    imageService.deleteImagesByPostId(postId);
     postDao.delete(postId);
   }
 

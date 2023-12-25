@@ -1,3 +1,4 @@
+<%@ page import="su.itpro.photogram.model.enums.PostStatus" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -28,7 +29,27 @@
                alt="profile icon" class="img-fluid rounded-circle mb-2"
                onError="this.onerror=null;this.src='${pageContext.request.contextPath}/img/default-profile-icon.jpg';"
                style="width: 180px; height: 180px"/>
-          <h5 class="mb-0">${requestScope.profile.fullName()}</h5>
+          <h5 class="mb-0 text-center">${requestScope.profile.fullName()}</h5>
+
+          <c:if test="${empty requestScope.readyToSubscribe or requestScope.readyToSubscribe eq 'false'}">
+            <c:set var="subscribeReady" value="true"/>
+          </c:if>
+
+          <form action="/subscribe/${requestScope.account.id()}" method="post">
+          <button class="btn btn-outline-primary mt-2" type="submit"
+            <c:if test="${empty requestScope.readyToSubscribe or requestScope.readyToSubscribe eq 'false'}">
+              <c:out value="hidden"/>
+            </c:if> >Подписаться</button>
+          </form>
+
+          <form action="/unsubscribe/${requestScope.account.id()}" method="post">
+            <button class="btn btn-outline-danger mt-2" type="submit"
+                <c:if test="${empty requestScope.readyToSubscribe or requestScope.readyToSubscribe eq 'true'}">
+                  <c:out value="hidden"/>
+                </c:if> >Отписаться</button>
+          </form>
+
+
         </div>
       </div>
       <div class="col">
@@ -53,7 +74,7 @@
           <div class="col">
             <div class="row p-2">
               <h5>Обо мне</h5>
-              <p>${requestScope.profile.aboutMe()}</p>
+              <p>${requestScope.profile.getAboutMeForPage()}</p>
             </div>
           </div>
         </div>
@@ -71,22 +92,19 @@
         <button class="nav-link active" id="advice-tab" data-bs-toggle="tab"
                 data-bs-target="#advice-tab-pane"
                 type="button" role="tab" aria-controls="advice-tab-pane"
-                aria-selected="true">Рекомендуем подписаться
-        </button>
+                aria-selected="true">Рекомендуем подписаться</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="subscribe-tab" data-bs-toggle="tab"
                 data-bs-target="#subscribe-tab-pane"
                 type="button" role="tab" aria-controls="subscribe-tab-pane"
-                aria-selected="false">Вы подписаны
-        </button>
+                aria-selected="false">Вы подписаны</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="subscribers-tab" data-bs-toggle="tab"
                 data-bs-target="#subscribers-tab-pane"
                 type="button" role="tab" aria-controls="subscribers-tab-pane"
-                aria-selected="false">Ваши подписчики
-        </button>
+                aria-selected="false">Ваши подписчики</button>
       </li>
     </ul>
     <div class="tab-content" id="adviceTabContent">
@@ -150,17 +168,14 @@
           <c:forEach var="subscribersDto" items="${requestScope.subscribersDtoList}">
             <div class="card card-body text-center"
                  style="min-width: 160px; max-width: 160px; margin-right: 20px;">
-              <form
-                  action="${pageContext.request.contextPath}/unsubscribe/${subscribersDto.id()}"
-                  method="post">
-                <a href="${pageContext.request.contextPath}/home/${subscribersDto.username()}">
-                  <img
-                      src="${pageContext.request.contextPath}/icon/download/${subscribersDto.id()}"
-                      alt="profile icon" class="img-fluid rounded-circle mb-2"
-                      onError="this.onerror=null;this.src='${pageContext.request.contextPath}/img/default-profile-icon.jpg';"
-                      style="width: 120px; height: 120px"/></a>
-                <h5 class="mb-0">${subscribersDto.username()}</h5>
-              </form>
+
+              <a href="${pageContext.request.contextPath}/home/${subscribersDto.username()}">
+                <img
+                    src="${pageContext.request.contextPath}/icon/download/${subscribersDto.id()}"
+                    alt="profile icon" class="img-fluid rounded-circle mb-2"
+                    onError="this.onerror=null;this.src='${pageContext.request.contextPath}/img/default-profile-icon.jpg';"
+                    style="width: 120px; height: 120px"/></a>
+              <h5 class="mb-0">${subscribersDto.username()}</h5>
             </div>
           </c:forEach>
         </div>
@@ -204,7 +219,7 @@
                 <img
                     src="${pageContext.request.contextPath}/image/download/${requestScope.postToImageMap.get(post.id())}"
                     width="1080" height="1920"
-                    class="img-thumbnail <c:if test="${post.isActive() eq 'false'}"><c:out value="opacity-25"/></c:if>"
+                    class="img-thumbnail <c:if test="${post.status() ne PostStatus.PUBLIC}"><c:out value="opacity-25"/></c:if>"
                     alt="Фотография для публикации">
               </a>
             </div>
@@ -223,11 +238,9 @@
                 <c:set var="queryParam" value="?view=${requestScope.account.username()}"/>
               </c:if>
               <a href="${pageContext.request.contextPath}/post/${post.id()}${queryParam}">
-                <img
+                <img class="img-thumbnail" alt="Фотография для публикации"
                     src="${pageContext.request.contextPath}/image/download/${requestScope.postSubscribeToImageMap.get(post.id())}"
-                    width="1080" height="1920"
-                    class="img-thumbnail <c:if test="${post.isActive() eq 'false'}"><c:out value="opacity-25"/></c:if>"
-                    alt="Фотография для публикации">
+                    width="1080" height="1920">
               </a>
             </div>
           </c:forEach>

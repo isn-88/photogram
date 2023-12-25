@@ -88,7 +88,7 @@ class AccountUpdateValidatorTest {
 
   @Test
   void validate_emailCorrect() {
-    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "user@gmail.com", USERNAME);
+    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "user.name@mail.com", USERNAME);
 
     ValidationResult actualResult = validator.validate(dto);
 
@@ -97,7 +97,7 @@ class AccountUpdateValidatorTest {
 
   @Test
   void validate_emailIncorrectShortName() {
-    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "u@gmail.com", USERNAME);
+    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "@mail.com", USERNAME);
 
     ValidationResult actualResult = validator.validate(dto);
 
@@ -107,7 +107,7 @@ class AccountUpdateValidatorTest {
 
   @Test
   void validate_emailIncorrectStartSymbol() {
-    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "+u@gmail.com", USERNAME);
+    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "+u@mail.com", USERNAME);
 
     ValidationResult actualResult = validator.validate(dto);
 
@@ -117,7 +117,7 @@ class AccountUpdateValidatorTest {
 
   @Test
   void validate_emailIncorrectDomainOne() {
-    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "user@gmail.c", USERNAME);
+    AccountUpdateDto dto = new AccountUpdateDto(PHONE, "user@mail.c", USERNAME);
 
     ValidationResult actualResult = validator.validate(dto);
 

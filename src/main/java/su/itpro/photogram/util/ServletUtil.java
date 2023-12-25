@@ -10,7 +10,12 @@ import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.enums.ComplainStatus;
+import su.itpro.photogram.model.enums.PostStatus;
+import su.itpro.photogram.model.enums.Role;
 import su.itpro.photogram.servlet.enums.PageSelector;
 import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.converter.DateConverter;
@@ -20,8 +25,14 @@ public class ServletUtil {
   private static final String ACCOUNT_ATTRIBUTE_NAME = "account";
   private static final String PREFIX_JSP_PATH = "/WEB-INF/jsp/";
   private static final String JSP_PATH_PATTERN = "%s%s.jsp";
-  private static final String SERVLET_PATH_PATTERN = "%s/%s";
-  private static final String SERVLET_PARAM_PATTERN = "%s/%s/%s";
+  private static final String SERVLET_PATH_PATTERN = "%s%s";
+  private static final String SERVLET_CONTEXT_PARAM_PATTERN = "%s%s/%s";
+  private static final String SERVLET_PARAM_PATTERN = "%s/%s";
+  private static final String QUERY_PARAM_PATTERN = "%s=%s";
+  private static final String QUERY_PATH_PATTERN = "?%s";
+
+
+  private static final Logger LOG = LoggerFactory.getLogger(ServletUtil.class);
 
   private ServletUtil() {
   }
@@ -35,21 +46,24 @@ public class ServletUtil {
   }
 
   public static String getServletPath(String contextPath, PathSelector selector) {
-    return SERVLET_PATH_PATTERN.formatted(contextPath, selector.get());
+    return (contextPath.isEmpty())
+           ? selector.get()
+           : SERVLET_PATH_PATTERN.formatted(contextPath, selector.get());
   }
 
   public static String getServletPath(String contextPath, PathSelector selector, String param) {
-    return SERVLET_PARAM_PATTERN.formatted(contextPath, selector.get(), param);
+    return (contextPath.isEmpty())
+           ? SERVLET_PARAM_PATTERN.formatted(selector.get(), param)
+           : SERVLET_CONTEXT_PARAM_PATTERN.formatted(contextPath, selector.get(), param);
   }
 
   public static String getServletPath(String contextPath, PathSelector selector, String param,
                                       Map<String, String> queryParams) {
     String servletPath = getServletPath(contextPath, selector, param);
-    return (Objects.isNull(queryParams) || queryParams.isEmpty())
-           ? servletPath
-           : servletPath + '?' + queryParams.entrySet().stream()
-               .map(e -> e.getKey() + '=' + e.getValue())
-               .collect(joining("&"));
+    String result = (Objects.isNull(queryParams) || queryParams.isEmpty())
+                    ? ""
+                    : getQueryPath(queryParams);
+    return SERVLET_PATH_PATTERN.formatted(servletPath, result);
   }
 
   public static String variableOfQueryPath(String path) {
@@ -66,6 +80,25 @@ public class ServletUtil {
 
   public static boolean getBoolean(HttpServletRequest request, String name) {
     return Boolean.parseBoolean(request.getParameter(name));
+  }
+
+  public static ComplainStatus getComplainStatusOrDefault(HttpServletRequest request,
+                                                          String name,
+                                                          ComplainStatus defaultComplainStatus) {
+    String inputValue = valueOrNull(request.getParameter(name));
+    return (inputValue == null) ? defaultComplainStatus : ComplainStatus.valueOf(inputValue);
+  }
+
+  public static PostStatus getPostStatusOrDefault(HttpServletRequest request,
+                                                  String name,
+                                                  PostStatus defaultStatus) {
+    String inputValue = valueOrNull(request.getParameter(name));
+    return (inputValue == null) ? defaultStatus : PostStatus.valueOf(inputValue);
+  }
+
+  public static Role getRole(HttpServletRequest request, String name) {
+    String inputValue = request.getParameter(name);
+    return Role.valueOf(inputValue);
   }
 
   public static String getValueAndStrip(HttpServletRequest request, String name) {
@@ -114,4 +147,14 @@ public class ServletUtil {
     }
     return value.replaceAll(regex, replacement);
   }
+
+  private static String getQueryPath(Map<String, String> queryParams) {
+    return QUERY_PATH_PATTERN.formatted(queryParams.entrySet().stream()
+                                            .map(e -> QUERY_PARAM_PATTERN.formatted(
+                                                e.getKey(),
+                                                e.getValue()
+                                            ))
+                                            .collect(joining("&")));
+  }
+
 }

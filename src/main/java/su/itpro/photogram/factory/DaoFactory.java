@@ -2,17 +2,21 @@ package su.itpro.photogram.factory;
 
 import su.itpro.photogram.dao.AccountDao;
 import su.itpro.photogram.dao.CommentDao;
+import su.itpro.photogram.dao.ComplaintDao;
 import su.itpro.photogram.dao.IconDao;
 import su.itpro.photogram.dao.ImageDataDao;
 import su.itpro.photogram.dao.ImageInfoDao;
+import su.itpro.photogram.dao.LikeDao;
 import su.itpro.photogram.dao.PostDao;
 import su.itpro.photogram.dao.ProfileDao;
 import su.itpro.photogram.dao.SubscribeDao;
 import su.itpro.photogram.dao.impl.AccountDaoImpl;
 import su.itpro.photogram.dao.impl.CommentDaoImpl;
+import su.itpro.photogram.dao.impl.ComplaintDaoImpl;
 import su.itpro.photogram.dao.impl.FileImageDataDaoImpl;
 import su.itpro.photogram.dao.impl.IconDaoImpl;
 import su.itpro.photogram.dao.impl.ImageInfoDaoImpl;
+import su.itpro.photogram.dao.impl.LikeDaoImpl;
 import su.itpro.photogram.dao.impl.PostDaoImpl;
 import su.itpro.photogram.dao.impl.ProfileDaoImpl;
 import su.itpro.photogram.dao.impl.SubscribeDaoImpl;
@@ -29,6 +33,8 @@ public enum DaoFactory {
   private final CommentDao commentDao;
   private final IconDao iconDao;
   private final SubscribeDao subscribeDao;
+  private final ComplaintDao complaintDao;
+  private final LikeDao likeDao;
 
 
   DaoFactory() {
@@ -40,6 +46,8 @@ public enum DaoFactory {
     commentDao = CommentDaoImpl.getInstance();
     iconDao = IconDaoImpl.getInstance();
     subscribeDao = SubscribeDaoImpl.getInstance();
+    complaintDao = ComplaintDaoImpl.getInstance();
+    likeDao = LikeDaoImpl.getInstance();
   }
 
   public AccountDao getAccountDao() {
@@ -72,5 +80,13 @@ public enum DaoFactory {
 
   public SubscribeDao getSubscribeDao() {
     return subscribeDao;
+  }
+
+  public ComplaintDao getComplaintDao() {
+    return complaintDao;
+  }
+
+  public LikeDao getLikeDao() {
+    return likeDao;
   }
 }

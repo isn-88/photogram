@@ -16,7 +16,7 @@
     <div class="col-sm-10 col-md-8 col-xl-6 p-5">
       <div class="card shadow">
         <div class="card-header text-center">
-          <h2 class="text-uppercase">Photogram</h2>
+          <h3 class="fst-italic">Photogram</h3>
           <span>Зарегистрируйтесь для просмотра фотографий ваших друзей</span>
         </div>
         <div class="card-body">
