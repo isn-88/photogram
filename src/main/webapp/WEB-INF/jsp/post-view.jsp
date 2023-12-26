@@ -16,12 +16,13 @@
 
 <body>
 
+<%@ include file="include/locale.jsp" %>
 
 <c:if test="${sessionScope.account.role() eq Role.MODERATOR}">
-  <%@ include file="navigation-moder.jsp" %>
+  <%@ include file="include/navigation-moder.jsp" %>
 </c:if>
 <c:if test="${sessionScope.account.role() ne Role.MODERATOR}">
-  <%@ include file="navigation.jsp" %>
+  <%@ include file="include/navigation.jsp" %>
 </c:if>
 
 
@@ -82,9 +83,11 @@
                         <div class="modal-footer">
                           <button type="button" class="btn btn-outline-secondary"
                                   data-bs-dismiss="modal">
-                            <i class="fa-solid fa-xmark"></i> Закрыть</button>
+                            <i class="fa-solid fa-xmark"></i> Закрыть
+                          </button>
                           <button type="submit" class="btn btn-outline-success">
-                            <i class="fa-solid fa-check"></i> Сохранить изменения</button>
+                            <i class="fa-solid fa-check"></i> Сохранить изменения
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -113,11 +116,13 @@
         <div class="card shadow" id="cardDescription">
           <div class="card-header">
             <c:if test="${requestScope.post.status() ne PostStatus.BLOCKED}">
-              <h5 class="card-title text-center">Описание</h5>
+              <h5 class="card-title text-center">
+                <fmt:message key="page.post-view.title.description"/></h5>
             </c:if>
 
             <c:if test="${requestScope.post.status() eq PostStatus.BLOCKED}">
-              <h5 class="card-title text-center text-danger">Заблокировано</h5>
+              <h5 class="card-title text-center text-danger">
+                <fmt:message key="page.post-view.blocked.description"/></h5>
             </c:if>
           </div>
           <div class="card-body" style="overflow-y: auto">
@@ -135,7 +140,8 @@
               </c:if>
 
               <c:if test="${sessionScope.account.role() ne Role.MODERATOR}">
-                <c:set var="backPath" value="${pageContext.request.contextPath}/home${viewEndpoint}"/>
+                <c:set var="backPath"
+                       value="${pageContext.request.contextPath}/home${viewEndpoint}"/>
               </c:if>
 
               <a href="${backPath}"
@@ -144,36 +150,46 @@
 
 
               <div class="input-group"
-              <c:if test="${requestScope.post.status() eq PostStatus.BLOCKED}">
-                <c:out value=" hidden"/>
-              </c:if> >
-              <form action="${pageContext.request.contextPath}/like/${requestScope.post.id()}"
-                    method="post" id="formLike">
-                <label>
-                  <input name="like" value="true" hidden>
-                </label>
-                <label>
-                  <input name="view" value="${requestScope.view}" hidden>
-                </label>
-              </form>
-              <button class="btn btn-outline-success" type="submit" form="formLike">
-                <i class="fa-regular fa-heart fa-lg"></i></button>
+                  <c:if test="${requestScope.post.status() eq PostStatus.BLOCKED}">
+                    <c:out value=" hidden"/>
+                  </c:if> >
+                <form action="${pageContext.request.contextPath}/like/${requestScope.post.id()}"
+                      method="post" id="formLike">
+                  <label>
+                    <input name="like" value="true" hidden>
+                  </label>
+                  <label>
+                    <input name="view" value="${requestScope.view}" hidden>
+                  </label>
+                </form>
 
-              <input type="text" class="form-control" placeholder="" aria-label=""
-                     value="${requestScope.likeScore}" readonly>
+                <c:set var="buttonLikeColor" value="btn-outline-success"/>
+                <c:set var="buttonDislikeColor" value="btn-outline-danger"/>
+                <c:if test="${requestScope.likeScore == 1}">
+                  <c:set var="buttonLikeColor" value="btn-outline-secondary"/>
+                </c:if>
+                <c:if test="${requestScope.likeScore == -1}">
+                  <c:set var="buttonDislikeColor" value="btn-outline-secondary"/>
+                </c:if>
 
-              <button class="btn btn-outline-danger" type="submit" form="formDislike">
-                <i class="fa-solid fa-heart-crack fa-lg"></i></button>
-              <form action="${pageContext.request.contextPath}/like/${requestScope.post.id()}"
-                    method="post" id="formDislike">
-                <label>
-                  <input name="dislike" value="true" hidden>
-                </label>
-                <label>
-                  <input name="view" value="${requestScope.view}" hidden>
-                </label>
-              </form>
-            </div>
+                <button class="btn ${buttonLikeColor}" type="submit" form="formLike">
+                  <i class="fa-regular fa-heart fa-lg"></i></button>
+
+                <input type="text" class="form-control" placeholder="" aria-label=""
+                       value="${requestScope.likeTotalScore}" readonly>
+
+                <button class="btn ${buttonDislikeColor}" type="submit" form="formDislike">
+                  <i class="fa-solid fa-heart-crack fa-lg"></i></button>
+                <form action="${pageContext.request.contextPath}/like/${requestScope.post.id()}"
+                      method="post" id="formDislike">
+                  <label>
+                    <input name="dislike" value="true" hidden>
+                  </label>
+                  <label>
+                    <input name="view" value="${requestScope.view}" hidden>
+                  </label>
+                </form>
+              </div>
 
               <%-- Редактировать --%>
               <button class="btn btn-outline-warning" type="button"
@@ -240,7 +256,7 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h1 class="modal-title fs-5" id="complaintPostModalLabel">Отправка жалобы</h1>
+                <h1 class="modal-title fs-5" id="complaintPostModalLabel">Обращение</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Закрыть"></button>
               </div>
@@ -262,9 +278,11 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal">Отмена</button>
+                        data-bs-dismiss="modal">Отмена
+                </button>
                 <button type="submit" class="btn btn-outline-danger">
-                  <i class="fa-solid fa-triangle-exclamation"></i> Отправить</button>
+                  <i class="fa-solid fa-triangle-exclamation"></i> Отправить
+                </button>
               </div>
             </div>
           </div>
@@ -272,12 +290,11 @@
       </div>
 
 
-
       <!-- Комментарии -->
       <div class="col" onload="handleResize();">
         <div class="card shadow" id="cardComment">
           <div class="card-header">
-            <h5>Комментарии</h5>
+            <h5><fmt:message key="page.post-view.title.comment"/></h5>
           </div>
           <div class="card-body" style="overflow-y: auto">
             <div class="card-text">
@@ -285,7 +302,8 @@
                 <div class="row row-cols-2 p-1">
                   <div class="col-2 col-md-1 col-lg-3 col-xl-3 col-xxl-2 g-0">
                     <div class="mb-3 d-flex flex-column align-items-center">
-                      <form action="${pageContext.request.contextPath}/comment/delete" method="post">
+                      <form action="${pageContext.request.contextPath}/comment/delete"
+                            method="post">
 
                         <a href="${pageContext.request.contextPath}/home/${comment.username()}">
                           <img
@@ -305,7 +323,8 @@
                         </label>
 
                         <button type="submit" class="btn btn-link link-danger"
-                            <c:if test="${(sessionScope.account.id() ne comment.accountId()) or comment.isDeleted() eq 'true'}">
+                            <c:if
+                                test="${(sessionScope.account.id() ne comment.accountId()) or comment.isDeleted() eq 'true'}">
                               <c:out value=" hidden"/></c:if> >
                           <i class="fa-regular fa-trash-can"></i></button>
                       </form>
@@ -332,7 +351,8 @@
               <div class="row row-cols-1 g-2">
                 <div class="col">
                   <label for="createCommentMessage"
-                         class="form-label ms-2 fs-5">Написать сообщение</label>
+                         class="form-label ms-2 fs-5">
+                    <fmt:message key="page.post-view.comment.label"/></label>
                   <textarea class="form-control" name="message" id="createCommentMessage"
                             rows="3" maxlength="500" required></textarea>
 

@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ include file="locale.jsp" %>
 
 
 <section>
@@ -21,14 +22,19 @@
                 <div class="input-group input-group-sm">
                   <span class="input-group-text" id="inputGroup-sizing-sm">@</span>
                   <input type="search" class="form-control" name="search"
-                         aria-describedby="inputGroup-sizing-sm" placeholder="Поиск"
-                         aria-label="Поиск">
-                  <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+                         aria-describedby="inputGroup-sizing-sm"
+                         placeholder="<fmt:message key="nav.user.search.placeholder"/>"
+                         aria-label="search">
+                  <button class="btn btn-outline-secondary" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
               </form>
             </li>
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item mt-1 me-lg-4">
+              <%@ include file="locale-menu.jsp" %>
+            </li>
             <li class="nav-item">
               <a class="nav-link"
                  href="${pageContext.request.contextPath}/home">

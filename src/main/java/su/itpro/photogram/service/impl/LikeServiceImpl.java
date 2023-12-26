@@ -23,7 +23,12 @@ public class LikeServiceImpl implements LikeService {
   }
 
   @Override
-  public int getScore(UUID postId) {
+  public int getScore(UUID id, UUID postId) {
+    return likeDao.getScore(id, postId);
+  }
+
+  @Override
+  public int getTotalScore(UUID postId) {
     return likeDao.sumScore(postId);
   }
 

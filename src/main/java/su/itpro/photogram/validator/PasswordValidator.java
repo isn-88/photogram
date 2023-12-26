@@ -34,17 +34,17 @@ public class PasswordValidator implements Validator<AccountChangeDto> {
     ValidationResult errors = new ValidationResult();
 
     if (Objects.isNull(dto.password()) || dto.password().isBlank()) {
-      errors.add(Error.of("password.empty", "Пароль не должен быть пустым"));
+      errors.add(Error.of("password.empty", "message.account.password.empty"));
     } else {
       String password = dto.password();
       if (!passwordPattern.matcher(password).matches()) {
-        errors.add(Error.of("password.invalid", "Пароль содержит недопустимые символы"));
+        errors.add(Error.of("password.invalid", "message.account.password.invalid"));
       }
       if (password.length() < PASSWORD_LENGTH_MIN) {
-        errors.add(Error.of("password.short", "Пароль слишком короткий"));
+        errors.add(Error.of("password.short", "message.account.password.short"));
       }
       if (password.length() > PASSWORD_LENGTH_MAX) {
-        errors.add(Error.of("password.long", "Пароль слишком длинный"));
+        errors.add(Error.of("password.long", "message.account.password.long"));
       }
     }
     return errors;

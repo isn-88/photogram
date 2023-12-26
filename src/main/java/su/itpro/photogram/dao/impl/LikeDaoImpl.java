@@ -16,6 +16,13 @@ public class LikeDaoImpl implements LikeDao {
       ;
       """;
 
+  private static final String LIKE_SCORE_SQL = """
+      SELECT score
+      FROM likes
+      WHERE account_id = ? AND post_id = ?
+      ;
+      """;
+
   private static final String SUM_SCORE_SQL = """
       SELECT sum(score)
       FROM likes
@@ -50,6 +57,23 @@ public class LikeDaoImpl implements LikeDao {
 
   public static LikeDao getInstance() {
     return INSTANCE;
+  }
+
+  @Override
+  public int getScore(UUID accountId, UUID postId) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(LIKE_SCORE_SQL)) {
+      prepared.setObject(1, accountId);
+      prepared.setObject(2, postId);
+      var resultSet = prepared.executeQuery();
+
+      if (resultSet.next()) {
+        return resultSet.getInt(1);
+      }
+      return 0;
+    } catch (SQLException e) {
+      throw new DaoException("Error getScore Like", e.getMessage());
+    }
   }
 
   @Override

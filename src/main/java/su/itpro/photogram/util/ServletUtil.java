@@ -122,6 +122,20 @@ public class ServletUtil {
     return null;
   }
 
+  public static String getQueryPath(Map<String, String> queryParams) {
+    return QUERY_PATH_PATTERN.formatted(queryParams.entrySet().stream()
+                                            .map(e -> QUERY_PARAM_PATTERN.formatted(
+                                                e.getKey(),
+                                                e.getValue()
+                                            ))
+                                            .collect(joining("&")));
+  }
+
+  public static String getPathWithoutQueryParam(String path) {
+    int index = path.indexOf('?');
+    return (index >= 0) ? path.substring(0, index) : path;
+  }
+
   public static void writeDate(InputStream inputStream, HttpServletResponse resp, int bufferSize) {
     try (inputStream; OutputStream outputStream = resp.getOutputStream()) {
       byte[] buffer = new byte[bufferSize];
@@ -147,14 +161,4 @@ public class ServletUtil {
     }
     return value.replaceAll(regex, replacement);
   }
-
-  private static String getQueryPath(Map<String, String> queryParams) {
-    return QUERY_PATH_PATTERN.formatted(queryParams.entrySet().stream()
-                                            .map(e -> QUERY_PARAM_PATTERN.formatted(
-                                                e.getKey(),
-                                                e.getValue()
-                                            ))
-                                            .collect(joining("&")));
-  }
-
 }

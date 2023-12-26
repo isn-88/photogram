@@ -14,6 +14,7 @@ import su.itpro.photogram.model.dto.ComplaintActionDto;
 import su.itpro.photogram.model.dto.ComplaintCreateDto;
 import su.itpro.photogram.model.dto.ComplaintDto;
 import su.itpro.photogram.model.dto.ComplaintSearchDto;
+import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.PostUpdateDto;
 import su.itpro.photogram.model.entity.Complaint;
 import su.itpro.photogram.model.enums.PostStatus;
@@ -30,7 +31,6 @@ public class ComplaintServiceImpl implements ComplaintService {
   private final ComplaintFindDtoMapper complaintFindDtoMapper;
   private final ComplaintDtoMapper complaintDtoMapper;
   private final ComplaintMapper complaintMapper;
-
 
 
   private ComplaintServiceImpl() {
@@ -73,7 +73,10 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     switch (actionDto.status()) {
       case APPROVED -> {
-        postService.update(new PostUpdateDto(actionDto.postId(), PostStatus.BLOCKED, null));
+        PostDto postDto = postService.findById(actionDto.postId());
+        PostStatus postStatus = (postDto.accountId().equals(actionDto.accountId()))
+                                ? PostStatus.PUBLIC : PostStatus.BLOCKED;
+        postService.update(new PostUpdateDto(actionDto.postId(), postStatus, null));
         complaintDao.update(complaintMapper.mapFrom(actionDto));
       }
       case REJECTED -> {

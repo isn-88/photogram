@@ -1,6 +1,7 @@
 <%@ page import="su.itpro.photogram.model.enums.PostStatus" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -15,7 +16,9 @@
 
 <body>
 
-<%@ include file="navigation.jsp" %>
+<%@ include file="include/locale.jsp" %>
+
+<%@ include file="include/navigation.jsp" %>
 
 
 <section style="padding-top: 80px; padding-bottom: 10px;">
@@ -57,15 +60,15 @@
           <div class="col-12 col-md-3 col-lg-2">
             <div class="row row-cols-1 row-cols-sm-3 row-cols-md-1 mt-md-5 gy-2 text-center">
               <div class="col">
-                <span>публикаций</span><br>
+                <span><fmt:message key="page.home.label.post"/></span><br>
                 <span class="fs-4"><c:out value="${requestScope.postCount}"/></span>
               </div>
               <div class="col">
-                <span>подписок</span><br>
+                <span><fmt:message key="page.home.label.subscriptions"/></span><br>
                 <span class="fs-4"><c:out value="${requestScope.subscribeCount}"/></span>
               </div>
               <div class="col">
-                <span>подписчиков</span><br>
+                <span><fmt:message key="page.home.label.subscribers"/></span><br>
                 <span class="fs-4"><c:out value="${requestScope.subscribersCount}"/></span>
               </div>
             </div>
@@ -73,7 +76,7 @@
 
           <div class="col">
             <div class="row p-2">
-              <h5>Обо мне</h5>
+              <h5><fmt:message key="page.home.label.about-me"/></h5>
               <p>${requestScope.profile.getAboutMeForPage()}</p>
             </div>
           </div>
@@ -92,19 +95,19 @@
         <button class="nav-link active" id="advice-tab" data-bs-toggle="tab"
                 data-bs-target="#advice-tab-pane"
                 type="button" role="tab" aria-controls="advice-tab-pane"
-                aria-selected="true">Рекомендуем подписаться</button>
+                aria-selected="true"><fmt:message key="page.home.tab.advice"/></button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="subscribe-tab" data-bs-toggle="tab"
                 data-bs-target="#subscribe-tab-pane"
                 type="button" role="tab" aria-controls="subscribe-tab-pane"
-                aria-selected="false">Вы подписаны</button>
+                aria-selected="false"><fmt:message key="page.home.tab.subscribed"/></button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="subscribers-tab" data-bs-toggle="tab"
                 data-bs-target="#subscribers-tab-pane"
                 type="button" role="tab" aria-controls="subscribers-tab-pane"
-                aria-selected="false">Ваши подписчики</button>
+                aria-selected="false"><fmt:message key="page.home.tab.subscribers"/></button>
       </li>
     </ul>
     <div class="tab-content" id="adviceTabContent">
@@ -128,8 +131,8 @@
                   <input type="text" id="inputAdviceId" name="subscribeId"
                          value="${adviceDto.id()}" hidden>
                 </label>
-                <button type="submit" class="btn mt-2 m-auto btn-outline-primary">Подписаться
-                </button>
+                <button type="submit" class="btn mt-2 m-auto btn-outline-primary">
+                  <fmt:message key="page.home.button.subscribe"/></button>
               </form>
             </div>
           </c:forEach>
@@ -154,7 +157,8 @@
                       onError="this.onerror=null;this.src='${pageContext.request.contextPath}/img/default-profile-icon.jpg';"
                       style="width: 120px; height: 120px"/></a>
                 <h5 class="mb-0">${subscribeDto.username()}</h5>
-                <button type="submit" class="btn mt-2 m-auto btn-outline-danger">Отписаться</button>
+                <button type="submit" class="btn mt-2 m-auto btn-outline-danger">
+                  <fmt:message key="page.home.button.unsubscribe"/></button>
               </form>
             </div>
           </c:forEach>
@@ -193,14 +197,14 @@
         <button class="nav-link active" id="my-post-tab" data-bs-toggle="tab"
                 data-bs-target="#my-post-tab-pane"
                 type="button" role="tab" aria-controls="my-post-tab-pane"
-                aria-selected="true">Мои публикации
+                aria-selected="true"><fmt:message key="page.home.my-publications"/>
         </button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="subscribers-post-tab" data-bs-toggle="tab"
                 data-bs-target="#subscribers-post-tab-pane"
                 type="button" role="tab" aria-controls="subscribers-post-tab-pane"
-                aria-selected="false">Подписки
+                aria-selected="false"><fmt:message key="page.home.my-subscriptions"/>
         </button>
       </li>
 

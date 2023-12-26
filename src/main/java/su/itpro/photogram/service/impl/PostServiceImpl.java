@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import su.itpro.photogram.dao.ComplaintDao;
 import su.itpro.photogram.dao.PostDao;
 import su.itpro.photogram.exception.service.PostServiceException;
 import su.itpro.photogram.factory.DaoFactory;
@@ -17,7 +18,6 @@ import su.itpro.photogram.model.entity.Post;
 import su.itpro.photogram.model.enums.PostStatus;
 import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.CommentService;
-import su.itpro.photogram.service.ComplaintService;
 import su.itpro.photogram.service.ImageService;
 import su.itpro.photogram.service.LikeService;
 import su.itpro.photogram.service.PostService;
@@ -29,7 +29,7 @@ public class PostServiceImpl implements PostService {
   private final AccountService accountService;
   private final ImageService imageService;
   private final CommentService commentService;
-  private final ComplaintService complaintService;
+  private final ComplaintDao complaintDao;
   private final LikeService likeService;
   private final PostDao postDao;
   private final PostDtoMapper postDtoMapper;
@@ -39,7 +39,7 @@ public class PostServiceImpl implements PostService {
     accountService = AccountServiceImpl.getInstance();
     imageService = ImageServiceImpl.getInstance();
     commentService = CommentServiceImpl.getInstance();
-    complaintService = ComplaintServiceImpl.getInstance();
+    complaintDao = DaoFactory.INSTANCE.getComplaintDao();
     likeService = LikeServiceImpl.getInstance();
     postDao = DaoFactory.INSTANCE.getPostDao();
     postDtoMapper = PostDtoMapper.getInstance();
@@ -96,7 +96,7 @@ public class PostServiceImpl implements PostService {
   public void delete(UUID postId) {
     likeService.deleteBy(postId);
     commentService.deleteAllCommentsByPostId(postId);
-    complaintService.deleteByPost(postId);
+    complaintDao.deleteByPost(postId);
     imageService.deleteImagesByPostId(postId);
     postDao.delete(postId);
   }

@@ -32,28 +32,28 @@ public class PasswordChangeValidator implements Validator<ChangePasswordDto> {
     ValidationResult errors = new ValidationResult();
 
     if (Objects.isNull(dto.currentPassword()) || dto.currentPassword().isBlank()) {
-      errors.add(Error.of("password.current.empty", "Не указан текущий пароль"));
+      errors.add(Error.of("password.current.empty", "message.password.current.empty"));
     }
 
     if (Objects.isNull(dto.newPassword()) || dto.newPassword().isBlank()) {
-      errors.add(Error.of("password.new.empty", "Не указан новый пароль"));
+      errors.add(Error.of("password.new.empty", "message.password.new.empty"));
     } else {
       String newPassword = dto.newPassword();
       if (!passwordPattern.matcher(newPassword).matches()) {
-        errors.add(Error.of("password.new.invalid", "Новый пароль содержит недопустимые символы"));
+        errors.add(Error.of("password.new.invalid", "message.password.new.invalid"));
       }
       if (newPassword.length() < PASSWORD_LENGTH_MIN) {
-        errors.add(Error.of("password.new.short", "Новый пароль слишком короткий"));
+        errors.add(Error.of("password.new.short", "message.password.new.short"));
       }
       if (newPassword.length() > PASSWORD_LENGTH_MAX) {
-        errors.add(Error.of("password.new.long", "Новый пароль слишком длинный"));
+        errors.add(Error.of("password.new.long", "message.password.new.long"));
       }
       if (Objects.isNull(dto.checkPassword()) || dto.checkPassword().isBlank()) {
-        errors.add(Error.of("password.check.empty", "Не указан проверочный пароль"));
+        errors.add(Error.of("password.check.empty", "message.password.check.empty"));
       } else {
         String checkPassword = dto.checkPassword();
         if (!newPassword.equals(checkPassword)) {
-          errors.add(Error.of("password.check.mismatch", "Проверочный пароль не совпадает"));
+          errors.add(Error.of("password.check.mismatch", "message.password.check.mismatch"));
         }
       }
     }
