@@ -1,7 +1,6 @@
 package su.itpro.photogram.validator;
 
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import su.itpro.photogram.model.dto.AccountUpdateDto;
 import su.itpro.photogram.util.PropertiesUtil;

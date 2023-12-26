@@ -9,7 +9,6 @@ import su.itpro.photogram.mapper.ComplaintCreateMapper;
 import su.itpro.photogram.mapper.ComplaintDtoMapper;
 import su.itpro.photogram.mapper.ComplaintFindDtoMapper;
 import su.itpro.photogram.mapper.ComplaintMapper;
-import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.ComplainFindDto;
 import su.itpro.photogram.model.dto.ComplaintActionDto;
 import su.itpro.photogram.model.dto.ComplaintCreateDto;
@@ -19,7 +18,6 @@ import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.PostUpdateDto;
 import su.itpro.photogram.model.entity.Complaint;
 import su.itpro.photogram.model.enums.PostStatus;
-import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.ComplaintService;
 import su.itpro.photogram.service.PostService;
 
