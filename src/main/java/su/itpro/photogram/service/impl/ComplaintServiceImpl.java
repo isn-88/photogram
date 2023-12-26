@@ -9,14 +9,17 @@ import su.itpro.photogram.mapper.ComplaintCreateMapper;
 import su.itpro.photogram.mapper.ComplaintDtoMapper;
 import su.itpro.photogram.mapper.ComplaintFindDtoMapper;
 import su.itpro.photogram.mapper.ComplaintMapper;
+import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.ComplainFindDto;
 import su.itpro.photogram.model.dto.ComplaintActionDto;
 import su.itpro.photogram.model.dto.ComplaintCreateDto;
 import su.itpro.photogram.model.dto.ComplaintDto;
 import su.itpro.photogram.model.dto.ComplaintSearchDto;
+import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.PostUpdateDto;
 import su.itpro.photogram.model.entity.Complaint;
 import su.itpro.photogram.model.enums.PostStatus;
+import su.itpro.photogram.service.AccountService;
 import su.itpro.photogram.service.ComplaintService;
 import su.itpro.photogram.service.PostService;
 
@@ -30,7 +33,6 @@ public class ComplaintServiceImpl implements ComplaintService {
   private final ComplaintFindDtoMapper complaintFindDtoMapper;
   private final ComplaintDtoMapper complaintDtoMapper;
   private final ComplaintMapper complaintMapper;
-
 
 
   private ComplaintServiceImpl() {
@@ -73,7 +75,10 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     switch (actionDto.status()) {
       case APPROVED -> {
-        postService.update(new PostUpdateDto(actionDto.postId(), PostStatus.BLOCKED, null));
+        PostDto postDto = postService.findById(actionDto.postId());
+        PostStatus postStatus = (postDto.accountId().equals(actionDto.accountId()))
+                                ? PostStatus.PUBLIC : PostStatus.BLOCKED;
+        postService.update(new PostUpdateDto(actionDto.postId(), postStatus, null));
         complaintDao.update(complaintMapper.mapFrom(actionDto));
       }
       case REJECTED -> {

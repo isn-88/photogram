@@ -5,6 +5,8 @@ import su.itpro.photogram.model.Like;
 
 public interface LikeDao {
 
+  int getScore(UUID id, UUID postId);
+
   int sumScore(UUID postId);
 
   boolean exists(Like like);

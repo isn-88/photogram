@@ -21,7 +21,7 @@ import su.itpro.photogram.util.ServletUtil;
 @WebFilter("/*")
 public class AuthFilter implements Filter {
 
-  private final List<String> resourcePath;
+  private final List<String> resourcePaths;
   private final List<String> publicPaths;
   private final List<String> userPaths;
   private final List<String> adminPaths;
@@ -29,9 +29,9 @@ public class AuthFilter implements Filter {
 
 
   public AuthFilter() {
-    resourcePath = List.of("/favicon.ico", "/css", "/img", "/js", "/webfonts");
+    resourcePaths = List.of("/favicon.ico", "/css", "/img", "/js", "/webfonts");
     publicPaths = List.of(PathSelector.LOGIN.get(), PathSelector.REGISTRATION.get(),
-                          PathSelector.LOGOUT.get()
+                          PathSelector.LOGOUT.get(), "/locale"
     );
     userPaths = List.of("/account", "/comment", "/complaint", PathSelector.EDIT.get(),
                         PathSelector.HOME.get(), "/icon", "/image", "/password",
@@ -114,7 +114,7 @@ public class AuthFilter implements Filter {
   }
 
   private boolean isResourcePath(HttpServletRequest req) {
-    return findPath(req.getServletPath(), resourcePath);
+    return findPath(req.getServletPath(), resourcePaths);
   }
 
   private boolean isPublicPath(HttpServletRequest req) {

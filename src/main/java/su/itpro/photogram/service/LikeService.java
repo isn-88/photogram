@@ -5,7 +5,9 @@ import su.itpro.photogram.model.dto.LikeDto;
 
 public interface LikeService {
 
-  int getScore(UUID postId);
+  int getScore(UUID id, UUID postId);
+
+  int getTotalScore(UUID postId);
 
   void update(LikeDto dto);
 

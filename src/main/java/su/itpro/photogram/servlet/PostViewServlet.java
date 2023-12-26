@@ -48,17 +48,19 @@ public class PostViewServlet extends HttpServlet {
 
     AccountDto accountDto = ServletUtil.getAccountFromSession(req);
     UUID postId = UUID.fromString(ServletUtil.variableOfQueryPath(req.getPathInfo()));
-    String view = ServletUtil.getValue(req, "view");
+    String userView = ServletUtil.getValue(req, "view");
 
     PostDto postDto = postService.findById(postId);
     List<UUID> imageIds = imageService.findAllImageIdsByPostId(postId);
     List<CommentDto> comments = commentService.findAllBy(postDto.id());
 
-    req.setAttribute("view", view);
+    req.setAttribute("view", userView);
     req.setAttribute("post", postDto);
     req.setAttribute("imageIds", imageIds);
     req.setAttribute("comments", comments);
-    req.setAttribute("likeScore", likeService.getScore(postId));
+    req.setAttribute("likeScore", likeService.getScore(accountDto.id(), postId));
+    req.setAttribute("likeTotalScore", likeService.getTotalScore(postId));
+
     //TODO accountId who view
     req.setAttribute("isComplaint", complaintService.exists(accountDto.id(), postId));
 

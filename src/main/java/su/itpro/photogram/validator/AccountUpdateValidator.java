@@ -1,6 +1,7 @@
 package su.itpro.photogram.validator;
 
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import su.itpro.photogram.model.dto.AccountUpdateDto;
 import su.itpro.photogram.util.PropertiesUtil;
@@ -48,46 +49,46 @@ public class AccountUpdateValidator implements Validator<AccountUpdateDto> {
     ValidationResult errors = new ValidationResult();
 
     if (Objects.isNull(dto.phone()) && Objects.isNull(dto.email())) {
-      errors.add(Error.of("input.empty", "Номер телефона и(или) email должны быть указаны"));
+      errors.add(Error.of("input.empty", "message.account.input.empty"));
     } else {
       if (Objects.nonNull(dto.phone())) {
         String phone = dto.phone();
         if (!phonePattern.matcher(phone).matches()) {
-          errors.add(Error.of("phone.invalid", "Номер телефона содержит недопустимые символы"));
+          errors.add(Error.of("phone.invalid", "message.account.phone.invalid"));
         }
         if (phone.length() < PHONE_LENGTH_MIN) {
-          errors.add(Error.of("phone.short", "Номер телефона слишком короткий"));
+          errors.add(Error.of("phone.short", "message.account.phone.short"));
         }
         if (phone.length() > PHONE_LENGTH_MAX) {
-          errors.add(Error.of("phone.long", "Номер телефона слишком длинный"));
+          errors.add(Error.of("phone.long", "message.account.phone.long"));
         }
       }
       if (Objects.nonNull(dto.email())) {
         String email = dto.email();
         if (!emailPattern.matcher(email).matches()) {
-          errors.add(Error.of("email.invalid", "Email содержит недопустимые символы"));
+          errors.add(Error.of("email.invalid", "message.account.email.invalid"));
         }
         if (getLengthLocalEmail(email) > EMAIL_LENGTH_LOCAL_MAX) {
-          errors.add(Error.of("email.long", "Email слишком длинный"));
+          errors.add(Error.of("email.long", "message.account.email.long"));
         }
         if (getLengthDomainEmail(email) > EMAIL_LENGTH_DOMAIN_MAX) {
-          errors.add(Error.of("email.long", "Email слишком длинный"));
+          errors.add(Error.of("email.long", "message.account.email.long"));
         }
       }
     }
 
     if (Objects.isNull(dto.username())) {
-      errors.add(Error.of("username.empty", "Имя пользователя должно быть заполнено"));
+      errors.add(Error.of("username.empty", "message.account.username.empty"));
     } else {
       String username = dto.username();
       if (!usernamePattern.matcher(username).matches()) {
-        errors.add(Error.of("username.invalid", "Имя пользователя содержит недопустимые символы"));
+        errors.add(Error.of("username.invalid", "message.account.username.invalid"));
       }
       if (username.length() < USERNAME_LENGTH_MIN) {
-        errors.add(Error.of("username.short", "Имя пользователя слишком короткое"));
+        errors.add(Error.of("username.short", "message.account.username.short"));
       }
       if (username.length() > USERNAME_LENGTH_MAX) {
-        errors.add(Error.of("username.long", "Имя пользователя слишком длинное"));
+        errors.add(Error.of("username.long", "message.account.username.long"));
       }
     }
 

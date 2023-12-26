@@ -14,7 +14,7 @@
 <body>
 
 
-<%@ include file="navigation-moder.jsp" %>
+<%@ include file="include/navigation-moder.jsp" %>
 
 
 <section style="padding-top: 80px; padding-bottom: 10px;">
@@ -60,13 +60,13 @@
                       <label class="form-check-label"
                              for="isOpened">Открыто</label>
                     </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="isClosed"
-                             value="${ComplainStatus.CLOSE}"
-                             id="isClosed" form="formModeratorFind">
-                      <label class="form-check-label"
-                             for="isClosed">Закрыто</label>
-                    </div>
+<%--                    <div class="form-check">--%>
+<%--                      <input class="form-check-input" type="checkbox" name="isClosed"--%>
+<%--                             value="${ComplainStatus.CLOSE}"--%>
+<%--                             id="isClosed" form="formModeratorFind">--%>
+<%--                      <label class="form-check-label"--%>
+<%--                             for="isClosed">Закрыто</label>--%>
+<%--                    </div>--%>
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" name="isApproved"
                              value="${ComplainStatus.APPROVED}"
@@ -126,7 +126,7 @@
                                  checked>
                           <label class="form-check-label"
                                  for="rejectedRadio${complaint.accountId()}&${complaint.postId()}"
-                          >Отклонить жалобу</label>
+                          >Отклонить</label>
                         </div>
                         <div class="form-check text-start">
                           <input class="form-check-input" type="radio"
@@ -135,7 +135,7 @@
                                  form="formAction${complaint.accountId()}&${complaint.postId()}">
                           <label class="form-check-label"
                                  for="approvedRadio${complaint.accountId()}&${complaint.postId()}"
-                          >Заблокировать публикацию</label>
+                          >Принять</label>
                         </div>
 
                         <label>
@@ -154,8 +154,11 @@
 
                         <button type="submit"
                                 form="formAction${complaint.accountId()}&${complaint.postId()}"
-                                class="btn btn-outline-danger btn-sm">Выполнить
-                        </button>
+                                class="btn btn-outline-danger btn-sm"
+                                <c:if test="${complaint.status() ne ComplainStatus.OPEN}">
+                                  <c:out value=" disabled"/>
+                                </c:if>
+                        >Выполнить</button>
                       </div>
                     </td>
                   </tr>

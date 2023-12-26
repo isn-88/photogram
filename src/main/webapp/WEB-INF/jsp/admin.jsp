@@ -259,10 +259,10 @@
                           </td>
 
                           <td>
-                            <label>
-                              <input type="text" name="find_id" value="" class="form-control-sm"
-                                     placeholder="id" form="formAdminFind" readonly/>
-                            </label>
+<%--                            <label>--%>
+<%--                              <input type="text" name="find_id" value="" class="form-control-sm"--%>
+<%--                                     placeholder="id" form="formAdminFind" readonly/>--%>
+<%--                            </label>--%>
                           </td>
                           <td>
                             <label>

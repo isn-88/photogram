@@ -59,7 +59,7 @@ public class PostEditServlet extends HttpServlet {
     req.setAttribute("post", postDto);
     req.setAttribute("imageIds", imageIds);
     req.setAttribute("comments", comments);
-    req.setAttribute("likeScore", likeService.getScore(postUpdateDto.id()));
+    req.setAttribute("likeScore", likeService.getTotalScore(postUpdateDto.id()));
 
     req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.POST_VIEW)).forward(req, resp);
   }

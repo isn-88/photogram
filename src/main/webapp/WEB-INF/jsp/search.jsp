@@ -15,7 +15,7 @@
 
 <body>
 
-<%@ include file="navigation.jsp" %>
+<%@ include file="include/navigation.jsp" %>
 
 
 <section style="padding-top: 80px; padding-bottom: 10px;">

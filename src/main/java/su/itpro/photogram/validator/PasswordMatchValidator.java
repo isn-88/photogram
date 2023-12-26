@@ -20,7 +20,7 @@ public class PasswordMatchValidator implements Validator<PasswordMatchDto> {
     ValidationResult errors = new ValidationResult();
 
     if (!dto.currentAccountPassword().equals(dto.inputCurrentPassword())) {
-      errors.add(Error.of("password.current.mismatch", "Текущий пароль не совпадает"));
+      errors.add(Error.of("password.current.mismatch", "message.password.current.mismatch"));
     }
 
     return errors;

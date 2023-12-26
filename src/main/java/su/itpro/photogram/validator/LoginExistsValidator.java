@@ -19,13 +19,13 @@ public class LoginExistsValidator implements Validator<LoginExistsResultDto> {
     ValidationResult errors = new ValidationResult();
 
     if (dto.isExistsPhone()) {
-      errors.add(Error.of("phone.exists", "Номер телефона уже используется"));
+      errors.add(Error.of("phone.exists", "message.login.phone.exists"));
     }
     if (dto.isExistsEmail()) {
-      errors.add(Error.of("email.exists", "Email уже используется"));
+      errors.add(Error.of("email.exists", "message.login.email.exists"));
     }
     if (dto.isExistsUsername()) {
-      errors.add(Error.of("username.exists", "Имя пользователя уже используется"));
+      errors.add(Error.of("username.exists", "message.login.username.exists"));
     }
 
     return errors;

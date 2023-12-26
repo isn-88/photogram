@@ -23,11 +23,11 @@ public class LoginValidator implements Validator<LoginDto> {
     ValidationResult errors = new ValidationResult();
 
     if (Objects.isNull(dto.login()) || dto.login().isBlank()) {
-      errors.add(Error.of("login.empty", "Не указан логин"));
+      errors.add(Error.of("login.empty", "message.login.login.empty"));
     }
 
     if (Objects.isNull(dto.password()) || dto.password().isBlank()) {
-      errors.add(Error.of("password.empty", "Не указан пароль"));
+      errors.add(Error.of("password.empty", "message.login.password.empty"));
     }
 
     return errors;
@@ -38,16 +38,16 @@ public class LoginValidator implements Validator<LoginDto> {
     if (accountOpt.isPresent()) {
       Account account = accountOpt.get();
       if (account.getStatus().equals(Status.BLOCKED)) {
-        errors.add(Error.of("account.blocked", "Аккаунт заблокирован"));
+        errors.add(Error.of("account.blocked", "message.login.account.blocked"));
       }
       if (account.getStatus().equals(Status.DELETED)) {
-        errors.add(Error.of("account.deleted", "Аккаунт удалён"));
+        errors.add(Error.of("account.deleted", "message.login.account.deleted"));
       }
       if (!account.getPassword().equals(dto.password())) {
-        errors.add(Error.of("password.incorrect", "Пароль не подходит"));
+        errors.add(Error.of("password.incorrect", "message.login.password.incorrect"));
       }
     } else {
-      errors.add(Error.of("account.not.found", "Аккаунт не найден"));
+      errors.add(Error.of("account.not.found", "message.login.account.not-found"));
     }
     return errors;
   }
