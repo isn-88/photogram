@@ -81,6 +81,7 @@ public class IconDaoImpl implements IconDao {
     return null;
   }
 
+  @Override
   public boolean exists(UUID accountId) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(EXISTS_SQL)) {

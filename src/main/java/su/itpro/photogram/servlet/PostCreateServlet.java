@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.PostCreateDto;
+import su.itpro.photogram.model.enums.PostStatus;
 import su.itpro.photogram.service.PostService;
 import su.itpro.photogram.service.impl.PostServiceImpl;
 import su.itpro.photogram.servlet.enums.PageSelector;
@@ -42,7 +43,7 @@ public class PostCreateServlet extends HttpServlet {
 
     AccountDto accountDto = ServletUtil.getAccountFromSession(req);
     var postCreateDto = new PostCreateDto(
-        ServletUtil.getBoolean(req, "isActive"),
+        ServletUtil.getPostStatusOrDefault(req, "postStatus", PostStatus.DRAFT),
         ServletUtil.getValue(req, "description"),
         req.getParts()
     );

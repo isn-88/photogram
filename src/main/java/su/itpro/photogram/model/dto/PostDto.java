@@ -2,10 +2,11 @@ package su.itpro.photogram.model.dto;
 
 import java.time.Instant;
 import java.util.UUID;
+import su.itpro.photogram.model.enums.PostStatus;
 
 public record PostDto(UUID id,
                       UUID accountId,
-                      Boolean isActive,
+                      PostStatus status,
                       String description,
                       Instant createDate) {
 

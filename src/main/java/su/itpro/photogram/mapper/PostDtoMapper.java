@@ -24,7 +24,7 @@ public final class PostDtoMapper implements Mapper<Post, PostDto> {
     return new PostDto(
         post.getId(),
         post.getAccountId(),
-        post.getActive(),
+        post.getStatus(),
         post.getDescription(),
         post.getCreateDate()
     );

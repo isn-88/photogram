@@ -12,6 +12,7 @@ public class Comment {
   private Instant createTime;
   private Instant changeTime;
   private Boolean isDeleted;
+  private String username;
   private String message;
 
 
@@ -25,13 +26,14 @@ public class Comment {
   }
 
   public Comment(UUID id, UUID accountId, UUID postId, Instant createTime, Instant changeTime,
-                 Boolean isDeleted, String message) {
+                 Boolean isDeleted, String username, String message) {
     this.id = id;
     this.accountId = accountId;
     this.postId = postId;
     this.createTime = createTime;
     this.changeTime = changeTime;
     this.isDeleted = isDeleted;
+    this.username = username;
     this.message = message;
   }
 
@@ -57,6 +59,10 @@ public class Comment {
 
   public Boolean getDeleted() {
     return isDeleted;
+  }
+
+  public String getUsername() {
+    return username;
   }
 
   public String getMessage() {
@@ -87,6 +93,10 @@ public class Comment {
     isDeleted = deleted;
   }
 
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
   public void setMessage(String message) {
     this.message = message;
   }
@@ -114,6 +124,7 @@ public class Comment {
            "id=" + id +
            ", accountId=" + accountId +
            ", postId=" + postId +
+           ", username='" + username + '\'' +
            ", message='" + message + '\'' +
            '}';
   }

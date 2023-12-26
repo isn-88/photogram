@@ -2,6 +2,7 @@ package su.itpro.photogram.dao.impl;
 
 import static su.itpro.photogram.util.converter.DateConverter.fromTimestamp;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,28 +14,31 @@ import su.itpro.photogram.dao.PostDao;
 import su.itpro.photogram.datasource.DataSource;
 import su.itpro.photogram.exception.dao.DaoException;
 import su.itpro.photogram.model.entity.Post;
+import su.itpro.photogram.model.enums.PostStatus;
 
 public class PostDaoImpl implements PostDao {
 
   private static final String ID = "id";
   private static final String ACCOUNT_ID = "account_id";
-  private static final String IS_ACTIVE = "is_active";
+  private static final String STATUS = "status";
   private static final String CREATE_DATE = "create_date";
   private static final String DESCRIPTION = "description";
 
   private static final PostDao INSTANCE = new PostDaoImpl();
 
   private static final String FIND_BY_ID_SQL = """
-      SELECT id, account_id, is_active, create_date, description
-      FROM post
-      WHERE id = ?
+      SELECT p.id, account_id, status, create_date, description
+      FROM post p
+          JOIN post_status ps ON ps.id = p.status_id
+      WHERE p.id = ?
       ;
       """;
 
   private static final String FIND_BY_TOP_SQL = """
-      SELECT id, account_id, is_active, create_date, description
-      FROM post
-      WHERE account_id = ? AND is_active IN (true, ?)
+      SELECT p.id, account_id, status, create_date, description
+      FROM post p
+          JOIN post_status ps ON ps.id = p.status_id
+      WHERE account_id = ? AND status = ANY (?)
       ORDER BY create_date DESC
       LIMIT ?
       ;
@@ -43,19 +47,20 @@ public class PostDaoImpl implements PostDao {
   private static final String COUNT_POSTS_SQL = """
       SELECT count(id)
       FROM post
-      WHERE account_id = ? AND is_active = true
+      WHERE account_id = ? AND
+            status_id = (SELECT id FROM post_status WHERE status = 'PUBLIC')
       ;
       """;
 
   private static final String SAVE_SQL = """
-      INSERT INTO post (account_id, is_active, description)
-      VALUES (?, ?, ?)
+      INSERT INTO post (account_id, status_id, description)
+      VALUES (?, (SELECT id FROM post_status WHERE status = ?), ?)
       ;
       """;
 
   private static final String UPDATE_SQL = """
       UPDATE post
-      SET is_active = ?,
+      SET status_id = (SELECT id FROM post_status WHERE status = ?),
           description = ?
       WHERE id = ?
       ;
@@ -94,11 +99,15 @@ public class PostDaoImpl implements PostDao {
   }
 
   @Override
-  public List<Post> findTopByAccountIdAndLimit(UUID accountId, boolean onlyIsActive, int limit) {
+  public List<Post> findTopByAccountIdAndLimit(UUID accountId,
+                                               List<PostStatus> findStatuses, int limit) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(FIND_BY_TOP_SQL)) {
       prepared.setObject(1, accountId);
-      prepared.setBoolean(2, onlyIsActive);
+      List<String> listStatuses = findStatuses.stream().map(PostStatus::name).toList();
+      String[] arrayStatuses = listStatuses.toArray(new String[0]);
+      Array statuses = connection.createArrayOf("varchar", arrayStatuses);
+      prepared.setArray(2, statuses);
       prepared.setInt(3, limit);
 
       prepared.executeQuery();
@@ -143,7 +152,7 @@ public class PostDaoImpl implements PostDao {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
       prepared.setObject(1, post.getAccountId());
-      prepared.setBoolean(2, post.getActive());
+      prepared.setString(2, post.getStatus().name());
       prepared.setString(3, post.getDescription());
       prepared.executeUpdate();
 
@@ -161,7 +170,7 @@ public class PostDaoImpl implements PostDao {
   public void update(Post post) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
-      prepared.setBoolean(1, post.getActive());
+      prepared.setString(1, post.getStatus().name());
       prepared.setString(2, post.getDescription());
       prepared.setObject(3, post.getId());
 
@@ -186,7 +195,7 @@ public class PostDaoImpl implements PostDao {
   private Post parsePost(ResultSet resultSet) throws SQLException {
     Post post = new Post(resultSet.getObject(ID, UUID.class));
     post.setAccountId(resultSet.getObject(ACCOUNT_ID, UUID.class));
-    post.setActive(resultSet.getBoolean(IS_ACTIVE));
+    post.setStatus(PostStatus.valueOf(resultSet.getString(STATUS)));
     fromTimestamp(resultSet.getTimestamp(CREATE_DATE)).ifPresent(post::setCreateDate);
     post.setDescription(resultSet.getString(DESCRIPTION));
     return post;

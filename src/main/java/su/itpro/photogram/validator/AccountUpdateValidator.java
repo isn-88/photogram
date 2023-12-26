@@ -24,7 +24,7 @@ public class AccountUpdateValidator implements Validator<AccountUpdateDto> {
   private static final String PHONE_REGEX = """
       [0-9() \\-]+""";
   private static final String EMAIL_REGEX = """
-      [a-zA-Z]\\w+@\\w+\\.\\w{2,3}""";
+      [a-zA-Z]\\S*@\\S+\\.\\S{2,3}""";
   private static final String USERNAME_REGEX = """
       [a-zA-Z][-a-zA-z0-9_\\.]+""";
 

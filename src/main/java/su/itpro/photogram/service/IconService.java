@@ -1,7 +1,8 @@
 package su.itpro.photogram.service;
 
+import java.io.InputStream;
+import java.util.Optional;
 import java.util.UUID;
-import su.itpro.photogram.model.dto.IconBase64Dto;
 
 /**
  * Интерфейс для работы с иконками пользователей
@@ -9,12 +10,12 @@ import su.itpro.photogram.model.dto.IconBase64Dto;
 public interface IconService {
 
   /**
-   * Производить поиск иконки
+   * Проверяет наличие установленной иконки у аккаунта
    *
    * @param accountId - идентификатор аккаунта
-   * @return - данные изображения
+   * @return true - если есть иконка
    */
-  IconBase64Dto findById(UUID accountId);
+  boolean exists(UUID accountId);
 
   /**
    * Сохраняет или обновляет иконку
@@ -31,4 +32,11 @@ public interface IconService {
    */
   void delete(UUID accountId);
 
+  /**
+   * Отдаёт поток для получения иконки
+   *
+   * @param iconId - идентификатор иконки
+   * @return - поток данных
+   */
+  Optional<InputStream> loadIcon(UUID iconId);
 }

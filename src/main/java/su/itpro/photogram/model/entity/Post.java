@@ -3,12 +3,13 @@ package su.itpro.photogram.model.entity;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import su.itpro.photogram.model.enums.PostStatus;
 
 public class Post {
 
   private UUID id;
   private UUID accountId;
-  private Boolean isActive;
+  private PostStatus status;
   private String description;
   private Instant createDate;
 
@@ -20,18 +21,18 @@ public class Post {
     this.id = id;
   }
 
-  public Post(UUID accountId, Boolean isActive, String description) {
-    this(accountId, isActive, description, Instant.now());
+  public Post(UUID accountId, PostStatus status, String description) {
+    this(accountId, status, description, Instant.now());
   }
 
-  public Post(UUID accountId, Boolean isActive, String description, Instant createDate) {
-    this(UUID.randomUUID(), accountId, isActive, description, createDate);
+  public Post(UUID accountId, PostStatus status, String description, Instant createDate) {
+    this(UUID.randomUUID(), accountId, status, description, createDate);
   }
 
-  public Post(UUID id, UUID accountId, Boolean isActive, String description, Instant createDate) {
+  public Post(UUID id, UUID accountId, PostStatus status, String description, Instant createDate) {
     this.id = id;
     this.accountId = accountId;
-    this.isActive = isActive;
+    this.status = status;
     this.description = description;
     this.createDate = createDate;
   }
@@ -44,8 +45,8 @@ public class Post {
     return accountId;
   }
 
-  public Boolean getActive() {
-    return isActive;
+  public PostStatus getStatus() {
+    return status;
   }
 
   public String getDescription() {
@@ -64,8 +65,8 @@ public class Post {
     this.accountId = accountId;
   }
 
-  public void setActive(Boolean active) {
-    isActive = active;
+  public void setStatus(PostStatus status) {
+    this.status = status;
   }
 
   public void setDescription(String description) {

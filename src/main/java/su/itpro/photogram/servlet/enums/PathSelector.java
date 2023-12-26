@@ -2,11 +2,14 @@ package su.itpro.photogram.servlet.enums;
 
 public enum PathSelector {
 
-  EDIT("edit"),
-  HOME("home"),
-  LOGIN("login"),
-  LOGOUT("logout"),
-  POST("post");
+  ADMIN("/admin"),
+  EDIT("/edit"),
+  HOME("/home"),
+  LOGIN("/login"),
+  LOGOUT("/logout"),
+  MODERATOR("/moderator"),
+  POST("/post"),
+  REGISTRATION("/registration");
 
   private final String path;
 

@@ -1,3 +1,4 @@
+<%@ page import="su.itpro.photogram.model.enums.PostStatus" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 
@@ -153,7 +154,8 @@
 
                 <div class="form-check form-switch p-5 fs-5 align-self-center">
                   <input class="form-check-input" type="checkbox" role="switch"
-                         id="flexSwitchCheckChecked" name="isActive" value="true" checked>
+                         id="flexSwitchCheckChecked" name="postStatus"
+                         value="${PostStatus.PUBLIC}" checked>
                   <label class="form-check-label"
                          for="flexSwitchCheckChecked">Опубликовать</label>
                 </div>
@@ -164,8 +166,7 @@
                        class="btn btn-outline-secondary" type="button">
                       <i class="fa-solid fa-arrow-left"></i> Назад</a>
                     <button type="submit" class="btn btn-outline-success" id="buttonPostCreate">
-                      <i class="fa-solid fa-check"></i> Создать
-                    </button>
+                      <i class="fa-solid fa-check"></i> Создать</button>
                   </div>
                 </div>
               </div>

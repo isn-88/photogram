@@ -19,6 +19,7 @@ import su.itpro.photogram.util.ServletUtil;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
+  private static final int INACTIVE_INTERVAL = 60 * 60; //1 hour
   private final LoginService loginService;
 
 
@@ -46,8 +47,18 @@ public class LoginServlet extends HttpServlet {
     try {
       AccountDto accountDto = loginService.login(loginDto);
       req.getSession().setAttribute("account", accountDto);
+      req.getSession().setMaxInactiveInterval(INACTIVE_INTERVAL);
 
-      resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
+      switch (accountDto.role()) {
+        case USER -> resp.sendRedirect(
+            ServletUtil.getServletPath(req.getContextPath(), PathSelector.HOME));
+        case ADMIN -> resp.sendRedirect(
+            ServletUtil.getServletPath(req.getContextPath(), PathSelector.ADMIN));
+        case MODERATOR -> resp.sendRedirect(
+            ServletUtil.getServletPath(req.getContextPath(), PathSelector.MODERATOR));
+        default -> throw new IllegalStateException();
+      }
+
     } catch (ValidationException e) {
       req.setAttribute("errors", e.getErrors());
       req.setAttribute("login", loginDto.login());

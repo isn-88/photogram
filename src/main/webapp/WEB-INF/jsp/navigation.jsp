@@ -6,14 +6,27 @@
     <nav class="navbar navbar-expand-md border-bottom bg-body-tertiary fixed-top">
       <div class="container">
         <i class="fa-solid fa-camera-retro fa-lg"></i>
-        <a class="navbar-brand text-uppercase p-1" href="#">Photogram</a>
+        <a class="navbar-brand fst-italic fs-4 p-1"
+           href="${pageContext.request.contextPath}/home">Photogram</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                 aria-expanded="false" aria-label="Переключатель навигации">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <form class="d-flex" role="search" method="post"
+                    action="${pageContext.request.contextPath}/search">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text" id="inputGroup-sizing-sm">@</span>
+                  <input type="search" class="form-control" name="search"
+                         aria-describedby="inputGroup-sizing-sm" placeholder="Поиск"
+                         aria-label="Поиск">
+                  <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+                </div>
+              </form>
+            </li>
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item">

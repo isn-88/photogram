@@ -28,7 +28,8 @@ public class CommentDtoMapper implements Mapper<Comment, CommentDto> {
             comment.getDeleted()
         ),
         comment.getDeleted(),
-        comment.getMessage()
+        comment.getUsername(),
+        comment.getDeleted() ? null : comment.getMessage()
     );
   }
 

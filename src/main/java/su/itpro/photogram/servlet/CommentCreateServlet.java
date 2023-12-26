@@ -1,6 +1,9 @@
 package su.itpro.photogram.servlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,13 +18,13 @@ import su.itpro.photogram.servlet.enums.PathSelector;
 import su.itpro.photogram.util.ServletUtil;
 
 
-@WebServlet("/comment/send/*")
-public class CommentServlet extends HttpServlet {
+@WebServlet("/comment/send")
+public class CommentCreateServlet extends HttpServlet {
 
   private final CommentService commentService;
 
 
-  public CommentServlet() {
+  public CommentCreateServlet() {
     commentService = CommentServiceImpl.getInstance();
   }
 
@@ -30,7 +33,8 @@ public class CommentServlet extends HttpServlet {
       throws ServletException, IOException {
 
     AccountDto accountDto = ServletUtil.getAccountFromSession(req);
-    String postId = ServletUtil.variableOfQueryPath(req.getPathInfo());
+    String postId = ServletUtil.getValue(req, "postId");
+    String view = ServletUtil.getValue(req, "view");
 
     var createMessageDto = new CommentCreateDto(
         accountDto.id(),
@@ -40,6 +44,12 @@ public class CommentServlet extends HttpServlet {
 
     commentService.saveComment(createMessageDto);
 
-    resp.sendRedirect(ServletUtil.getServletPath(req.getContextPath(), PathSelector.POST, postId));
+    Map<String, String> queryPath = new HashMap<>();
+    if (Objects.nonNull(view)) {
+      queryPath.put("view", view);
+    }
+    resp.sendRedirect(ServletUtil.getServletPath(
+        req.getContextPath(), PathSelector.POST, postId, queryPath));
   }
+
 }

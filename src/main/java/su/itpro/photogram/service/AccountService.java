@@ -1,8 +1,11 @@
 package su.itpro.photogram.service;
 
+import java.util.List;
 import java.util.UUID;
 import su.itpro.photogram.model.dto.AccountDto;
+import su.itpro.photogram.model.dto.AccountFindDto;
 import su.itpro.photogram.model.dto.AccountUpdateDto;
+import su.itpro.photogram.model.enums.Status;
 
 /**
  * Интерфейс сервиса по работе с аккаунтами
@@ -16,6 +19,14 @@ public interface AccountService {
    * @return - true если аккаунт действующий (не заблокирован)
    */
   boolean checkStatus(UUID accountId);
+
+  /**
+   * Производит поиск аккаунта по идентификатору
+   *
+   * @param id - идентификатор аккаунта
+   * @return аккаунт
+   */
+  AccountDto findById(UUID id);
 
   /**
    * Производит поиск аккаунта по уникальному имени пользователя
@@ -42,6 +53,14 @@ public interface AccountService {
   AccountDto findByPhone(String phone);
 
   /**
+   * Производит поиск аккаунтов подходящих под заданные фильтры
+   *
+   * @param searchDto - фильтры поиска
+   * @return - список аккаунтов
+   */
+  List<AccountDto> findAllBy(AccountFindDto searchDto);
+
+  /**
    * Обновляет данные для входа в ЛК
    *
    * @param accountId - идентификатор аккаунта
@@ -50,4 +69,11 @@ public interface AccountService {
    */
   AccountDto update(UUID accountId, AccountUpdateDto dto);
 
+  /**
+   * Обновляет статус аккаунта
+   *
+   * @param id - идентификатор аккаунта
+   * @param status - обновляемый статус
+   */
+  void updateStatus(UUID id, Status status);
 }

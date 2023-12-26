@@ -22,11 +22,14 @@ public class CommentDaoImpl implements CommentDao {
   private static final String CREATE_TIME = "create_time";
   private static final String CHANGE_TIME = "change_time";
   private static final String IS_DELETED = "is_deleted";
+  private static final String USERNAME = "username";
   private static final String MESSAGE = "message";
 
+
   private static final String FIND_ALL_BY_POST_SQL = """
-      SELECT id, account_id, post_id, create_time, change_time, is_deleted, message
-      FROM comment
+      SELECT c.id, account_id, post_id, create_time, change_time, is_deleted, a.username, message
+      FROM comment c
+          JOIN account a ON a.id = c.account_id
       WHERE post_id = ?
       ORDER BY create_time
       ;
@@ -38,7 +41,14 @@ public class CommentDaoImpl implements CommentDao {
       ;
       """;
 
-  private static final String DELETE_BY_POST_ID_SQL = """
+  private static final String DELETE_SQL = """
+      UPDATE comment
+      SET is_deleted = true, change_time = now()
+      WHERE id = ?
+      ;
+      """;
+
+  private static final String DELETE_ALL_BY_POST_ID_SQL = """
       DELETE FROM comment
       WHERE post_id = ?
       ;
@@ -104,13 +114,13 @@ public class CommentDaoImpl implements CommentDao {
 
   @Override
   public void update(Comment comment) {
-
+    // не используется
   }
 
   @Override
   public void deleteByPostId(UUID postId) {
     try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(DELETE_BY_POST_ID_SQL)) {
+        var prepared = connection.prepareStatement(DELETE_ALL_BY_POST_ID_SQL)) {
       prepared.setObject(1, postId);
 
       prepared.executeUpdate();
@@ -121,7 +131,14 @@ public class CommentDaoImpl implements CommentDao {
 
   @Override
   public void delete(UUID id) {
+    try (var connection = DataSource.getConnection();
+        var prepared = connection.prepareStatement(DELETE_SQL)) {
+      prepared.setObject(1, id);
 
+      prepared.executeUpdate();
+    } catch (SQLException e) {
+      throw new DaoException("Error delete Comment", e.getMessage());
+    }
   }
 
   private Comment parseMessage(ResultSet resultSet) throws SQLException {
@@ -132,6 +149,7 @@ public class CommentDaoImpl implements CommentDao {
         fromTimestamp(resultSet.getTimestamp(CREATE_TIME)).orElse(null),
         fromTimestamp(resultSet.getTimestamp(CHANGE_TIME)).orElse(null),
         resultSet.getBoolean(IS_DELETED),
+        resultSet.getString(USERNAME),
         resultSet.getString(MESSAGE)
     );
   }
