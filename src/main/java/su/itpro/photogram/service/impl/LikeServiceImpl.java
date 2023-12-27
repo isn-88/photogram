@@ -43,8 +43,8 @@ public class LikeServiceImpl implements LikeService {
   }
 
   @Override
-  public void deleteBy(UUID postId) {
-    likeDao.deleteBy(postId);
+  public void deleteAllByPostId(UUID postId) {
+    likeDao.deleteAllByPostId(postId);
   }
 
 

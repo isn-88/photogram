@@ -23,7 +23,7 @@ public class SubscribeDaoImpl implements SubscribeDao {
   private static final String COUNT = "count";
 
 
-  private static final String FIND_TOP_100_BY_COUNT_POST_SQL = """
+  private static final String FIND_TOP_BY_COUNT_POST_SQL = """
       SELECT account_id, a.username, count(p.id) AS count
       FROM post p
           JOIN post_status ps ON ps.id = p.status_id
@@ -32,11 +32,11 @@ public class SubscribeDaoImpl implements SubscribeDao {
       WHERE ast.status = 'ACTIVE' AND ps.status = 'PUBLIC'
       GROUP BY account_id, a.username
       ORDER BY count DESC
-      LIMIT 100
+      LIMIT ?
       ;
       """;
 
-  private static final String FIND_TOP_100_BY_COUNT_SUBSCRIBES_SQL = """
+  private static final String FIND_TOP_BY_COUNT_SUBSCRIBES_SQL = """
       SELECT account_id, username, count(subscribe_id) AS count
       FROM subscribe
           JOIN account a ON a.id = subscribe.account_id
@@ -44,7 +44,7 @@ public class SubscribeDaoImpl implements SubscribeDao {
       WHERE status = 'ACTIVE'
       GROUP BY account_id, username
       ORDER BY count DESC
-      LIMIT 100;
+      LIMIT ?;
       ;
       """;
 
@@ -113,32 +113,32 @@ public class SubscribeDaoImpl implements SubscribeDao {
     return INSTANCE;
   }
 
-  public List<AdviceDto> findTop100AdviceByPost() {
+  public List<AdviceDto> findTopAdviceByPost(int limit) {
     try (var connection = DataSource.getConnection();
-        var statement = connection.createStatement()) {
-      ResultSet resultSet = statement.executeQuery(FIND_TOP_100_BY_COUNT_POST_SQL);
+        var prepared = connection.prepareStatement(FIND_TOP_BY_COUNT_POST_SQL)) {
+      prepared.setInt(1, (limit > 0) ? limit : 100);
+      ResultSet resultSet = prepared.executeQuery();
 
       List<AdviceDto> adviceDtoList = new ArrayList<>();
       while (resultSet.next()) {
         adviceDtoList.add(parseAdvice(resultSet));
       }
-
       return adviceDtoList;
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public List<AdviceDto> findTop100AdviceBySubscribes() {
+  public List<AdviceDto> findTopAdviceBySubscribes(int limit) {
     try (var connection = DataSource.getConnection();
-        var statement = connection.createStatement()) {
-      ResultSet resultSet = statement.executeQuery(FIND_TOP_100_BY_COUNT_SUBSCRIBES_SQL);
+        var prepared = connection.prepareStatement(FIND_TOP_BY_COUNT_SUBSCRIBES_SQL)) {
+      prepared.setInt(1, (limit > 0) ? limit : 100);
+      ResultSet resultSet = prepared.executeQuery();
 
       List<AdviceDto> adviceDtoList = new ArrayList<>();
       while (resultSet.next()) {
         adviceDtoList.add(parseAdvice(resultSet));
       }
-
       return adviceDtoList;
     } catch (SQLException e) {
       throw new RuntimeException(e);

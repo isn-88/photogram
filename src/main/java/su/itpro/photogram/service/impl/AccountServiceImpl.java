@@ -102,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public List<AccountDto> findAllBy(AccountFindDto searchDto) {
-    List<Account> accounts = accountDao.findAllBy(searchDto);
+    List<Account> accounts = accountDao.findAllByFilter(searchDto);
     List<AccountDto> accountDtoList = new ArrayList<>();
     accounts.forEach(account -> accountDtoList.add(accountDtoMapper.mapFrom(account)));
     return accountDtoList;

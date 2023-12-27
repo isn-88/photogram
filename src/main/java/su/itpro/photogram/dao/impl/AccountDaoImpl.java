@@ -85,7 +85,7 @@ public class AccountDaoImpl implements AccountDao {
       ;
       """;
 
-  private static final String FIND_ALL_BY_SQL = """
+  private static final String FIND_ALL_BY_FILTER_SQL = """
       SELECT a.id, phone, email, username, password, role, status,
              is_verified_phone, is_verified_email, create_date
       FROM account a
@@ -259,9 +259,9 @@ public class AccountDaoImpl implements AccountDao {
     }
   }
 
-  public List<Account> findAllBy(AccountFindDto findDto) {
+  public List<Account> findAllByFilter(AccountFindDto findDto) {
     try (var connection = DataSource.getConnection();
-        var prepared = connection.prepareStatement(FIND_ALL_BY_SQL)) {
+        var prepared = connection.prepareStatement(FIND_ALL_BY_FILTER_SQL)) {
       prepared.setString(1, prepareValue(findDto.phone()));
       prepared.setString(2, presentValue(findDto.phone()));
       prepared.setString(3, prepareValue(findDto.email()));

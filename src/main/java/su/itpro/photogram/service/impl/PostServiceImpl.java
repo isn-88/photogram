@@ -94,9 +94,9 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public void delete(UUID postId) {
-    likeService.deleteBy(postId);
+    likeService.deleteAllByPostId(postId);
     commentService.deleteAllCommentsByPostId(postId);
-    complaintDao.deleteByPost(postId);
+    complaintDao.deleteAllByPostId(postId);
     imageService.deleteImagesByPostId(postId);
     postDao.delete(postId);
   }

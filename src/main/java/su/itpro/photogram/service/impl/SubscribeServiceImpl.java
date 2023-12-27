@@ -18,6 +18,8 @@ import su.itpro.photogram.service.SubscribeService;
 
 public class SubscribeServiceImpl implements SubscribeService {
 
+  private static final int ADVICE_QUERY_LIMIT = 100;
+
   private static final SubscribeService INSTANCE = new SubscribeServiceImpl();
 
   private final SubscribeDao subscribeDao;
@@ -35,8 +37,8 @@ public class SubscribeServiceImpl implements SubscribeService {
 
   @Override
   public List<AdviceDto> getAdvice(UUID accountId, int limit) {
-    List<AdviceDto> byPost = subscribeDao.findTop100AdviceByPost();
-    List<AdviceDto> bySubscribes = subscribeDao.findTop100AdviceBySubscribes();
+    List<AdviceDto> byPost = subscribeDao.findTopAdviceByPost(ADVICE_QUERY_LIMIT);
+    List<AdviceDto> bySubscribes = subscribeDao.findTopAdviceBySubscribes(ADVICE_QUERY_LIMIT);
     Set<AdviceDto> result = new HashSet<>(byPost);
     result.addAll(bySubscribes);
 

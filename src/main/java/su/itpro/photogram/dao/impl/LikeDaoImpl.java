@@ -135,7 +135,7 @@ public class LikeDaoImpl implements LikeDao {
   }
 
   @Override
-  public void deleteBy(UUID postId) {
+  public void deleteAllByPostId(UUID postId) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(DELETE_SQL)) {
       prepared.setObject(1, postId);

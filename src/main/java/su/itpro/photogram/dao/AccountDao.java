@@ -28,7 +28,7 @@ public interface AccountDao extends BaseDao<UUID, Account> {
    * @param searchDto - набор фильтров
    * @return - список найденных аккаунтов
    */
-  List<Account> findAllBy(AccountFindDto searchDto);
+  List<Account> findAllByFilter(AccountFindDto searchDto);
 
   /**
    * Производит поиск аккаунта по имени пользователя

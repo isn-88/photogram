@@ -72,25 +72,22 @@ public class ComplaintServiceImpl implements ComplaintService {
   public void action(ComplaintActionDto actionDto) {
 
     switch (actionDto.status()) {
-      case APPROVED -> {
-        PostDto postDto = postService.findById(actionDto.postId());
-        PostStatus postStatus = (postDto.accountId().equals(actionDto.accountId()))
-                                ? PostStatus.PUBLIC : PostStatus.BLOCKED;
-        postService.update(new PostUpdateDto(actionDto.postId(), postStatus, null));
-        complaintDao.update(complaintMapper.mapFrom(actionDto));
-      }
-      case REJECTED -> {
-        complaintDao.update(complaintMapper.mapFrom(actionDto));
-      }
-      default -> {
-        throw new IllegalStateException();
-      }
+      case APPROVED -> approve(actionDto);
+      case REJECTED -> rejected(actionDto);
+      default -> throw new IllegalStateException();
     }
   }
 
-  @Override
-  public void deleteByPost(UUID postId) {
-    complaintDao.deleteByPost(postId);
+  private void approve(ComplaintActionDto actionDto) {
+    PostDto postDto = postService.findById(actionDto.postId());
+    PostStatus postStatus = (postDto.accountId().equals(actionDto.accountId()))
+                            ? PostStatus.PUBLIC : PostStatus.BLOCKED;
+    postService.update(new PostUpdateDto(actionDto.postId(), postStatus, null));
+    complaintDao.update(complaintMapper.mapFrom(actionDto));
+  }
+
+  private void rejected(ComplaintActionDto actionDto) {
+    complaintDao.update(complaintMapper.mapFrom(actionDto));
   }
 
 }

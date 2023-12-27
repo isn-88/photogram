@@ -139,7 +139,7 @@ public class ComplaintDaoImpl implements ComplaintDao {
   }
 
   @Override
-  public void deleteByPost(UUID postId) {
+  public void deleteAllByPostId(UUID postId) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(DELETE_SQL)) {
       prepared.setObject(1, postId);
