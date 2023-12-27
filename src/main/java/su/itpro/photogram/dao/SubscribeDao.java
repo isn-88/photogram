@@ -12,18 +12,20 @@ import su.itpro.photogram.model.entity.Subscribe;
 public interface SubscribeDao {
 
   /**
-   * Возвращает 100 рекомендаций по количеству публикаций
+   * Возвращает рекомендации сформированные по количеству публикаций
    *
+   * @param limit - ограничение результирующего списка
    * @return - список рекомендаций
    */
-  List<AdviceDto> findTop100AdviceByPost();
+  List<AdviceDto> findTopAdviceByPost(int limit);
 
   /**
-   * Возвращает 100 рекомендаций по количеству подписок
+   * Возвращает рекомендации сформированные по количеству подписок
    *
+   * @param limit - ограничение результирующего списка
    * @return - список рекомендаций
    */
-  List<AdviceDto> findTop100AdviceBySubscribes();
+  List<AdviceDto> findTopAdviceBySubscribes(int limit);
 
   /**
    * Поиск всех подписок для указанного аккаунта
