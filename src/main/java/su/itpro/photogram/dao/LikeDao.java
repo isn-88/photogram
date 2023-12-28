@@ -37,8 +37,9 @@ public interface LikeDao {
    * Обновляет оценку пользователя
    *
    * @param like - Оценка
+   * @return true если обновление прошло успешно
    */
-  void update(Like like);
+  boolean update(Like like);
 
   /**
    * Удаляет все оценки пользователей указанной для публикации

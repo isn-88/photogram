@@ -39,7 +39,7 @@ public interface BaseDao<K, E> {
    *
    * @param entity обновляемая сущность
    */
-  void update(E entity);
+  boolean update(E entity);
 
   /**
    * Удаляет сущность

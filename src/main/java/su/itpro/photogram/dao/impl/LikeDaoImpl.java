@@ -121,14 +121,14 @@ public class LikeDaoImpl implements LikeDao {
   }
 
   @Override
-  public void update(Like like) {
+  public boolean update(Like like) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setShort(1, like.getScore());
       prepared.setObject(2, like.getAccountId());
       prepared.setObject(3, like.getPostId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Like", e.getMessage());
     }

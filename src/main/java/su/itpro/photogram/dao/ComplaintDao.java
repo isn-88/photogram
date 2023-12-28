@@ -38,8 +38,9 @@ public interface ComplaintDao {
    * Обновляет обращение
    *
    * @param complaint - обращение
+   * @return true если обновление прошло успешно
    */
-  void update(Complaint complaint);
+  boolean update(Complaint complaint);
 
   /**
    * Удаляет все обращения для публикации
