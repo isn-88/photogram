@@ -125,14 +125,14 @@ public class ComplaintDaoImpl implements ComplaintDao {
   }
 
   @Override
-  public void update(Complaint complaint) {
+  public boolean update(Complaint complaint) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setString(1, complaint.getStatus().name());
       prepared.setObject(2, complaint.getAccountId());
       prepared.setObject(3, complaint.getPostId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Complaint", e.getMessage());
     }

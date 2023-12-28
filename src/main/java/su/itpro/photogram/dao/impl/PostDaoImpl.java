@@ -167,14 +167,14 @@ public class PostDaoImpl implements PostDao {
   }
 
   @Override
-  public void update(Post post) {
+  public boolean update(Post post) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setString(1, post.getStatus().name());
       prepared.setString(2, post.getDescription());
       prepared.setObject(3, post.getId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Post", e.getMessage());
     }

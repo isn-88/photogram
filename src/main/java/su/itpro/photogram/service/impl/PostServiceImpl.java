@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
   @Override
   public PostDto findById(UUID postId) {
     return postDtoMapper.mapFrom(postDao.findById(postId).orElseThrow(
-        () -> new PostServiceException("Post with id [%s] not found".formatted(postId))
+        () -> new PostServiceException("Post with id (%s) was not found".formatted(postId))
     ));
   }
 
@@ -83,13 +83,15 @@ public class PostServiceImpl implements PostService {
   @Override
   public void update(PostUpdateDto dto) {
     Post post = postDao.findById(dto.id()).orElseThrow(
-        () -> new PostServiceException("Post not found")
+        () -> new PostServiceException("Post was not found")
     );
 
     Optional.ofNullable(dto.description()).ifPresent(post::setDescription);
     Optional.ofNullable(dto.status()).ifPresent(post::setStatus);
 
-    postDao.update(post);
+    if (!postDao.update(post)) {
+      throw new PostServiceException("Post (%s) was not updated".formatted(dto.id()));
+    }
   }
 
   @Override

@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
         accountDao.findById(id).orElseThrow(
             () -> {
               log.info("findById id: " + id);
-              return new AccountServiceException("Account not found by username: " + id);
+              return new AccountServiceException("Account was not found by username: " + id);
             }
         ));
   }
@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
         accountDao.findByUsername(username).orElseThrow(
             () -> {
               log.info("findByUsername username: " + username);
-              return new AccountServiceException("Account not found by username: " + username);
+              return new AccountServiceException("Account was not found by username: " + username);
             }
         ));
   }
@@ -84,7 +84,7 @@ public class AccountServiceImpl implements AccountService {
         accountDao.findByEmail(email).orElseThrow(
             () -> {
               log.info("findByUsername email: " + email);
-              return new AccountServiceException("Account not found by email: " + email);
+              return new AccountServiceException("Account was not found by email: " + email);
             }
         ));
   }
@@ -95,7 +95,7 @@ public class AccountServiceImpl implements AccountService {
         accountDao.findByPhone(phone).orElseThrow(
             () -> {
               log.info("findByUsername phone: " + phone);
-              return new AccountServiceException("Account not found by phone: " + phone);
+              return new AccountServiceException("Account was not found by phone: " + phone);
             }
         ));
   }
@@ -119,7 +119,7 @@ public class AccountServiceImpl implements AccountService {
     Account account = accountDao.findById(accountId).orElseThrow(
         () -> {
           log.info("Account findById: " + accountId);
-          return new AccountServiceException("Account not found by id: " + accountId);
+          return new AccountServiceException("Account was not found by id: " + accountId);
         }
     );
 
@@ -134,7 +134,10 @@ public class AccountServiceImpl implements AccountService {
     optionalOf(updateDto.email()).ifPresent(account::setEmail);
     optionalOf(updateDto.username()).ifPresent(account::setUsername);
 
-    accountDao.update(account);
+    if (!accountDao.update(account)) {
+      throw new AccountServiceException(
+          "Account (%s) was not updated".formatted(account.getId()));
+    }
     return accountDtoMapper.mapFrom(account);
   }
 
