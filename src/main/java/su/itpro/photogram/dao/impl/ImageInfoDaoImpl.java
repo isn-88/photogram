@@ -163,7 +163,7 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
   }
 
   @Override
-  public void update(Image image) {
+  public boolean update(Image image) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setObject(1, image.getPostId());
@@ -171,7 +171,7 @@ public class ImageInfoDaoImpl implements ImageInfoDao {
       prepared.setInt(3, image.getOrdinal());
       prepared.setObject(4, image.getId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Image", e.getMessage());
     }

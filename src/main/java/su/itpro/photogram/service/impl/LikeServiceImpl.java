@@ -2,6 +2,7 @@ package su.itpro.photogram.service.impl;
 
 import java.util.UUID;
 import su.itpro.photogram.dao.LikeDao;
+import su.itpro.photogram.exception.service.LikeServiceException;
 import su.itpro.photogram.factory.DaoFactory;
 import su.itpro.photogram.model.Like;
 import su.itpro.photogram.model.dto.LikeDto;
@@ -36,7 +37,12 @@ public class LikeServiceImpl implements LikeService {
   public void update(LikeDto dto) {
     Like like = new Like(dto.accountId(), dto.postId(), dto.score());
     if (likeDao.exists(like)) {
-      likeDao.update(like);
+      if (!likeDao.update(like)) {
+        throw new LikeServiceException("Like [accountId=%s, postId=%s] was not updated".formatted(
+            dto.accountId(),
+            dto.postId()
+        ));
+      }
     } else {
       likeDao.save(like);
     }
@@ -46,6 +52,5 @@ public class LikeServiceImpl implements LikeService {
   public void deleteAllByPostId(UUID postId) {
     likeDao.deleteAllByPostId(postId);
   }
-
 
 }

@@ -111,7 +111,7 @@ public class ProfileDaoImpl implements ProfileDao {
   }
 
   @Override
-  public void update(Profile profile) {
+  public boolean update(Profile profile) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setString(1, profile.getFullName());
@@ -121,7 +121,7 @@ public class ProfileDaoImpl implements ProfileDao {
       prepared.setString(5, profile.getAboutMe());
       prepared.setObject(6, profile.getAccountId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Person", e.getMessage());
     }
@@ -129,7 +129,7 @@ public class ProfileDaoImpl implements ProfileDao {
 
   @Override
   public void delete(UUID id) {
-    // Profile not deleting
+    // Profile is not deleting
   }
 
   private Profile parsePerson(ResultSet resultSet) throws SQLException {

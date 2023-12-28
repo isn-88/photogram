@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import su.itpro.photogram.dao.ComplaintDao;
+import su.itpro.photogram.exception.service.ComplaintServiceException;
 import su.itpro.photogram.factory.DaoFactory;
 import su.itpro.photogram.mapper.ComplaintCreateMapper;
 import su.itpro.photogram.mapper.ComplaintDtoMapper;
@@ -83,11 +84,23 @@ public class ComplaintServiceImpl implements ComplaintService {
     PostStatus postStatus = (postDto.accountId().equals(actionDto.accountId()))
                             ? PostStatus.PUBLIC : PostStatus.BLOCKED;
     postService.update(new PostUpdateDto(actionDto.postId(), postStatus, null));
-    complaintDao.update(complaintMapper.mapFrom(actionDto));
+    if (complaintDao.update(complaintMapper.mapFrom(actionDto))) {
+      throw new ComplaintServiceException(
+          "Complaint [accountId=%s, postId=%s] was not updated".formatted(
+              actionDto.accountId(),
+              actionDto.postId()
+          ));
+    }
   }
 
   private void rejected(ComplaintActionDto actionDto) {
-    complaintDao.update(complaintMapper.mapFrom(actionDto));
+    if (complaintDao.update(complaintMapper.mapFrom(actionDto))) {
+      throw new ComplaintServiceException(
+          "Complaint [accountId=%s, postId=%s] was not updated".formatted(
+              actionDto.accountId(),
+              actionDto.postId()
+          ));
+    }
   }
 
 }

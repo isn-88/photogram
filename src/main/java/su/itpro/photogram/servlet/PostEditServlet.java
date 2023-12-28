@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import su.itpro.photogram.model.dto.AccountDto;
 import su.itpro.photogram.model.dto.CommentDto;
 import su.itpro.photogram.model.dto.PostDto;
 import su.itpro.photogram.model.dto.PostUpdateDto;
@@ -43,9 +44,9 @@ public class PostEditServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String postId = ServletUtil.variableOfQueryPath(req.getPathInfo());
+    UUID postId = UUID.fromString(ServletUtil.variableOfQueryPath(req.getPathInfo()));
     PostUpdateDto postUpdateDto = new PostUpdateDto(
-        UUID.fromString(postId),
+        postId,
         ServletUtil.getPostStatusOrDefault(req, "postStatus", PostStatus.DRAFT),
         ServletUtil.getValue(req, "description")
     );
@@ -55,11 +56,13 @@ public class PostEditServlet extends HttpServlet {
     PostDto postDto = postService.findById(postUpdateDto.id());
     List<UUID> imageIds = imageService.findAllImageIdsByPostId(postDto.id());
     List<CommentDto> comments = commentService.findAllBy(postDto.id());
+    AccountDto accountDto = ServletUtil.getAccountFromSession(req);
 
     req.setAttribute("post", postDto);
     req.setAttribute("imageIds", imageIds);
     req.setAttribute("comments", comments);
-    req.setAttribute("likeScore", likeService.getTotalScore(postUpdateDto.id()));
+    req.setAttribute("likeScore", likeService.getScore(accountDto.id(), postId));
+    req.setAttribute("likeTotalScore", likeService.getTotalScore(postId));
 
     req.getRequestDispatcher(ServletUtil.getJspPage(PageSelector.POST_VIEW)).forward(req, resp);
   }

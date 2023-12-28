@@ -113,8 +113,9 @@ public class CommentDaoImpl implements CommentDao {
   }
 
   @Override
-  public void update(Comment comment) {
-    // не используется
+  public boolean update(Comment comment) {
+    // Comment is not updated
+    return false;
   }
 
   @Override

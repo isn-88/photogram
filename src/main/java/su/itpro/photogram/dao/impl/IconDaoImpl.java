@@ -111,13 +111,13 @@ public class IconDaoImpl implements IconDao {
   }
 
   @Override
-  public void update(Icon icon) {
+  public boolean update(Icon icon) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setBytes(1, icon.getData());
       prepared.setObject(2, icon.getAccountId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Icon", e.getMessage());
     }

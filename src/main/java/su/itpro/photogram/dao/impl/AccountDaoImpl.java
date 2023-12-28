@@ -354,7 +354,7 @@ public class AccountDaoImpl implements AccountDao {
   }
 
   @Override
-  public void update(Account account) {
+  public boolean update(Account account) {
     try (var connection = DataSource.getConnection();
         var prepared = connection.prepareStatement(UPDATE_SQL)) {
       prepared.setString(1, account.getPhone());
@@ -362,7 +362,7 @@ public class AccountDaoImpl implements AccountDao {
       prepared.setString(3, account.getUsername());
       prepared.setObject(4, account.getId());
 
-      prepared.executeUpdate();
+      return prepared.executeUpdate() > 0;
     } catch (SQLException e) {
       throw new DaoException("Error update Account", e.getMessage());
     }
