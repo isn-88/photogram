@@ -84,7 +84,7 @@ public class ComplaintServiceImpl implements ComplaintService {
     PostStatus postStatus = (postDto.accountId().equals(actionDto.accountId()))
                             ? PostStatus.PUBLIC : PostStatus.BLOCKED;
     postService.update(new PostUpdateDto(actionDto.postId(), postStatus, null));
-    if (complaintDao.update(complaintMapper.mapFrom(actionDto))) {
+    if (!complaintDao.update(complaintMapper.mapFrom(actionDto))) {
       throw new ComplaintServiceException(
           "Complaint [accountId=%s, postId=%s] was not updated".formatted(
               actionDto.accountId(),
