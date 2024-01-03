@@ -25,7 +25,7 @@ VALUES (1, 'OPEN'),
 
 
 INSERT INTO post_status (id, status)
-VALUES (1, 'ACTIVE'),
+VALUES (1, 'PUBLIC'),
        (2, 'DRAFT'),
        (3, 'BLOCKED');
 
